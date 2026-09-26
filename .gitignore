@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved.bak
+
+# Secrets: never commit (CLAUDE.md rule 4/5)
+Secrets.xcconfig
+*.secrets.xcconfig
+.env
+.env.*
+.dev.vars
+
+# Later: Cloudflare worker
+node_modules/
+.wrangler/

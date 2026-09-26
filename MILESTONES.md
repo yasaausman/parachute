@@ -1,0 +1,162 @@
+# MILESTONES.md: Parachute (2 developers)
+
+| | Owns | Code lives in |
+|---|---|---|
+| **Dev A: You (Money / "Untax" lead)** | Capturing money deadlines, escalation + alarm, Decide screen, curated cancel-step content, RevenueCat paywall | `Packages/MoneyKit`, `ShareExtension/` |
+| **Dev B: Your friend (Parachute lead)** | Unfreeze engine + player, AI atomizer, task path, audio companion, scoreboard + celebration, widgets | `Packages/ParachuteKit`, `Widgets/` |
+| **Both** | Models, protocols, design system, app shell, polish, README, video | `Packages/SharedKit`, `App/`, `docs/` |
+
+**Dates assume the Sep 30, 2026, 11:45pm PDT deadline** (convert to your time zone). If you take longer, keep the same order and stretch the days.
+Every milestone has a **Done when**. Nothing is done until it runs on a real iPhone.
+
+---
+
+## How you work together (read once)
+- **Branches:** `a/<feature>` and `b/<feature>` → merge to `main` at every **Sync** below. Keep PRs small.
+- **Ownership:** don't edit the other person's package without asking. **`SharedKit` changes need the other's review**; they're contracts (`docs/interfaces.md`).
+- **Project-file conflicts:** almost all code lives in the Swift packages, so the Xcode project file rarely changes. ⚠️ If Xcode 27 offers folder-synced groups, use them for `App/`, `Widgets/`, `ShareExtension/` so adding files doesn't edit the project file.
+- **Blocked?** Code against the protocol and use the fake implementation in `SharedKit/Fakes`. Never wait on the other person.
+- **Daily sync:** 15 minutes at the end of each day: demo on device → merge → agree on tomorrow's first task.
+- **Claude sessions:** tell Claude "I'm Dev A" or "I'm Dev B" at the start; it reads `CLAUDE.md`. Update `PROJECT.md` at each sync.
+
+---
+
+## Phase 0: Setup & spikes (Fri Sep 25, today/tonight)
+
+### Together (≈1.5 h, pair on one screen)
+- [ ] **S0.1 Repo + project.** `git init`, push to a **public** GitHub repo. Create `Parachute.xcodeproj` (App + Widgets + ShareExtension targets, one App Group, deployment target iOS 26, Swift 6 language mode) and the three local packages. Add RevenueCat `purchases-ios` **5.91.0** via SPM.
+  *Done when:* both of you clone, build, and run the empty app on your own iPhones.
+- [ ] **S0.2 Contracts.** Put the models + protocols from `docs/interfaces.md` into `SharedKit`, with **fake implementations** in `SharedKit/Fakes`.
+  *Done when:* the app compiles with fakes wired in; you both agree the interfaces won't change without a heads-up.
+- [ ] **S0.3 Decisions.** Pick: free or $99 Apple account · the **5 services** to curate · the Representative. Both check you have a student/academic email for Devpost.
+  *Done when:* written in `PROJECT.md`.
+
+### Dev A spikes
+- [ ] **A0 Platform spike.** On a real iPhone with the chosen account: (1) schedule an AlarmKit alarm whose **Stop runs a `stopIntent` that re-arms it** 1 minute later; (2) schedule a local notification; (3) make a **RevenueCat Test Store** purchase.
+  *Done when:* all three work, or you've written down what doesn't and the workaround.
+
+### Dev B spikes
+- [ ] **B0 Atomizer spike.** Foundation Models `@Generable` → `[Step{text, seconds}]`. Run it on **20 real deadline tasks** (essays, forms, applications, emails) and **10 unknown services** ("how to cancel X").
+  *Done when:* ≥ 15/20 task lists and ≥ 7/10 service lists are specific enough to follow without guessing; prompt + results saved in `docs/`. **If it fails, tell Dev A and cut or shrink the task path now.**
+
+---
+
+## Day 1: Foundation (Sat Sep 26)
+
+### Dev A
+- [ ] **A1 Money deadlines, manual.** Add/edit/delete `MoneyDeadline` (service, amount, trial end date, billed by Apple?); list with countdowns ("Hulu · $17.99 in 3 days").
+  *Done when:* items persist across launches; date-math tests pass.
+- [ ] **A2 Reminder ladder.** `EscalationScheduler` (real implementation): local notifications at −3 days and −1 day, with money-first copy ("$17.99 leaves your account tomorrow").
+  *Done when:* in debug time-travel mode, both reminders fire for a test item.
+- [ ] **A3 Curate 5 services.** Hand-verify cancel steps on real accounts → `SharedKit/Resources/CancelSteps.json` + a log in `docs/cancel-steps-verification.md` (date, screenshots).
+  *Done when:* each of the 5 was followed end to end; the JSON passes B's validity test.
+
+### Dev B
+- [ ] **B1 Unfreeze player UI** (with a fake plan). One step on screen, 90-second ring, companion line, **Done / Break it smaller / Skip**, finish → callback.
+  *Done when:* a 5-step fake plan plays start to finish; works with Dynamic Type at the largest size.
+- [ ] **B2 CancelSteps loader + validation.** Reads `CancelSteps.json` → `UnfreezePlan`; unit test rejects bad entries (missing steps, step > 90 s, empty text).
+  *Done when:* the test passes on A's real file.
+
+### 🔄 Sync 1 (end of Day 1)
+Merge. A temporary "I'm frozen" button on a money item opens **B's real UnfreezeView** with **A's real curated steps**.
+*Done when:* you can "unfreeze" a real Netflix-style cancel on device.
+
+---
+
+## Day 2: The follow-through (Sun Sep 27)
+
+### Dev A
+- [ ] **A4 Final-day alarm.** AlarmKit alarm on the deadline day: **Stop → `stopIntent` re-arms in 30 min**; secondary button **"Decide"** opens the app. It stops only when a decision is recorded.
+  *Done when:* time-travel test: alarm → Stop → rings again → Decide → decision → no more alarms.
+- [ ] **A5 Decide screen.** Cancel · Keep · Snooze-until · 🧊 I'm frozen. "I'm frozen" calls the injected `onFrozen(UnfreezeRequest)`; Cancel/Keep write a `CompletionRecord` via `CompletionLedger`.
+  *Done when:* each of the 4 choices does the right thing, and Keep stops all nagging.
+- [ ] **A6 Apple subscriptions path.** For `billedByApple` items, the cancel step opens Apple's subscription management. ⚠️ Confirm the correct API/link on device.
+  *Done when:* it opens the right screen on a real iPhone.
+
+### Dev B
+- [ ] **B3 UnfreezeEngine (real).** `UnfreezeProviding`: curated → Apple path → AI fallback ("Suggested steps," never invents URLs) → graceful non-AI fallback on devices without Apple Intelligence.
+  *Done when:* the right source is picked for all 4 cases in unit tests.
+- [ ] **B4 Task path.** Home "I'm frozen" → "What's overwhelming you?" → `FrozenTask` (+ optional due time) → atomizer → player. "Break it smaller" re-atomizes the current step.
+  *Done when:* 5 of B0's test tasks go from typed description to finished on device.
+- [ ] **B5 Task reminders.** The task path uses **A's `EscalationScheduling`** for due-time reminders and the deadline alarm.
+  *Done when:* a task due in 5 minutes (time-travel) triggers a reminder.
+
+### 🔄 Sync 2 (end of Day 2): the full money flow
+*Done when:* on device, in time-travel: reminder → alarm → Stop → re-rings → Decide → 🧊 I'm frozen → curated steps → Cancelled → record saved. **This is the core of the video; if it works, you have a submission.**
+
+---
+
+## Day 3: AI capture + reward (Mon Sep 28)
+
+### Dev A
+- [ ] **A7 Share extension.** Screenshot/text → Vision OCR → Foundation Models extraction (service, amount, end date, billed by Apple?) → "Found: X. Track it?" → one tap. Falls back to a pre-filled manual form if AI is unavailable.
+  *Done when:* 10 fixture screenshots → correct items in ≤ 2 taps (≥ 8/10 fully correct); fixtures committed.
+
+### Dev B
+- [ ] **B6 Scoreboard + ledger.** `CompletionLedger` implementation; "ADHD Tax Refunded" screen: $ back · tasks unfrozen · **best run** (no shame); monthly list.
+  *Done when:* the numbers are right after cancel, keep (no $), task done, and snooze (nothing).
+- [ ] **B7 Celebration + share.** Confetti + haptics on every win; "Share my wins" renders an image card.
+  *Done when:* smooth on device; the share sheet exports the image.
+- [ ] **B8 Widgets.** Money countdown ("Hulu · $17.99 in 3 days") + task variant ("Essay · Step 3 of 7"), reading SharedKit data from the App Group.
+  *Done when:* both widgets update after changes in the app.
+- [ ] **B9 Audio companion.** AVSpeechSynthesizer reads the step aloud (toggle) + gentle procedural ambient sound (AVAudioEngine; no licensed audio).
+  *Done when:* on/off works; audio stops cleanly when the player closes.
+
+### 🔄 Sync 3
+*Done when:* both paths run end to end on both phones; the scoreboard shows money + tasks; widgets are live.
+
+---
+
+## Day 4: Money + polish (Tue Sep 29)
+
+### Dev A
+- [ ] **A8 RevenueCat paywall.** Offerings: **$29.99 lifetime** (headline), $3.99/mo, $24.99/yr, 7-day trial; `EntitlementsProviding` (real) → `isPro`; Restore; the ironic banner; **a local reminder 24h before Parachute's own trial ends**.
+  *Done when:* a Test Store purchase flips `isPro`, restore works, and gated features unlock.
+- [ ] **A9 README: "How RevenueCat is used"** + money-path architecture notes.
+
+### Dev B
+- [ ] **B10 Gating in Parachute.** "First step always free"; AI unfreeze + voice are Pro, via **A's `EntitlementsProviding`**. (Or 3/week if you chose that.)
+  *Done when:* the free user sees Step 1, then an upsell; a Pro user gets everything.
+- [ ] **B11 README: Foundation Models / Unfreeze section** + the Mermaid architecture diagram.
+
+### Both (afternoon)
+- [ ] **P1 Polish your own screens.** Dark Mode · Dynamic Type · VoiceOver labels · SF Symbols · smooth transitions.
+- [ ] **P2 Demo data.** A seed button in debug with realistic items (only Apple-billed trials go to Apple's page, per CLAUDE.md rule 8).
+- [ ] **🧊 FEATURE FREEZE at end of Day 4.** Only bug fixes after this.
+
+### 🔄 Sync 4
+*Done when:* the full demo (`docs/demo-script.md`) runs **3× in a row on each phone without a crash**; raw screen recordings captured.
+
+---
+
+## Day 5: Ship (Wed Sep 30)
+
+- [ ] **V1 Video** (A records the money segments, B records the unfreeze/task segments; one person edits). Under 2 minutes, captions, device frames. QuickTime is free.
+- [ ] **V2 README final:** icon + 3 screenshots (1179×2556) · pitch · architecture · badges · RevenueCat section · build steps · privacy · MIT.
+- [ ] **V3 Code sweep:** no secrets; **Test Store key only in Debug**; no dead code; tests green.
+- [ ] **V4 Devpost:** description (what it does in the first line), video link, repo link, license visible. **The Representative submits by ~6pm PDT**, leaving hours of buffer before 11:45pm PDT.
+  *Done when:* the submission is confirmed and someone who's never seen the app understands it from the video's first 15 seconds.
+
+---
+
+## If you fall behind: cut in this order
+1. Audio companion (B9)
+2. AI fallback for unknown services (part of B3), keeping curated + Apple
+3. Task widget variant (part of B8)
+4. Share extension (A7): manual add still demos everything
+5. Task path (B4/B5): only if B0 failed
+
+**Never cut:** alarm with Stop re-arming (A4) → Decide (A5) → Unfreeze player with curated steps (B1–B3) → scoreboard (B6) → paywall (A8). That chain *is* the video.
+
+---
+
+## Dependency map
+```
+S0.1 ─► S0.2 (contracts + fakes) ─┬─► A1 ─► A2 ─► A4 ─► A5 ─┐
+                                   │    A3 (content) ──────────┤
+                                   └─► B1 ─► B2 ─► B3 ─────────┼─► Sync 2 ─► A7 / B6–B9 ─► A8 / B10 ─► freeze ─► ship
+                                        B0 ─► B4 ─► B5 (needs A2) ┘
+```
+
+## After the sprint (if you keep going)
+Email forwarding pipeline (A) · returns + gift cards (A) · curated services 5 → 20 (A) · voice input "I'm stuck on…" (B) · the lock mode (A+B, needs $99) · App Store release.

@@ -2,14 +2,53 @@
   "version": 1,
   "services": [
     {
-      "id": "example-service",
-      "name": "Example Service",
+      "id": "spotify",
+      "name": "Spotify",
       "verifiedOn": "2026-09-26",
       "verifiedBy": "A",
       "steps": [
-        { "text": "Open Safari and go to example.com/account", "seconds": 30, "url": "https://example.com/account" },
-        { "text": "Tap 'Membership', then 'Cancel membership'", "seconds": 30 },
-        { "text": "Tap 'Finish cancellation'. Screenshot the confirmation.", "seconds": 20 }
+        { "text": "Open Safari (not the Spotify app) and go to your Spotify account page. Log in if it asks.", "seconds": 45 },
+        { "text": "Under 'Your Premium', tap 'Cancel subscription'.", "seconds": 15 },
+        { "text": "On 'How you listen will change', tap 'Continue to cancel'.", "seconds": 15 },
+        { "text": "Tap 'Yes, cancel'. You keep Premium until your next bill date.", "seconds": 10 }
+      ]
+    },
+    {
+      "id": "claude",
+      "name": "Claude",
+      "verifiedOn": "2026-09-26",
+      "verifiedBy": "A",
+      "steps": [
+        { "text": "Open Safari and go to claude.ai. Log in if it asks.", "seconds": 45 },
+        { "text": "Open Settings, then tap 'Billing'.", "seconds": 20 },
+        { "text": "Scroll to the bottom. Under 'Cancellation', tap 'Cancel'.", "seconds": 15 },
+        { "text": "Tap 'Cancel plan'. You keep Pro until the end of this billing period.", "seconds": 10 }
+      ]
+    },
+    {
+      "id": "google-one",
+      "name": "Google AI Pro (Google One)",
+      "verifiedOn": "2026-09-26",
+      "verifiedBy": "A",
+      "steps": [
+        { "text": "Open Safari and go to your Google Account. Log in if it asks.", "seconds": 45 },
+        { "text": "Tap 'Payments & subscriptions'.", "seconds": 15 },
+        { "text": "Under 'Subscriptions', tap 'Google One'.", "seconds": 15 },
+        { "text": "Tap 'Cancel subscription'.", "seconds": 10 },
+        { "text": "Tap 'Cancel subscription' again to confirm. You keep your plan until the end of this billing period.", "seconds": 10 }
+      ]
+    },
+    {
+      "id": "apple-one",
+      "name": "Apple One",
+      "verifiedOn": "2026-09-26",
+      "verifiedBy": "A",
+      "steps": [
+        { "text": "Open Settings. Tap your name at the top, then 'Subscriptions'.", "seconds": 20 },
+        { "text": "Tap 'Apple One'.", "seconds": 10 },
+        { "text": "Scroll to the bottom and tap 'Cancel All Services'.", "seconds": 15 },
+        { "text": "On 'Do you want to keep any services?', leave them all unticked and tap 'Cancel All Services'.", "seconds": 15 },
+        { "text": "Tap 'Cancel Subscription'. A free trial ends right away.", "seconds": 10 }
       ]
     }
   ]

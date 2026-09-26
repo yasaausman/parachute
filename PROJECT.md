@@ -12,14 +12,14 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
 
 ## Status
 - ✅ Done: idea validation, competitor research, claim audit, merged plan, two-person milestones, contracts (`docs/interfaces.md`), video script
-- 🔨 In progress (branch `a/phase0-setup`, Dev A):
+- 🔨 In progress (Dev A; all merged to `main` on 2026-09-26):
   - **S0.1** scaffolded: `project.yml` (XcodeGen, generated project gitignored) with App + Widgets + ShareExtension, one App Group, iOS 26, Swift 6 mode; SharedKit / MoneyKit / ParachuteKit packages; RevenueCat 5.91.0 (in MoneyKit). Builds for simulator; built, signed (free team), installed over Wi-Fi and running on Dev A's iPhone (iOS 27.0).
   - **S0.2** drafted: every model + protocol from `docs/interfaces.md` compiles in SharedKit, fakes in `SharedKit/Fakes`, wired in `App/AppDependencies.swift`. ☐ Needs Dev B's review.
   - ✅ **A0 passed 11/11 on a free Apple ID** (2026-09-26): AlarmKit Stop re-arms (even after force-quit), Decide opens the app and ends the chain, rings on Silent; local notifications work; RevenueCat Test Store purchase grants `parachute_pro`. Details + A4 notes: `docs/a0-platform-spike.md`.
   - **A3** 4 of 5 services curated (Spotify, Claude, Google AI Pro, Apple One); see `docs/cancel-steps-verification.md`.
-  - ✅ **A1** on `a/a1-money-deadlines` (stacked on `a/phase0-setup`): Money tab with countdowns, add/edit/delete; persistence verified in the simulator, running on Dev A's iPhone.
-  - ✅ **A2** on `a/a2-reminders`: real `EscalationScheduler` with the reminder ladder + debug time travel; both reminders fired on Dev A's iPhone. Real `EscalationScheduler` now replaces `FakeEscalationScheduler` in `AppDependencies`.
-- ⏭️ Next (Dev A): A4 final-day alarm (Stop re-arms, Decide opens the app) → A5 Decide screen → finish A3 (service #5, URLs, iPhone Safari check). Open PRs to `main` so Dev B can build on SharedKit.
+  - ✅ **A1**: Money tab with countdowns, add/edit/delete; persistence verified in the simulator, running on Dev A's iPhone.
+  - ✅ **A2**: real `EscalationScheduler` with the reminder ladder + debug time travel; both reminders fired on Dev A's iPhone. Real `EscalationScheduler` now replaces `FakeEscalationScheduler` in `AppDependencies`.
+- ⏭️ Next (Dev A): A4 final-day alarm (Stop re-arms, Decide opens the app) → A5 Decide screen → finish A3 (service #5, URLs, iPhone Safari check).
 
 ## How to run
 1. `cp Config/Local.xcconfig.example Config/Local.xcconfig` and set your `DEVELOPMENT_TEAM` + a `BUNDLE_ID_PREFIX` unique to you (free Apple IDs can't share bundle IDs).
@@ -29,6 +29,7 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
 5. Changing targets, Info.plist keys, or entitlements: edit `project.yml`, then `xcodegen generate`. Adding files in `App/`, `Widgets/`, `ShareExtension/` also needs a regenerate; files inside a package don't.
 
 ## Decisions & why (newest first)
+- 2026-09-26: **Merged Phase 0, A1, A2 and the A3 content straight to `main`** (fast-forward, Dev A's call) so Dev B can build on SharedKit now; any interface issues get fixed as they come up. New work continues on short `a/<feature>` branches.
 - 2026-09-26: **Reminders fire at 10:00 local**, 3 days and 1 day before the last day to act; past slots are skipped (a trial added the day before its charge relies on the A4 alarm). Debug "time travel" compresses 1 day into 1 minute. ⚠️ iOS reportedly keeps only the 64 soonest local notifications per app (not in Apple's docs page we checked); at 2 per trial that's fine for the sprint.
 - 2026-09-26: **Apple-billed deadline = charge date minus 24 h.** Apple's subscribe sheet: *"Cancel anytime in Settings > Apple Account at least a day before each renewal date."* A2 reminders and the A4 alarm anchor to that for `billedByApple` items. Also: cancelling an Apple free trial can end access immediately, so no "keep it until the end" copy for Apple trials.
 - 2026-09-26: **Curated services (4 of 5):** Spotify, Claude, Google AI Pro (Google One), Apple One (the Apple-billed one). Web ones followed to the final button on a Mac without tapping it; still need their page URLs + an iPhone Safari check. Log: `docs/cancel-steps-verification.md`.

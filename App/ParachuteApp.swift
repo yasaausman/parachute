@@ -7,7 +7,7 @@ import UserNotifications
 
 @main
 struct ParachuteApp: App {
-    @State private var dependencies = AppDependencies.fakes
+    @State private var dependencies = AppDependencies.live
     private let container: ModelContainer
 
     init() {
@@ -24,6 +24,7 @@ struct ParachuteApp: App {
         WindowGroup {
             RootView()
                 .environment(dependencies)
+                .environment(\.moneyEscalation, dependencies.moneyEscalation)
         }
         .modelContainer(container)
     }

@@ -19,7 +19,7 @@ struct RootView: View {
             }
             #if DEBUG
             Tab("Debug", systemImage: "ladybug") {
-                NavigationStack { PlatformSpikeView() }
+                NavigationStack { MoneyDebugMenu() }
             }
             #endif
         }

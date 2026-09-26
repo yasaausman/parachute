@@ -5,6 +5,7 @@ import SwiftUI
 /// A1: the Money tab. Open trials sorted by charge date with countdowns; decided ones below.
 public struct MoneyListView: View {
     @Environment(\.modelContext) private var context
+    @Environment(\.moneyEscalation) private var escalation
     @Query(sort: \MoneyDeadline.dueDate) private var deadlines: [MoneyDeadline]
     @State private var editing: MoneyDeadline?
     @State private var isAdding = false
@@ -20,6 +21,9 @@ public struct MoneyListView: View {
             ToolbarItem(placement: .primaryAction) {
                 Button("Add trial", systemImage: "plus") { isAdding = true }
             }
+        }
+        .task {
+            await escalation?.resync(deadlines)
         }
         .sheet(isPresented: $isAdding) {
             NavigationStack { DeadlineEditorView() }
@@ -76,7 +80,9 @@ public struct MoneyListView: View {
 
     private func delete(_ list: [MoneyDeadline], at offsets: IndexSet) {
         for index in offsets {
+            let id = list[index].id
             context.delete(list[index])
+            Task { await escalation?.resolve(itemID: id) }
         }
         try? context.save()
     }

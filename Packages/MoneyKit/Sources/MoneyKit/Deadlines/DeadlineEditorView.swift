@@ -6,6 +6,7 @@ import SwiftUI
 public struct DeadlineEditorView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.moneyEscalation) private var escalation
 
     private let deadline: MoneyDeadline?
     private let curated = CuratedServices.load()
@@ -97,7 +98,9 @@ public struct DeadlineEditorView: View {
         let due = DeadlineMath.normalizedDueDate(dueDate)
         let serviceID = CuratedServices.serviceID(for: trimmedName, in: curated)
 
+        let saved: MoneyDeadline
         if let deadline {
+            saved = deadline
             deadline.serviceName = trimmedName
             deadline.serviceID = serviceID
             deadline.amountCents = cents
@@ -105,23 +108,28 @@ public struct DeadlineEditorView: View {
             deadline.dueDate = due
             deadline.billedByApple = billedByApple
         } else {
-            context.insert(MoneyDeadline(
+            saved = MoneyDeadline(
                 serviceName: trimmedName,
                 serviceID: serviceID,
                 amountCents: cents,
                 currencyCode: currencyCode,
                 dueDate: due,
                 billedByApple: billedByApple
-            ))
+            )
+            context.insert(saved)
         }
         try? context.save()
+        let snapshot = MoneyDeadlineSnapshot(saved)
+        Task { try? await escalation?.schedule(deadline: snapshot) }
         dismiss()
     }
 
     private func delete() {
         if let deadline {
+            let id = deadline.id
             context.delete(deadline)
             try? context.save()
+            Task { await escalation?.resolve(itemID: id) }
         }
         dismiss()
     }

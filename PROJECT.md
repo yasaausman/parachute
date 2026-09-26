@@ -19,6 +19,7 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
 Not yet: the Xcode project is created in Phase 0 (S0.1). Then: open `Parachute.xcodeproj`, select your iPhone, Run. Tests: Product → Test (or `xcodebuild test` once schemes exist).
 
 ## Decisions & why (newest first)
+- 2026-09-25: **Dev A is the Devpost Representative** and submits with a student email (✅ Next Gen requires *"a qualifying student or academic email address on Devpost"*). Repo: https://github.com/yasaausman/parachute (public, MIT detected); commits use the GitHub no-reply address.
 - 2026-09-25: **Name = Parachute** (App Store has other apps named "Parachute" (plasma, backup, etc.); fine for a no-store-release submission; if publishing later, use a full title like "Parachute: Beat the ADHD Tax").
 - 2026-09-25: **Two devs.** A = Money ("Untax") path + paywall; B = Parachute (unfreeze, tasks, scoreboard, widgets). Split by local Swift packages so they rarely touch the same files.
 - 2026-09-25: **Lead with Unfreeze.** Clawback (released Sep 24) has a near-identical money pitch; Nudgy has the Stop-only-postpones alarm. The unique part is curated unfreeze steps + the task path.
@@ -33,7 +34,7 @@ Not yet: the Xcode project is created in Phase 0 (S0.1). Then: open `Parachute.x
 - Free Apple ID or $99 Program?
 - Which 5 services to curate? (Need real accounts; include one Apple-billed trial.)
 - Free unfreeze limit: breadth-gated (recommended) or 3/week?
-- Who is the Devpost Representative? Do **both** have student/academic emails? Anyone under 18 (guardian consent)? ⚠️ Confirm on the Shipaton Discord that every team member must be a student for Next Gen.
+- Does Dev B also have a student/academic email for joining the Devpost team? Anyone under 18 (guardian consent)? ⚠️ Confirm on the Shipaton Discord that every team member must be a student for Next Gen.
 
 ## Milestone checklist (details + owners in MILESTONES.md)
 - [ ] Phase 0: S0.1 project · S0.2 contracts + fakes · S0.3 decisions · A0 platform spike · B0 atomizer spike

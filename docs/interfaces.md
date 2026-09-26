@@ -4,6 +4,8 @@ These live in `Packages/SharedKit`. **Both devs code against these, never agains
 
 > ⚠️ These are **sketches** to agree on in Phase 0 (S0.2). Compile them, fix whatever the compiler says, and keep the *shape*. Apple framework specifics (SwiftData enum storage, AlarmKit intent types) must be checked against Apple's docs while implementing (CLAUDE.md rule 1).
 
+> ✅ **Compiled in S0.2 (2026-09-25)** in `Packages/SharedKit`, same shape as below, plus: public inits on every type; typed accessors on the models (`status`, `source`, `kind`) wrapping the `…Raw` strings; `Hashable` on the request/plan/outcome types; `Codable` on `PlanStep`; `CancelStepsFile` (the JSON's Codable shape); `SharedStore.makeContainer()` (the App Group SwiftData container) and `AppGroup.defaults`.
+
 ## Package dependency rule
 ```
 App (composition root) ──► MoneyKit (A) ──► SharedKit

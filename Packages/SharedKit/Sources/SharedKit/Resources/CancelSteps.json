@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "services": [
+    {
+      "id": "example-service",
+      "name": "Example Service",
+      "verifiedOn": "2026-09-26",
+      "verifiedBy": "A",
+      "steps": [
+        { "text": "Open Safari and go to example.com/account", "seconds": 30, "url": "https://example.com/account" },
+        { "text": "Tap 'Membership', then 'Cancel membership'", "seconds": 30 },
+        { "text": "Tap 'Finish cancellation'. Screenshot the confirmation.", "seconds": 20 }
+      ]
+    }
+  ]
+}

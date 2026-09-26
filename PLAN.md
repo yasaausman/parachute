@@ -195,6 +195,8 @@ README: icon + 3 screenshots · pitch · Mermaid architecture · badges · **"Ho
 4. **Which 5 services** to curate (ones you can test with real accounts).
 5. **Audio:** voice check-ins, procedural ambient, or both.
 6. **Representative** + eligibility confirmations.
+7. **Logo / app icon:** decide later, before V2 (README screenshots). Until then notifications show a blank icon.
+8. **Deferred test, end of sprint (P1 / Sync 4): alarm with iOS 27's "Alarms and Timers" volume at zero** (Settings → Sounds & Haptics, turn off *Match Ringtone Volume*). Expect a silent but full-screen alert, since apps can't override it. If so, add an onboarding tip to check that volume.
 
 ## 14. Parked
 - **Friction-style lock** (block chosen apps until you decide): ✅ needs the $99 Program even for development; opening the app from the block screen needs iOS 26.5+. See `research/friction-research.md`.
@@ -212,8 +214,8 @@ README: icon + 3 screenshots · pitch · Mermaid architecture · badges · **"Ho
 | RevenueCat Test Store: no setup, ≥ 5.43.0, never in release | ✅ RevenueCat docs |
 | Clawback (Sep 24) & Nudgy (Aug) exist as described | ✅ App Store listings |
 | 79% / $45/mo (Dimers); 15.5M ADHD (CDC); $86 vs $219 (C+R) | ✅ |
-| Local notifications need no special capability | ⚠️ confirm in spike |
-| Test Store works without the IAP capability | ⚠️ confirm in spike |
+| Local notifications need no special capability | ✅ A0 on device (2026-09-26) |
+| Test Store works without the IAP capability | ✅ A0 on device (2026-09-26) |
 | Curated cancel steps accurate | ⚠️ hand-verify |
 | AI atomizer quality | ⚠️ spike (≥ 15/20) |
 | Our combination is unique | ⚠️ searches only |

@@ -1,0 +1,4 @@
+#include "Base.xcconfig"
+
+// Never ship the Test Store key: the SDK crashes release builds that use it.
+REVENUECAT_API_KEY =

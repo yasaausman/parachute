@@ -1,0 +1,11 @@
+// Shared build settings for every target. Per-developer values live in
+// Local.xcconfig (gitignored); copy Local.xcconfig.example to create it.
+
+// Defaults, overridden by Local.xcconfig.
+DEVELOPMENT_TEAM =
+BUNDLE_ID_PREFIX = com.example
+
+#include? "Local.xcconfig"
+
+PARACHUTE_BUNDLE_ID = $(BUNDLE_ID_PREFIX).parachute
+PARACHUTE_APP_GROUP = group.$(BUNDLE_ID_PREFIX).parachute

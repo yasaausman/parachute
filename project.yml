@@ -1,0 +1,135 @@
+# Source of truth for Parachute.xcodeproj. Don't edit the project in Xcode's
+# target settings; edit this file and run `xcodegen` (brew install xcodegen).
+name: Parachute
+options:
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+  developmentLanguage: en
+  xcodeVersion: "27.0"
+configs:
+  Debug: debug
+  Release: release
+configFiles:
+  Debug: Config/Debug.xcconfig
+  Release: Config/Release.xcconfig
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Automatic
+    TARGETED_DEVICE_FAMILY: "1"
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    DEAD_CODE_STRIPPING: YES
+
+packages:
+  SharedKit:
+    path: Packages/SharedKit
+  MoneyKit:
+    path: Packages/MoneyKit
+  ParachuteKit:
+    path: Packages/ParachuteKit
+
+targets:
+  Parachute:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(PARACHUTE_BUNDLE_ID)
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleDisplayName: Parachute
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        NSAlarmKitUsageDescription: Parachute rings on the day a trial is about to charge you, so you can decide before the money leaves.
+        ParachuteAppGroup: $(PARACHUTE_APP_GROUP)
+        RevenueCatAPIKey: $(REVENUECAT_API_KEY)
+    entitlements:
+      path: App/Parachute.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - $(PARACHUTE_APP_GROUP)
+    dependencies:
+      - package: SharedKit
+      - package: MoneyKit
+      - package: ParachuteKit
+      - target: ParachuteWidgets
+      - target: ParachuteShare
+
+  ParachuteWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Widgets
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(PARACHUTE_BUNDLE_ID).widgets
+    info:
+      path: Widgets/Info.plist
+      properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleDisplayName: Parachute
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+        ParachuteAppGroup: $(PARACHUTE_APP_GROUP)
+    entitlements:
+      path: Widgets/ParachuteWidgets.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - $(PARACHUTE_APP_GROUP)
+    dependencies:
+      - package: SharedKit
+
+  ParachuteShare:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: ShareExtension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(PARACHUTE_BUNDLE_ID).share
+    info:
+      path: ShareExtension/Info.plist
+      properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleDisplayName: Track with Parachute
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsImageWithMaxCount: 1
+              NSExtensionActivationSupportsText: true
+        ParachuteAppGroup: $(PARACHUTE_APP_GROUP)
+    entitlements:
+      path: ShareExtension/ParachuteShare.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - $(PARACHUTE_APP_GROUP)
+    dependencies:
+      - package: SharedKit
+
+schemes:
+  Parachute:
+    build:
+      targets:
+        Parachute: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - package: SharedKit/SharedKitTests
+        - package: MoneyKit/MoneyKitTests
+        - package: ParachuteKit/ParachuteKitTests
+    archive:
+      config: Release

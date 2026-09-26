@@ -1,0 +1,6 @@
+#include "Base.xcconfig"
+
+// RevenueCat Test Store key: Debug only (CLAUDE.md rule 5).
+// Copy Secrets.xcconfig.example to Secrets.xcconfig (gitignored) and paste the key.
+REVENUECAT_API_KEY =
+#include? "Secrets.xcconfig"

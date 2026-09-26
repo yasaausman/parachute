@@ -32,7 +32,7 @@ Every milestone has a **Done when**. Nothing is done until it runs on a real iPh
   *Done when:* written in `PROJECT.md`.
 
 ### Dev A spikes
-- [ ] **A0 Platform spike.** On a real iPhone with the chosen account: (1) schedule an AlarmKit alarm whose **Stop runs a `stopIntent` that re-arms it** 1 minute later; (2) schedule a local notification; (3) make a **RevenueCat Test Store** purchase.
+- [x] **A0 Platform spike.** On a real iPhone with the chosen account: (1) schedule an AlarmKit alarm whose **Stop runs a `stopIntent` that re-arms it** 1 minute later; (2) schedule a local notification; (3) make a **RevenueCat Test Store** purchase.
   *Done when:* all three work, or you've written down what doesn't and the workaround.
 
 ### Dev B spikes

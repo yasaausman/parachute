@@ -44,9 +44,9 @@ Every milestone has a **Done when**. Nothing is done until it runs on a real iPh
 ## Day 1: Foundation (Sat Sep 26)
 
 ### Dev A
-- [ ] **A1 Money deadlines, manual.** Add/edit/delete `MoneyDeadline` (service, amount, trial end date, billed by Apple?); list with countdowns ("Hulu · $17.99 in 3 days").
+- [x] **A1 Money deadlines, manual.** Add/edit/delete `MoneyDeadline` (service, amount, trial end date, billed by Apple?); list with countdowns ("Hulu · $17.99 in 3 days").
   *Done when:* items persist across launches; date-math tests pass.
-  *Status (2026-09-26):* code done on `a/a1-money-deadlines`: Money tab list ("Spotify · $6.99 in 7 days"), add/edit/delete, curated quick-pick chips, Apple-billed items show "cancel by" a day early. 19 date-math/matching tests pass (incl. DST); add, edit, delete and persistence across a relaunch checked in the simulator. ☐ Dev A to confirm on the iPhone, then tick.
+  *Status (2026-09-26):* code done on `a/a1-money-deadlines`: Money tab list ("Spotify · $6.99 in 7 days"), add/edit/delete, curated quick-pick chips, Apple-billed items show "cancel by" a day early. 19 date-math/matching tests pass (incl. DST); add, edit, delete and persistence across a relaunch checked in the simulator; add, edit, sorting and the Apple "cancel by" line confirmed on Dev A's iPhone (iOS 27, dark mode).
 - [ ] **A2 Reminder ladder.** `EscalationScheduler` (real implementation): local notifications at −3 days and −1 day, with money-first copy ("$17.99 leaves your account tomorrow").
   *Done when:* in debug time-travel mode, both reminders fire for a test item.
 - [ ] **A3 Curate 5 services.** Hand-verify cancel steps on real accounts → `SharedKit/Resources/CancelSteps.json` + a log in `docs/cancel-steps-verification.md` (date, screenshots).

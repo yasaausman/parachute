@@ -46,10 +46,12 @@ Every milestone has a **Done when**. Nothing is done until it runs on a real iPh
 ### Dev A
 - [ ] **A1 Money deadlines, manual.** Add/edit/delete `MoneyDeadline` (service, amount, trial end date, billed by Apple?); list with countdowns ("Hulu · $17.99 in 3 days").
   *Done when:* items persist across launches; date-math tests pass.
+  *Status (2026-09-26):* code done on `a/a1-money-deadlines`: Money tab list ("Spotify · $6.99 in 7 days"), add/edit/delete, curated quick-pick chips, Apple-billed items show "cancel by" a day early. 19 date-math/matching tests pass (incl. DST); add, edit, delete and persistence across a relaunch checked in the simulator. ☐ Dev A to confirm on the iPhone, then tick.
 - [ ] **A2 Reminder ladder.** `EscalationScheduler` (real implementation): local notifications at −3 days and −1 day, with money-first copy ("$17.99 leaves your account tomorrow").
   *Done when:* in debug time-travel mode, both reminders fire for a test item.
 - [ ] **A3 Curate 5 services.** Hand-verify cancel steps on real accounts → `SharedKit/Resources/CancelSteps.json` + a log in `docs/cancel-steps-verification.md` (date, screenshots).
   *Done when:* each of the 5 was followed end to end; the JSON passes B's validity test.
+  *Status (2026-09-26):* 4 of 5 in `CancelSteps.json`: Spotify, Claude, Google AI Pro (web, followed to the final button on a Mac) and Apple One (Apple-billed, cancelled for real on the iPhone). Left: service #5, the 3 web page URLs, and an iPhone Safari check of the 3 web flows. B's validity test (B2) not written yet.
 
 ### Dev B
 - [ ] **B1 Unfreeze player UI** (with a fake plan). One step on screen, 90-second ring, companion line, **Done / Break it smaller / Skip**, finish → callback.

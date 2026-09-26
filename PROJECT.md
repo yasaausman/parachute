@@ -16,7 +16,9 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
   - **S0.1** scaffolded: `project.yml` (XcodeGen, generated project gitignored) with App + Widgets + ShareExtension, one App Group, iOS 26, Swift 6 mode; SharedKit / MoneyKit / ParachuteKit packages; RevenueCat 5.91.0 (in MoneyKit). Builds for simulator; built, signed (free team), installed over Wi-Fi and running on Dev A's iPhone (iOS 27.0).
   - **S0.2** drafted: every model + protocol from `docs/interfaces.md` compiles in SharedKit, fakes in `SharedKit/Fakes`, wired in `App/AppDependencies.swift`. ☐ Needs Dev B's review.
   - ✅ **A0 passed 11/11 on a free Apple ID** (2026-09-26): AlarmKit Stop re-arms (even after force-quit), Decide opens the app and ends the chain, rings on Silent; local notifications work; RevenueCat Test Store purchase grants `parachute_pro`. Details + A4 notes: `docs/a0-platform-spike.md`.
-- ⏭️ Next (Dev A): commit + push `a/phase0-setup`; S0.3 decisions (5 services!); then Day 1: A1 manual deadlines, A2 reminder ladder, A3 curate 5 services
+  - **A3** 4 of 5 services curated (Spotify, Claude, Google AI Pro, Apple One); see `docs/cancel-steps-verification.md`.
+  - **A1** code done on `a/a1-money-deadlines` (stacked on `a/phase0-setup`): Money tab with countdowns, add/edit/delete, persistence verified in the simulator. ☐ On-device confirmation.
+- ⏭️ Next (Dev A): confirm A1 on the iPhone → A2 reminder ladder (anchor Apple-billed items to charge date minus 24 h) → finish A3 (service #5, URLs, iPhone Safari check). Open PRs to `main` so Dev B can build on SharedKit.
 
 ## How to run
 1. `cp Config/Local.xcconfig.example Config/Local.xcconfig` and set your `DEVELOPMENT_TEAM` + a `BUNDLE_ID_PREFIX` unique to you (free Apple IDs can't share bundle IDs).
@@ -52,8 +54,8 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
 - Does Dev B also have a student/academic email for joining the Devpost team? Anyone under 18 (guardian consent)? ⚠️ Confirm on the Shipaton Discord that every team member must be a student for Next Gen.
 
 ## Milestone checklist (details + owners in MILESTONES.md)
-- [ ] Phase 0: S0.1 project · S0.2 contracts + fakes · S0.3 decisions · A0 platform spike · B0 atomizer spike
-- [ ] Day 1: A1 manual deadlines · A2 reminders · A3 curate 5 services · B1 Unfreeze player · B2 CancelSteps loader · 🔄 Sync 1
+- [ ] Phase 0: S0.1 project ✅ (Dev A side) · S0.2 contracts + fakes (needs B's review) · S0.3 decisions (partly) · A0 platform spike ✅ · B0 atomizer spike (Dev B)
+- [ ] Day 1: A1 manual deadlines (code done, device check) · A2 reminders · A3 curate 5 services (4/5) · B1 Unfreeze player · B2 CancelSteps loader · 🔄 Sync 1
 - [ ] Day 2: A4 alarm · A5 Decide · A6 Apple path · B3 UnfreezeEngine · B4 task path · B5 task reminders · 🔄 Sync 2 (full money flow)
 - [ ] Day 3: A7 share extension · B6 scoreboard · B7 celebration/share · B8 widgets · B9 audio · 🔄 Sync 3
 - [ ] Day 4: A8 paywall · A9 README (RevenueCat) · B10 gating · B11 README (FM) · P1 polish · P2 demo data · 🧊 freeze · 🔄 Sync 4

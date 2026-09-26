@@ -9,7 +9,7 @@ struct RootView: View {
                 placeholder("Home", detail: "I'm frozen → task path (B4)")
             }
             Tab("Money", systemImage: "dollarsign.circle") {
-                placeholder("Money", detail: "Trial deadlines (A1)")
+                NavigationStack { MoneyListView() }
             }
             Tab("Tasks", systemImage: "checklist") {
                 placeholder("Tasks", detail: "Frozen tasks (B4)")

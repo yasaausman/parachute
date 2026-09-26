@@ -18,8 +18,8 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
   - ✅ **A0 passed 11/11 on a free Apple ID** (2026-09-26): AlarmKit Stop re-arms (even after force-quit), Decide opens the app and ends the chain, rings on Silent; local notifications work; RevenueCat Test Store purchase grants `parachute_pro`. Details + A4 notes: `docs/a0-platform-spike.md`.
   - **A3** 4 of 5 services curated (Spotify, Claude, Google AI Pro, Apple One); see `docs/cancel-steps-verification.md`.
   - ✅ **A1** on `a/a1-money-deadlines` (stacked on `a/phase0-setup`): Money tab with countdowns, add/edit/delete; persistence verified in the simulator, running on Dev A's iPhone.
-  - **A2** on `a/a2-reminders`: real `EscalationScheduler` with the reminder ladder + debug time travel. Real `EscalationScheduler` now replaces `FakeEscalationScheduler` in `AppDependencies`.
-- ⏭️ Next (Dev A): finish A2 on the iPhone → finish A3 (service #5, URLs, iPhone Safari check). Open PRs to `main` so Dev B can build on SharedKit.
+  - ✅ **A2** on `a/a2-reminders`: real `EscalationScheduler` with the reminder ladder + debug time travel; both reminders fired on Dev A's iPhone. Real `EscalationScheduler` now replaces `FakeEscalationScheduler` in `AppDependencies`.
+- ⏭️ Next (Dev A): A4 final-day alarm (Stop re-arms, Decide opens the app) → A5 Decide screen → finish A3 (service #5, URLs, iPhone Safari check). Open PRs to `main` so Dev B can build on SharedKit.
 
 ## How to run
 1. `cp Config/Local.xcconfig.example Config/Local.xcconfig` and set your `DEVELOPMENT_TEAM` + a `BUNDLE_ID_PREFIX` unique to you (free Apple IDs can't share bundle IDs).
@@ -57,7 +57,7 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
 
 ## Milestone checklist (details + owners in MILESTONES.md)
 - [ ] Phase 0: S0.1 project ✅ (Dev A side) · S0.2 contracts + fakes (needs B's review) · S0.3 decisions (partly) · A0 platform spike ✅ · B0 atomizer spike (Dev B)
-- [ ] Day 1: A1 manual deadlines ✅ · A2 reminders (built, device check) · A3 curate 5 services (4/5) · B1 Unfreeze player · B2 CancelSteps loader · 🔄 Sync 1
+- [ ] Day 1: A1 manual deadlines ✅ · A2 reminders ✅ · A3 curate 5 services (4/5) · B1 Unfreeze player · B2 CancelSteps loader · 🔄 Sync 1
 - [ ] Day 2: A4 alarm · A5 Decide · A6 Apple path · B3 UnfreezeEngine · B4 task path · B5 task reminders · 🔄 Sync 2 (full money flow)
 - [ ] Day 3: A7 share extension · B6 scoreboard · B7 celebration/share · B8 widgets · B9 audio · 🔄 Sync 3
 - [ ] Day 4: A8 paywall · A9 README (RevenueCat) · B10 gating · B11 README (FM) · P1 polish · P2 demo data · 🧊 freeze · 🔄 Sync 4

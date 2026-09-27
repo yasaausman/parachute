@@ -12,11 +12,18 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
 
 ## Status
 - ✅ Done: idea validation, competitor research, claim audit, merged plan, two-person milestones, contracts (`docs/interfaces.md`), video script
-- 🔨 In progress (branch `a/phase0-setup`, Dev A):
+- ✅ Phase 0 (Dev A, branch `a/phase0-setup`):
   - **S0.1** scaffolded: `project.yml` (XcodeGen, generated project gitignored) with App + Widgets + ShareExtension, one App Group, iOS 26, Swift 6 mode; SharedKit / MoneyKit / ParachuteKit packages; RevenueCat 5.91.0 (in MoneyKit). Builds for simulator; built, signed (free team), installed over Wi-Fi and running on Dev A's iPhone (iOS 27.0).
   - **S0.2** drafted: every model + protocol from `docs/interfaces.md` compiles in SharedKit, fakes in `SharedKit/Fakes`, wired in `App/AppDependencies.swift`. ☐ Needs Dev B's review.
   - ✅ **A0 passed 11/11 on a free Apple ID** (2026-09-26): AlarmKit Stop re-arms (even after force-quit), Decide opens the app and ends the chain, rings on Silent; local notifications work; RevenueCat Test Store purchase grants `parachute_pro`. Details + A4 notes: `docs/a0-platform-spike.md`.
-- ⏭️ Next (Dev A): commit + push `a/phase0-setup`; S0.3 decisions (5 services!); then Day 1: A1 manual deadlines, A2 reminder ladder, A3 curate 5 services
+- ✅ Day 1 Dev A (branch `a/a1-money-deadlines`): A1 manual money deadlines with countdowns
+- ✅ Day 1–3 Dev B (branch `b/day1`, 2026-09-26):
+  - **B1** UnfreezeView: one-step-at-a-time player, 90s countdown ring, companion lines, ADHD-friendly copy
+  - **B2** CancelStepsLoader + validation tests (validates CancelSteps.json structure)
+  - **B3** UnfreezeEngine: curated → Apple path → AI fallback → non-AI fallback, with unit tests
+  - **B4** FrozenTaskEntryView + TaskListView: "I'm frozen" task entry → plan → player
+  - **B6** SwiftDataLedger (@ModelActor) + ScoreboardView: ADHD Tax Refunded, tasks unfrozen, best run
+- ⏭️ Next Dev B: B5 task reminders (uses A's EscalationScheduling), B7 celebration + share, B8 widgets, B9 audio
 
 ## How to run
 1. `cp Config/Local.xcconfig.example Config/Local.xcconfig` and set your `DEVELOPMENT_TEAM` + a `BUNDLE_ID_PREFIX` unique to you (free Apple IDs can't share bundle IDs).

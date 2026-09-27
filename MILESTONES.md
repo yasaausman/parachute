@@ -52,9 +52,9 @@ Every milestone has a **Done when**. Nothing is done until it runs on a real iPh
   *Done when:* each of the 5 was followed end to end; the JSON passes B's validity test.
 
 ### Dev B
-- [ ] **B1 Unfreeze player UI** (with a fake plan). One step on screen, 90-second ring, companion line, **Done / Break it smaller / Skip**, finish → callback.
+- [x] **B1 Unfreeze player UI** (with a fake plan). One step on screen, 90-second ring, companion line, **Done / Break it smaller / Skip**, finish → callback.
   *Done when:* a 5-step fake plan plays start to finish; works with Dynamic Type at the largest size.
-- [ ] **B2 CancelSteps loader + validation.** Reads `CancelSteps.json` → `UnfreezePlan`; unit test rejects bad entries (missing steps, step > 90 s, empty text).
+- [x] **B2 CancelSteps loader + validation.** Reads `CancelSteps.json` → `UnfreezePlan`; unit test rejects bad entries (missing steps, step > 90 s, empty text).
   *Done when:* the test passes on A's real file.
 
 ### 🔄 Sync 1 (end of Day 1)
@@ -74,9 +74,9 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
   *Done when:* it opens the right screen on a real iPhone.
 
 ### Dev B
-- [ ] **B3 UnfreezeEngine (real).** `UnfreezeProviding`: curated → Apple path → AI fallback ("Suggested steps," never invents URLs) → graceful non-AI fallback on devices without Apple Intelligence.
+- [x] **B3 UnfreezeEngine (real).** `UnfreezeProviding`: curated → Apple path → AI fallback ("Suggested steps," never invents URLs) → graceful non-AI fallback on devices without Apple Intelligence.
   *Done when:* the right source is picked for all 4 cases in unit tests.
-- [ ] **B4 Task path.** Home "I'm frozen" → "What's overwhelming you?" → `FrozenTask` (+ optional due time) → atomizer → player. "Break it smaller" re-atomizes the current step.
+- [x] **B4 Task path.** Home "I'm frozen" → "What's overwhelming you?" → `FrozenTask` (+ optional due time) → atomizer → player. "Break it smaller" re-atomizes the current step.
   *Done when:* 5 of B0's test tasks go from typed description to finished on device.
 - [ ] **B5 Task reminders.** The task path uses **A's `EscalationScheduling`** for due-time reminders and the deadline alarm.
   *Done when:* a task due in 5 minutes (time-travel) triggers a reminder.
@@ -93,7 +93,7 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
   *Done when:* 10 fixture screenshots → correct items in ≤ 2 taps (≥ 8/10 fully correct); fixtures committed.
 
 ### Dev B
-- [ ] **B6 Scoreboard + ledger.** `CompletionLedger` implementation; "ADHD Tax Refunded" screen: $ back · tasks unfrozen · **best run** (no shame); monthly list.
+- [x] **B6 Scoreboard + ledger.** `CompletionLedger` implementation; "ADHD Tax Refunded" screen: $ back · tasks unfrozen · **best run** (no shame); monthly list.
   *Done when:* the numbers are right after cancel, keep (no $), task done, and snooze (nothing).
 - [ ] **B7 Celebration + share.** Confetti + haptics on every win; "Share my wins" renders an image card.
   *Done when:* smooth on device; the share sheet exports the image.

@@ -16,6 +16,19 @@ struct CancelStepsView: View {
 
     var body: some View {
         List {
+            if deadline.billedByApple {
+                Section {
+                    Button {
+                        openURL(AppleSubscriptions.manageURL)
+                    } label: {
+                        Label("Open Apple Subscriptions", systemImage: "apple.logo")
+                            .font(.headline)
+                    }
+                } footer: {
+                    Text("Billed by Apple: cancel at least a day before the charge. Cancelling a free trial may end it right away.")
+                }
+            }
+
             if let curated {
                 Section {
                     ForEach(Array(curated.steps.enumerated()), id: \.offset) { index, step in
@@ -28,14 +41,15 @@ struct CancelStepsView: View {
                 }
             } else if deadline.billedByApple {
                 Section {
-                    // The generic Apple path (seen end to end with Apple One, docs/cancel-steps-verification.md).
-                    StepRow(number: 1, step: PlanStep(text: "Open Settings. Tap your name at the top, then 'Subscriptions'.", seconds: 20)) { _ in }
-                    StepRow(number: 2, step: PlanStep(text: "Tap '\(deadline.serviceName)'.", seconds: 10)) { _ in }
-                    StepRow(number: 3, step: PlanStep(text: "Tap 'Cancel Subscription' (or 'Cancel Free Trial'), then confirm.", seconds: 20)) { _ in }
+                    ForEach(Array(AppleSubscriptions.steps(serviceName: deadline.serviceName).enumerated()), id: \.offset) { index, step in
+                        StepRow(number: index + 1, step: step) { url in openURL(url) }
+                    }
+                    Button("Or cancel on Apple's website") { openURL(AppleSubscriptions.webURL) }
+                        .font(.subheadline)
                 } header: {
-                    Text("Cancel through Apple")
+                    Text("If the button doesn't open it")
                 } footer: {
-                    Text("Apple needs this at least a day before the charge. Cancelling a free trial may end it right away.")
+                    Text("Steps from Apple Support, \"Cancel a subscription from Apple\".")
                 }
             } else {
                 Section {

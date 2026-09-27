@@ -51,3 +51,18 @@ import Testing
         #expect(plan.steps.allSatisfy { $0.seconds <= 90 && $0.url == nil })
     }
 }
+
+@Suite struct AppleSubscriptionsTests {
+    @Test func stepsAreShortAndNameTheService() {
+        let steps = AppleSubscriptions.steps(serviceName: "Duolingo")
+        #expect(steps.count == 4)
+        #expect(steps.allSatisfy { $0.seconds <= 90 && !$0.text.isEmpty })
+        #expect(steps[2].text.contains("Duolingo"))
+    }
+
+    @Test func linksAreHTTPSOnApple() {
+        #expect(AppleSubscriptions.manageURL.scheme == "https")
+        #expect(AppleSubscriptions.manageURL.host() == "apps.apple.com")
+        #expect(AppleSubscriptions.webURL.host() == "account.apple.com")
+    }
+}

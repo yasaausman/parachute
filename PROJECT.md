@@ -21,7 +21,8 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
   - ✅ **A2**: real `EscalationScheduler` with the reminder ladder + debug time travel; both reminders fired on Dev A's iPhone. Real `EscalationScheduler` now replaces `FakeEscalationScheduler` in `AppDependencies`.
   - ✅ **A4**: real final-day alarm chain (Stop re-arms, Decide opens the app, a decision ends it) + a minimal Decide screen; full chain confirmed on Dev A's iPhone.
   - **A5** on `a/a5-decide`: full Decide screen (Cancel it · I'm frozen · Keep it · Snooze), ledger writes, Unfreeze hand-off via `SheetRouter`. ☐ iPhone run.
-- ⏭️ Next (Dev A): A5 on the iPhone → A6 Apple subscriptions path (Snooze-until, I'm frozen, ledger, design) → finish A3 (service #5, URLs, iPhone Safari check).
+  - **A6** on `a/a6-apple-path`: "Open Apple Subscriptions" + Apple's own steps for Apple-billed trials; shared with B3 via `SharedKit.AppleSubscriptions`. ☐ Device check of the link.
+- ⏭️ Next (Dev A): A7 share extension → A8 paywall → A9 README → P1/P2; then one combined iPhone test of A5–A8 before merging to `main` (Snooze-until, I'm frozen, ledger, design) → finish A3 (service #5, URLs, iPhone Safari check).
 
 ## How to run
 1. `cp Config/Local.xcconfig.example Config/Local.xcconfig` and set your `DEVELOPMENT_TEAM` + a `BUNDLE_ID_PREFIX` unique to you (free Apple IDs can't share bundle IDs).
@@ -31,6 +32,8 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
 5. Changing targets, Info.plist keys, or entitlements: edit `project.yml`, then `xcodegen generate`. Adding files in `App/`, `Widgets/`, `ShareExtension/` also needs a regenerate; files inside a package don't.
 
 ## Decisions & why (newest first)
+- 2026-09-27: **Apple path = deep link + Apple's written steps.** `AppStore.showManageSubscriptions(in:)` only manages *this* app's subscription (Apple docs), so it can't cancel someone's Spotify-via-Apple. The button uses `apps.apple.com/account/subscriptions` ⚠️ (confirm on device); the steps come from Apple Support 118428.
+- 2026-09-27: **Dev A finishes A6–A9 + P1/P2 on stacked branches; Dev A tests them together on the iPhone before any of it merges to `main`.**
 - 2026-09-26: **Tapping a trial opens Decide** (the main job); editing moved to swipe/long-press. **Snooze can't pass the last moment to act.** **"Cancelled" only claims money while the charge is still ahead** (the ledger records the real amount at decision time). `completionLedger` is a SharedKit environment value so both packages can write wins.
 - 2026-09-26: **Final-day alarm at 9:00 on the last day to act**; Stop re-arms every 30 min; Decide also queues a re-ring so closing the app without deciding doesn't end the chain; only a recorded decision (or deleting the trial) disarms. Added on the last day after 9:00 → rings in a minute. ⚠️ Web services may charge early on the charge day, before 9:00; if that shows up in testing, move web alarms to the evening before.
 - 2026-09-26: **Merged Phase 0, A1, A2 and the A3 content straight to `main`** (fast-forward, Dev A's call) so Dev B can build on SharedKit now; any interface issues get fixed as they come up. New work continues on short `a/<feature>` branches.

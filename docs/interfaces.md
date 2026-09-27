@@ -129,6 +129,9 @@ UnfreezeView(plan: UnfreezePlan, onFinish: (UnfreezeOutcome) -> Void)
 // Ledger is also in the environment: @Environment(\.completionLedger) (SharedKit).
 ```
 
+### Apple-billed path (A6, for B3)
+`SharedKit.AppleSubscriptions.steps(serviceName:)` returns Apple Support's cancel steps as `[PlanStep]`; `manageURL` is the deep link (⚠️ device check) and `webURL` Apple's web page. B3 can return `UnfreezePlan(steps: AppleSubscriptions.steps(...), source: .appleSubscriptions, isSuggested: false)`.
+
 ## 4. `CancelSteps.json` (content by A, loaded by B)
 Location: `Packages/SharedKit/Sources/SharedKit/Resources/CancelSteps.json`
 ```json

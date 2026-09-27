@@ -61,7 +61,13 @@ struct ReminderDebugView: View {
         }
         .navigationTitle("Reminders + alarm")
         .refreshable { await loadPending() }
-        .task { await loadPending() }
+        .task {
+            // Stop/Decide run as intents outside this screen, so poll instead of waiting for a redraw.
+            while !Task.isCancelled {
+                await loadPending()
+                try? await Task.sleep(for: .seconds(2))
+            }
+        }
     }
 
     private func reschedule() async {

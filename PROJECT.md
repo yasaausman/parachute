@@ -19,8 +19,8 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
   - **A3** 4 of 5 services curated (Spotify, Claude, Google AI Pro, Apple One); see `docs/cancel-steps-verification.md`.
   - ✅ **A1**: Money tab with countdowns, add/edit/delete; persistence verified in the simulator, running on Dev A's iPhone.
   - ✅ **A2**: real `EscalationScheduler` with the reminder ladder + debug time travel; both reminders fired on Dev A's iPhone. Real `EscalationScheduler` now replaces `FakeEscalationScheduler` in `AppDependencies`.
-  - **A4** on `a/a4-alarm`: real final-day alarm chain (Stop re-arms, Decide opens the app, a decision ends it) + a minimal Decide screen. ☐ iPhone run.
-- ⏭️ Next (Dev A): run A4 on the iPhone → A5 Decide screen (Snooze-until, I'm frozen, ledger, design) → finish A3 (service #5, URLs, iPhone Safari check).
+  - ✅ **A4** on `a/a4-alarm`: real final-day alarm chain (Stop re-arms, Decide opens the app, a decision ends it) + a minimal Decide screen; full chain confirmed on Dev A's iPhone.
+- ⏭️ Next (Dev A): A5 Decide screen (Snooze-until, I'm frozen, ledger, design) → finish A3 (service #5, URLs, iPhone Safari check).
 
 ## How to run
 1. `cp Config/Local.xcconfig.example Config/Local.xcconfig` and set your `DEVELOPMENT_TEAM` + a `BUNDLE_ID_PREFIX` unique to you (free Apple IDs can't share bundle IDs).
@@ -61,7 +61,7 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
 ## Milestone checklist (details + owners in MILESTONES.md)
 - [ ] Phase 0: S0.1 project ✅ (Dev A side) · S0.2 contracts + fakes (needs B's review) · S0.3 decisions (partly) · A0 platform spike ✅ · B0 atomizer spike (Dev B)
 - [ ] Day 1: A1 manual deadlines ✅ · A2 reminders ✅ · A3 curate 5 services (4/5) · B1 Unfreeze player · B2 CancelSteps loader · 🔄 Sync 1
-- [ ] Day 2: A4 alarm · A5 Decide · A6 Apple path · B3 UnfreezeEngine · B4 task path · B5 task reminders · 🔄 Sync 2 (full money flow)
+- [ ] Day 2: A4 alarm ✅ · A5 Decide · A6 Apple path · B3 UnfreezeEngine · B4 task path · B5 task reminders · 🔄 Sync 2 (full money flow)
 - [ ] Day 3: A7 share extension · B6 scoreboard · B7 celebration/share · B8 widgets · B9 audio · 🔄 Sync 3
 - [ ] Day 4: A8 paywall · A9 README (RevenueCat) · B10 gating · B11 README (FM) · P1 polish · P2 demo data · 🧊 freeze · 🔄 Sync 4
 - [ ] Day 5: V1 video · V2 README · V3 code sweep · V4 Devpost submit

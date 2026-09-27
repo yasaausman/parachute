@@ -33,6 +33,7 @@ public struct DecideView: View {
                 }
             }
         }
+        .tint(Theme.accent)
     }
 
     private func content(_ deadline: MoneyDeadline) -> some View {

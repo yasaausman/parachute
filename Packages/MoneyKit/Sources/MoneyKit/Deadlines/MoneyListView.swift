@@ -91,6 +91,8 @@ public struct MoneyListView: View {
             DeadlineRow(deadline: deadline, now: now)
         }
         .tint(.primary)
+        .accessibilityHint(deadline.isOpen ? "Opens Decide: cancel, keep, snooze, or get help" : "Edit or reopen")
+        .accessibilityAction(named: "Edit") { editing = deadline }
         .swipeActions(edge: .leading) {
             Button("Edit", systemImage: "pencil") { editing = deadline }
                 .tint(.gray)

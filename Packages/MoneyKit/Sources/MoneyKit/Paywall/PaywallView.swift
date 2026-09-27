@@ -61,6 +61,7 @@ public struct PaywallView: View {
         VStack(spacing: 8) {
             Image(systemName: "parachute")
                 .font(.system(size: 52))
+                .accessibilityHidden(true)
                 .foregroundStyle(Theme.accent)
             Text("Parachute Pro")
                 .font(.largeTitle.bold())
@@ -216,7 +217,7 @@ private struct FeatureRow: View {
         Label {
             Text(text)
         } icon: {
-            Image(systemName: systemImage).foregroundStyle(Theme.accent)
+            Image(systemName: systemImage).foregroundStyle(Theme.accent).accessibilityHidden(true)
         }
     }
 }

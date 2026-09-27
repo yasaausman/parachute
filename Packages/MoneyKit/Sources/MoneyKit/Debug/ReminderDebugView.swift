@@ -109,6 +109,9 @@ struct ReminderDebugView: View {
 /// The Debug tab: every Dev A test bench in one place.
 public struct MoneyDebugMenu: View {
     @Environment(\.proEntitlements) private var pro
+    @Environment(\.modelContext) private var context
+    @Environment(\.moneyEscalation) private var escalation
+    @State private var confirmingClear = false
     @AppStorage(ProEntitlements.forceProKey, store: AppGroup.defaults) private var forcePro = false
 
     public init() {}
@@ -117,6 +120,17 @@ public struct MoneyDebugMenu: View {
         List {
             NavigationLink("Platform spike (A0)") { PlatformSpikeView() }
             NavigationLink("Reminders, alarm + time travel (A2, A4)") { ReminderDebugView() }
+
+            Section {
+                Button("Load demo trials") {
+                    Task { await DemoData.load(into: context, escalation: escalation) }
+                }
+                Button("Clear all trials", role: .destructive) { confirmingClear = true }
+            } header: {
+                Text("Demo data (P2)")
+            } footer: {
+                Text("Spotify (3 days), Duolingo via Apple (tomorrow), Claude, Google AI Pro, and a cancelled Apple One.")
+            }
 
             if let pro {
                 Section {
@@ -135,5 +149,10 @@ public struct MoneyDebugMenu: View {
             }
         }
         .navigationTitle("Debug")
+        .confirmationDialog("Delete every trial?", isPresented: $confirmingClear, titleVisibility: .visible) {
+            Button("Delete all", role: .destructive) {
+                Task { await DemoData.clear(context, escalation: escalation) }
+            }
+        }
     }
 }

@@ -130,6 +130,8 @@ public struct DecideView: View {
 struct ChoiceButton: View {
     enum Style { case primary, frozen, plain }
 
+    @Environment(\.dynamicTypeSize) private var typeSize
+
     let title: String
     let subtitle: String
     let systemImage: String
@@ -138,16 +140,24 @@ struct ChoiceButton: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: Theme.spacing) {
+            // Accessibility text sizes stack the icon above the words so they get the full width.
+            let layout = typeSize.isAccessibilitySize
+                ? AnyLayout(VStackLayout(alignment: .leading, spacing: 8))
+                : AnyLayout(HStackLayout(spacing: Theme.spacing))
+            layout {
                 Image(systemName: systemImage)
                     .font(.title2)
-                    .frame(width: 32)
+                    .frame(minWidth: 32, alignment: .leading)
+                    .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title).font(.headline)
                     Text(subtitle).font(.subheadline).opacity(0.8)
                 }
-                Spacer(minLength: 0)
-                Image(systemName: "chevron.right").font(.footnote.bold()).opacity(0.5)
+                if !typeSize.isAccessibilitySize {
+                    Spacer(minLength: 0)
+                    Image(systemName: "chevron.right").font(.footnote.bold()).opacity(0.5)
+                        .accessibilityHidden(true)
+                }
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -155,7 +165,10 @@ struct ChoiceButton: View {
             .background(background, in: .rect(cornerRadius: Theme.cornerRadius))
         }
         .buttonStyle(.plain)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(title)
         .accessibilityHint(subtitle)
+        .accessibilityAddTraits(.isButton)
     }
 
     private var foreground: Color {

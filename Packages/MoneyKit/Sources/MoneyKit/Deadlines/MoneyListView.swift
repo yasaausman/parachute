@@ -69,13 +69,28 @@ public struct MoneyListView: View {
         }
     }
 
+    /// Open trials: tap to decide (the main job). Decided ones: tap to edit or reopen.
     private func row(_ deadline: MoneyDeadline, now: Date) -> some View {
         Button {
-            editing = deadline
+            if deadline.isOpen {
+                DecideRouter.shared.request(itemID: deadline.id)
+            } else {
+                editing = deadline
+            }
         } label: {
             DeadlineRow(deadline: deadline, now: now)
         }
         .tint(.primary)
+        .swipeActions(edge: .leading) {
+            Button("Edit", systemImage: "pencil") { editing = deadline }
+                .tint(.gray)
+        }
+        .contextMenu {
+            Button("Edit", systemImage: "pencil") { editing = deadline }
+            if deadline.isOpen {
+                Button("Decide", systemImage: "arrow.up.forward.app") { DecideRouter.shared.request(itemID: deadline.id) }
+            }
+        }
     }
 
     private func delete(_ list: [MoneyDeadline], at offsets: IndexSet) {
@@ -99,13 +114,7 @@ struct DeadlineRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(DeadlineMath.summary(
-                serviceName: deadline.serviceName,
-                amountCents: deadline.amountCents,
-                currencyCode: deadline.currencyCode,
-                due: deadline.dueDate,
-                now: now
-            ))
+            Text(headline)
             .font(.headline)
             .foregroundStyle(deadline.isOpen && daysToAct <= 1 ? Theme.accent : .primary)
 
@@ -117,11 +126,30 @@ struct DeadlineRow: View {
         .accessibilityElement(children: .combine)
     }
 
+    /// Open: the countdown. Decided: just the service and amount; the countdown no longer matters.
+    private var headline: String {
+        guard deadline.isOpen else {
+            return "\(deadline.serviceName) · \(deadline.amountCents.formattedCents(currencyCode: deadline.currencyCode))"
+        }
+        return DeadlineMath.summary(
+            serviceName: deadline.serviceName,
+            amountCents: deadline.amountCents,
+            currencyCode: deadline.currencyCode,
+            due: deadline.dueDate,
+            now: now
+        )
+    }
+
     private var detail: String {
         let charge = deadline.dueDate.formatted(.dateTime.month(.abbreviated).day())
         switch deadline.status {
-        case .cancelled: return "Cancelled before the charge"
+        case .cancelled:
+            // Only claim the money while the charge is still ahead; the ledger keeps the real record.
+            guard DeadlineDecision.beforeCharge(deadline.dueDate, now: now) else { return "Cancelled" }
+            return "Cancelled · \(deadline.amountCents.formattedCents(currencyCode: deadline.currencyCode)) won't be charged"
         case .kept: return "Kept"
+        case .snoozed where (deadline.snoozedUntil ?? .distantPast) > now:
+            return "Snoozed until \(deadline.snoozedUntil!.formatted(date: .omitted, time: .shortened))"
         case .snoozed, .tracking:
             guard deadline.billedByApple else { return "Charges \(charge)" }
             let cancelBy = deadline.cancelBy.formatted(.dateTime.month(.abbreviated).day())

@@ -2,26 +2,43 @@ import SharedKit
 import SwiftData
 import SwiftUI
 
-/// A4 minimum: record a decision so the alarm chain ends. A5 adds Snooze-until, "I'm frozen",
-/// the ledger write, and the final design.
+/// A5: the Decide screen. Opened by the alarm's Decide button, a reminder tap, or a trial row.
+/// Cancel · I'm frozen · Keep · Snooze. Never imports ParachuteKit: "I'm frozen" is a closure.
 public struct DecideView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
     @Environment(\.moneyEscalation) private var escalation
+    @Environment(\.completionLedger) private var ledger
     @Query private var matches: [MoneyDeadline]
+    @State private var path: [Step] = []
 
     private let itemID: UUID
+    private let onFrozen: (UnfreezeRequest) -> Void
 
-    public init(itemID: UUID) {
+    enum Step: Hashable {
+        case cancelSteps
+        case snooze
+    }
+
+    public init(itemID: UUID, onFrozen: @escaping (UnfreezeRequest) -> Void) {
         self.itemID = itemID
+        self.onFrozen = onFrozen
         _matches = Query(filter: #Predicate<MoneyDeadline> { $0.id == itemID })
     }
 
     public var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             Group {
                 if let deadline = matches.first {
-                    content(deadline)
+                    choices(for: deadline)
+                        .navigationDestination(for: Step.self) { step in
+                            switch step {
+                            case .cancelSteps:
+                                CancelStepsView(deadline: deadline, onDone: { decide(.cancelled, deadline) }, onFrozen: { frozen(deadline) })
+                            case .snooze:
+                                SnoozeView(deadline: deadline) { until in decide(.snoozed(until: until), deadline) }
+                            }
+                        }
                 } else {
                     ContentUnavailableView("This trial is gone", systemImage: "questionmark.circle", description: Text("It may have been deleted. Nothing will ring for it."))
                         .task { await escalation?.resolve(itemID: itemID) }
@@ -29,57 +46,131 @@ public struct DecideView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Later") { dismiss() }
+                    Button("Not now") { dismiss() }
                 }
             }
         }
         .tint(Theme.accent)
     }
 
-    private func content(_ deadline: MoneyDeadline) -> some View {
-        VStack(spacing: Theme.spacing * 1.5) {
-            Spacer()
-            Text(DeadlineMath.summary(
-                serviceName: deadline.serviceName,
-                amountCents: deadline.amountCents,
-                currencyCode: deadline.currencyCode,
-                due: deadline.dueDate,
-                now: .now
-            ))
-            .font(.title.bold())
-            .multilineTextAlignment(.center)
+    private func choices(for deadline: MoneyDeadline) -> some View {
+        ScrollView {
+            VStack(spacing: Theme.spacing) {
+                header(deadline)
+                    .padding(.vertical, Theme.spacing)
 
-            Text("What do you want to do?")
-                .foregroundStyle(.secondary)
+                ChoiceButton(
+                    title: "Cancel it",
+                    subtitle: "See the exact steps, then mark it done",
+                    systemImage: "xmark.circle.fill",
+                    style: .primary
+                ) { path.append(.cancelSteps) }
 
-            Spacer()
+                ChoiceButton(
+                    title: "I'm frozen",
+                    subtitle: "One tiny step at a time. The first one is free.",
+                    systemImage: "snowflake",
+                    style: .frozen
+                ) { frozen(deadline) }
 
-            Button {
-                record(.cancelled, for: deadline)
-            } label: {
-                Label("I cancelled it", systemImage: "checkmark.circle.fill")
-                    .frame(maxWidth: .infinity)
+                ChoiceButton(
+                    title: "Keep it",
+                    subtitle: "Stop reminding me. I want this one.",
+                    systemImage: "hand.thumbsup.fill",
+                    style: .plain
+                ) { decide(.kept, deadline) }
+
+                ChoiceButton(
+                    title: "Snooze",
+                    subtitle: "Remind me a bit later",
+                    systemImage: "moon.zzz.fill",
+                    style: .plain
+                ) { path.append(.snooze) }
             }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-
-            Button {
-                record(.kept, for: deadline)
-            } label: {
-                Label("Keep it", systemImage: "hand.thumbsup")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
+            .padding()
         }
-        .padding()
     }
 
-    private func record(_ status: DeadlineStatus, for deadline: MoneyDeadline) {
-        deadline.status = status
-        try? context.save()
-        let id = deadline.id
-        Task { await escalation?.resolve(itemID: id) }
-        dismiss()
+    private func header(_ deadline: MoneyDeadline) -> some View {
+        VStack(spacing: 8) {
+            Text(deadline.serviceName)
+                .font(.largeTitle.bold())
+            Text(chargeLine(deadline))
+                .font(.title3)
+                .foregroundStyle(Theme.accent)
+            if deadline.billedByApple {
+                Text("Billed by Apple: cancel by \(deadline.cancelBy.formatted(.dateTime.weekday(.wide).month(.abbreviated).day())).")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .multilineTextAlignment(.center)
+        .accessibilityElement(children: .combine)
+    }
+
+    private func chargeLine(_ deadline: MoneyDeadline) -> String {
+        let amount = deadline.amountCents.formattedCents(currencyCode: deadline.currencyCode)
+        let days = DeadlineMath.calendarDays(from: .now, to: deadline.dueDate)
+        return "\(amount) \(DeadlineMath.countdownText(days: days))"
+    }
+
+    private func decide(_ decision: DeadlineDecision, _ deadline: MoneyDeadline) {
+        Task {
+            await decision.apply(to: deadline, context: context, escalation: escalation, ledger: ledger)
+            dismiss()
+        }
+    }
+
+    private func frozen(_ deadline: MoneyDeadline) {
+        onFrozen(deadline.unfreezeRequest)
+    }
+}
+
+/// A big, calm, full-width choice. ADHD-first: one idea per button, a short "what happens" line.
+struct ChoiceButton: View {
+    enum Style { case primary, frozen, plain }
+
+    let title: String
+    let subtitle: String
+    let systemImage: String
+    let style: Style
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: Theme.spacing) {
+                Image(systemName: systemImage)
+                    .font(.title2)
+                    .frame(width: 32)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title).font(.headline)
+                    Text(subtitle).font(.subheadline).opacity(0.8)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right").font(.footnote.bold()).opacity(0.5)
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .foregroundStyle(foreground)
+            .background(background, in: .rect(cornerRadius: Theme.cornerRadius))
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint(subtitle)
+    }
+
+    private var foreground: Color {
+        switch style {
+        case .primary: .white
+        case .frozen: .primary
+        case .plain: .primary
+        }
+    }
+
+    private var background: Color {
+        switch style {
+        case .primary: Theme.accent
+        case .frozen: Theme.frozen.opacity(0.25)
+        case .plain: Color(.secondarySystemBackground)
+        }
     }
 }

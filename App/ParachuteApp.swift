@@ -25,6 +25,7 @@ struct ParachuteApp: App {
             RootView()
                 .environment(dependencies)
                 .environment(\.moneyEscalation, dependencies.moneyEscalation)
+                .environment(\.completionLedger, dependencies.ledger)
         }
         .modelContainer(container)
     }

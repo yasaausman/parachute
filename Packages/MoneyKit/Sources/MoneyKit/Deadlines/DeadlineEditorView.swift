@@ -70,6 +70,14 @@ public struct DeadlineEditorView: View {
                 Text("Turn this on if you started it inside an iPhone app and pay with your Apple Account. Apple needs you to cancel at least a day early, so Parachute counts down to the day before.")
             }
 
+            if let deadline, !deadline.isOpen {
+                Section {
+                    Button("Reopen", systemImage: "arrow.uturn.backward") { reopen(deadline) }
+                } footer: {
+                    Text("You marked this \(deadline.status == .kept ? "kept" : "cancelled"). Reopen it to get reminders and the alarm again.")
+                }
+            }
+
             if deadline != nil {
                 Section {
                     Button("Delete", role: .destructive) { confirmingDelete = true }
@@ -120,6 +128,15 @@ public struct DeadlineEditorView: View {
         }
         try? context.save()
         let snapshot = MoneyDeadlineSnapshot(saved)
+        Task { try? await escalation?.schedule(deadline: snapshot) }
+        dismiss()
+    }
+
+    private func reopen(_ deadline: MoneyDeadline) {
+        deadline.status = .tracking
+        deadline.snoozedUntil = nil
+        try? context.save()
+        let snapshot = MoneyDeadlineSnapshot(deadline)
         Task { try? await escalation?.schedule(deadline: snapshot) }
         dismiss()
     }

@@ -3,7 +3,8 @@ import SharedKit
 import SwiftUI
 
 struct RootView: View {
-    @Bindable private var decide = DecideRouter.shared
+    @State private var router = SheetRouter()
+    private let decide = DecideRouter.shared
 
     var body: some View {
         TabView {
@@ -26,8 +27,21 @@ struct RootView: View {
             #endif
         }
         .tint(Theme.accent)
-        .sheet(item: $decide.pending) { request in
-            DecideView(itemID: request.itemID)
+        .sheet(item: $router.sheet) { sheet in
+            switch sheet {
+            case .decide(let itemID):
+                DecideView(itemID: itemID) { request in
+                    router.sheet = .unfreeze(request, itemID: itemID)
+                }
+            case .unfreeze(let request, let itemID):
+                UnfreezeHost(request: request, itemID: itemID)
+            }
+        }
+        // Alarm "Decide", reminder taps and trial rows all land here.
+        .onChange(of: decide.pending) { _, request in
+            guard let request else { return }
+            router.sheet = .decide(itemID: request.itemID)
+            decide.pending = nil
         }
     }
 

@@ -71,8 +71,12 @@ public actor EscalationScheduler: EscalationScheduling {
             await resolve(itemID: deadline.id)
             return
         }
-        await clearReminders(itemID: deadline.id)
         let current = now()
+        // A snooze already replaced the ladder with one nudge (and moved the alarm); leave it.
+        if let until = deadline.snoozedUntil, until > current {
+            return
+        }
+        await clearReminders(itemID: deadline.id)
         let reminders = ReminderPlanner.moneyReminders(
             itemID: deadline.id,
             serviceName: deadline.serviceName,
@@ -191,6 +195,7 @@ public struct MoneyDeadlineSnapshot: Sendable, Hashable {
     public var dueDate: Date
     public var billedByApple: Bool
     public var isOpen: Bool
+    public var snoozedUntil: Date?
 
     public init(_ deadline: MoneyDeadline) {
         id = deadline.id
@@ -200,9 +205,10 @@ public struct MoneyDeadlineSnapshot: Sendable, Hashable {
         dueDate = deadline.dueDate
         billedByApple = deadline.billedByApple
         isOpen = deadline.isOpen
+        snoozedUntil = deadline.status == .snoozed ? deadline.snoozedUntil : nil
     }
 
-    public init(id: UUID, serviceName: String, amountCents: Int, currencyCode: String = "USD", dueDate: Date, billedByApple: Bool, isOpen: Bool = true) {
+    public init(id: UUID, serviceName: String, amountCents: Int, currencyCode: String = "USD", dueDate: Date, billedByApple: Bool, isOpen: Bool = true, snoozedUntil: Date? = nil) {
         self.id = id
         self.serviceName = serviceName
         self.amountCents = amountCents
@@ -210,5 +216,6 @@ public struct MoneyDeadlineSnapshot: Sendable, Hashable {
         self.dueDate = dueDate
         self.billedByApple = billedByApple
         self.isOpen = isOpen
+        self.snoozedUntil = snoozedUntil
     }
 }

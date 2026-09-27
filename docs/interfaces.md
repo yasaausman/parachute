@@ -118,13 +118,15 @@ public protocol CompletionLedger: Sendable {
 ## 3. UI hand-off (App target wires it)
 ```swift
 // A's Decide screen never imports ParachuteKit. It just calls a closure:
-DecideView(deadline: d, onFrozen: { request in router.presentUnfreeze(request) })
+DecideView(itemID: id, onFrozen: { request in router.sheet = .unfreeze(request, itemID: id) })   // as built (A5)
 
 // B provides the player:
 UnfreezeView(plan: UnfreezePlan, onFinish: (UnfreezeOutcome) -> Void)
 
-// App/Router.swift (either dev, small): presentUnfreeze → provider.plan(for:) → UnfreezeView
-// → on .completed for a money item: ledger.record(.moneyCancelled, …) + escalation.resolve(id)
+// App/SheetRouter.swift + App/UnfreezeHost.swift (built in A5): provider.plan(for:) → player
+// → on .completed for a money item: DeadlineDecision.cancelled.apply(…) = status + ledger.record(.moneyCancelled, …) + escalation.resolve(id)
+// UnfreezeHost shows a placeholder list until B1: swap in UnfreezeView(plan:onFinish:) there.
+// Ledger is also in the environment: @Environment(\.completionLedger) (SharedKit).
 ```
 
 ## 4. `CancelSteps.json` (content by A, loaded by B)

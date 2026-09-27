@@ -120,7 +120,8 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
 - [ ] **A8 RevenueCat paywall.** Offerings: **$29.99 lifetime** (headline), $3.99/mo, $24.99/yr, 7-day trial; `EntitlementsProviding` (real) → `isPro`; Restore; the ironic banner; **a local reminder 24h before Parachute's own trial ends**.
   *Done when:* a Test Store purchase flips `isPro`, restore works, and gated features unlock.
   *Status (2026-09-27):* built on `a/a8-paywall`. `ProEntitlements` (real `EntitlementsProviding`): follows RevenueCat's `customerInfoStream`, `parachute_pro` → `isPro`; restore; schedules "your Parachute trial ends tomorrow" 24 h before a renewing trial ends. Custom `PaywallView` from the current offering: lifetime first ("BEST"), then yearly, monthly; "Start free trial" + the ironic banner when a package has a free trial; Restore; honest Test Store note in Debug. Gating (`ProFeatures`): free = 5 open trials + reminders + cancel steps; Pro = unlimited + final-day alarm (arms/disarms on change). Debug: Force Pro, Show paywall, preview the trial reminder. Simulator: lifetime Test Store purchase → Pro = yes. 2 new tests. ☐ **Dev A: create the real-price products in RevenueCat** (Test Store prices can't be edited: *"You cannot edit an existing product's identifier, duration, or price… after it has been saved"*) · ☐ iPhone run.
-- [ ] **A9 README: "How RevenueCat is used"** + money-path architecture notes.
+- [x] **A9 README: "How RevenueCat is used"** + money-path architecture notes.
+  *Status (2026-09-27):* on `a/a9-readme`: RevenueCat table (setup, offerings, `parachute_pro`, purchase/restore, gating, our-own-trial reminder), money-path Mermaid diagram + design notes, build/run, privacy. Screenshots and the full two-path diagram come with V2/B11.
 
 ### Dev B
 - [ ] **B10 Gating in Parachute.** "First step always free"; AI unfreeze + voice are Pro, via **A's `EntitlementsProviding`**. (Or 3/week if you chose that.)

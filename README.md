@@ -4,7 +4,7 @@
 
 > 79% of Americans have started a free trial meaning to cancel, and got charged anyway ([Dimers, 2026](https://www.dimers.com/press/news/how-far-americans-will-go-for-freebies)). For ADHD brains the problem isn't remembering. It's **starting**.
 
-_Status: in development for the [RevenueCat Shipaton 2026](https://revenuecat-shipaton-2026.devpost.com/) Next Gen Award. This README is replaced with the full submission version (screenshots, architecture diagram, "How RevenueCat is used") on Day 4–5; see `MILESTONES.md`._
+_Status: in development for the [RevenueCat Shipaton 2026](https://revenuecat-shipaton-2026.devpost.com/) Next Gen Award. Screenshots and the full architecture diagram land with the final submission; see `MILESTONES.md`._
 
 ## How it works
 1. **Catch:** share a screenshot of a trial confirmation; on-device AI finds the service, price, and end date.
@@ -15,6 +15,51 @@ _Status: in development for the [RevenueCat Shipaton 2026](https://revenuecat-sh
 
 ## Built with
 SwiftUI · SwiftData · AlarmKit · Apple Foundation Models (on-device) · Vision · RevenueCat
+
+## How RevenueCat is used
+RevenueCat powers every purchase in Parachute and decides what Pro unlocks. All of it lives in `Packages/MoneyKit`.
+
+| What | How | Where |
+|---|---|---|
+| **Setup** | `purchases-ios` pinned at **5.91.0** via SPM. `Purchases.configure(withAPIKey:)` runs once at launch, **only in Debug**, with a **Test Store** key read from a gitignored `Config/Secrets.xcconfig`. Release builds carry no key (the SDK deliberately crashes a release build that uses a Test Store key). | `Entitlements/RevenueCatBootstrap.swift`, `Config/*.xcconfig` |
+| **Offerings, not hard-coded prices** | The paywall renders whatever is in the **current offering** (`Purchases.shared.offerings().current`), sorted lifetime → yearly → monthly, with localized prices from each `StoreProduct`. Changing prices or plans is a dashboard change, not an app update. | `Paywall/PaywallView.swift` |
+| **One entitlement** | Every product unlocks the **`parachute_pro`** entitlement. `ProEntitlements` listens to `customerInfoStream` and exposes `isPro`, so the UI updates the moment a purchase, restore, renewal, or expiry lands. | `Entitlements/ProEntitlements.swift` |
+| **Purchase + restore** | `purchase(package:)` and `restorePurchases()`, with plain-language results ("Nothing was charged"). | `Paywall/PaywallView.swift` |
+| **Gating** | `ProEntitlements` is also the shared `EntitlementsProviding` protocol, so the Parachute module (Dev B) gates its Pro features without importing RevenueCat. Money side: free keeps 5 open trials, reminders, and hand-checked cancel steps; Pro adds unlimited trials and the **final-day alarm** (armed or disarmed the moment Pro changes). | `ProFeatures`, `SharedKit/Protocols/EntitlementsProviding.swift` |
+| **Our own trial, honestly** | If `parachute_pro` is in a **trial period** that will renew, Parachute schedules a local notification **24 hours before its own trial ends**, using the entitlement's `expirationDate` and `periodType`. An app about forgotten trials shouldn't be one. | `ProEntitlements.scheduleTrialReminder` |
+
+**Pricing:** **$29.99 lifetime** is the headline ("We'd never charge a subscription to fix your follow-through"), with $24.99/yr and $3.99/mo as options. "Your first step is always free."
+
+## Money path architecture
+```mermaid
+flowchart LR
+    Share["Share sheet<br/>(screenshot or text)"] --> OCR["Vision OCR"] --> Extract["Patterns + on-device<br/>Foundation Models<br/>(fact-checked)"] --> Track["Track it?"]
+    Manual["Add trial"] --> Store
+    Track --> Store[("SwiftData<br/>App Group")]
+    Store --> Esc["EscalationScheduler"]
+    Esc --> Rem["Reminders<br/>-3d, -1d at 10:00"]
+    Esc --> Alarm["AlarmKit final-day alarm<br/>(Pro)"]
+    Alarm -- "Stop: re-arms in 30 min" --> Alarm
+    Alarm -- "Decide" --> Decide["Decide screen"]
+    Rem -- "tap" --> Decide
+    Decide -- "Cancel it / Keep it" --> Ledger["CompletionLedger<br/>(scoreboard)"]
+    Decide -- "I'm frozen" --> Unfreeze["Unfreeze player<br/>(ParachuteKit)"]
+    Decide -- "Snooze" --> Esc
+```
+- **The alarm can't be silenced for good, only answered.** AlarmKit alerts have a Stop button plus one custom button. Stop runs an App Intent that schedules the next ring 30 minutes later (even if the app was force-quit); **Decide** opens the app. Only a recorded decision ends the chain.
+- **Apple-billed trials move a day earlier.** Apple asks for cancellation "at least a day before each renewal date", so reminders and the alarm count down to the day before the charge.
+- **Capture never invents facts.** Pattern matching always runs, so capture works without Apple Intelligence. When the on-device model is available it may choose among the prices and dates printed in the screenshot, but anything it returns that isn't printed there is dropped. Scored with `TrialCaptureEval` on committed fixtures (`Packages/MoneyKit/Fixtures/`).
+- **MoneyKit never imports ParachuteKit.** "I'm frozen" is a closure; the app target wires the two packages together through the protocols in `SharedKit` (`docs/interfaces.md`).
+
+## Build and run
+1. Xcode 27 (iOS 27 SDK), an iPhone on iOS 26 or later, and [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`brew install xcodegen`).
+2. `cp Config/Local.xcconfig.example Config/Local.xcconfig` and set your team ID and a bundle prefix of your own. A free Apple ID works.
+3. Optional, for purchases: `cp Config/Secrets.xcconfig.example Config/Secrets.xcconfig` and paste a RevenueCat **Test Store** key (Debug only).
+4. `xcodegen generate`, open `Parachute.xcodeproj`, and run on your iPhone. AlarmKit needs a real device.
+5. Tests: `xcodebuild -project Parachute.xcodeproj -scheme Parachute -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test`. Capture eval (Mac with Apple Intelligence): `swift run --package-path Packages/MoneyKit TrialCaptureEval Packages/MoneyKit/Fixtures/TrialScreenshots`.
+
+## Privacy
+Everything stays on the phone: no account, no server, no analytics. Screenshots are read with on-device Vision and Apple's on-device model. The only network traffic is RevenueCat, for purchases.
 
 ## Repo guide
 - `PLAN.md`: product, research, verdict, architecture

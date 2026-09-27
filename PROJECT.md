@@ -24,7 +24,8 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
   - **A6** on `a/a6-apple-path`: "Open Apple Subscriptions" + Apple's own steps for Apple-billed trials; shared with B3 via `SharedKit.AppleSubscriptions`. ☐ Device check of the link.
   - **A7** on `a/a7-share-extension`: share a screenshot/text → on-device OCR + extraction → "Track it?" → saved. 10/10 fixtures, 4/5 real. ☐ iPhone run.
   - **A8** on `a/a8-paywall`: RevenueCat entitlements + custom paywall (lifetime headline, ironic banner, restore) + Pro gating of the final-day alarm and >5 trials. Simulated purchase flips Pro. ☐ Real-price products in the dashboard · ☐ iPhone run.
-- ⏭️ Next (Dev A): A9 README → A9 README → P1/P2; then one combined iPhone test of A5–A8 before merging to `main` (Snooze-until, I'm frozen, ledger, design) → finish A3 (service #5, URLs, iPhone Safari check).
+  - ✅ **A9** on `a/a9-readme`: README "How RevenueCat is used", money-path architecture, build steps, privacy.
+- ⏭️ Next (Dev A): P1 polish + P2 demo data → A9 README → P1/P2; then one combined iPhone test of A5–A8 before merging to `main` (Snooze-until, I'm frozen, ledger, design) → finish A3 (service #5, URLs, iPhone Safari check).
 
 ## How to run
 1. `cp Config/Local.xcconfig.example Config/Local.xcconfig` and set your `DEVELOPMENT_TEAM` + a `BUNDLE_ID_PREFIX` unique to you (free Apple IDs can't share bundle IDs).

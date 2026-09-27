@@ -7,6 +7,7 @@ public struct FrozenTaskEntryView: View {
     @Environment(\.dismiss) private var dismiss
     
     var unfreezeProvider: any UnfreezeProviding
+    var reminderService: TaskReminderService?
     
     @State private var taskTitle: String = ""
     @State private var hasDueDate: Bool = false
@@ -16,8 +17,9 @@ public struct FrozenTaskEntryView: View {
     @State private var generatedPlan: UnfreezePlan?
     @State private var navigateToPlan: Bool = false
     
-    public init(unfreezeProvider: any UnfreezeProviding) {
+    public init(unfreezeProvider: any UnfreezeProviding, reminderService: TaskReminderService? = nil) {
         self.unfreezeProvider = unfreezeProvider
+        self.reminderService = reminderService
     }
     
     public var body: some View {
@@ -129,6 +131,10 @@ public struct FrozenTaskEntryView: View {
                     self.generatedPlan = plan
                     self.isRequestingPlan = false
                     self.navigateToPlan = true
+                }
+                
+                if let task = self.createdTask, task.dueDate != nil {
+                    try? await reminderService?.scheduleReminders(for: task)
                 }
             } catch {
                 await MainActor.run {

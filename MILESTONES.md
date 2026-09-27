@@ -78,7 +78,7 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
   *Done when:* the right source is picked for all 4 cases in unit tests.
 - [x] **B4 Task path.** Home "I'm frozen" → "What's overwhelming you?" → `FrozenTask` (+ optional due time) → atomizer → player. "Break it smaller" re-atomizes the current step.
   *Done when:* 5 of B0's test tasks go from typed description to finished on device.
-- [ ] **B5 Task reminders.** The task path uses **A's `EscalationScheduling`** for due-time reminders and the deadline alarm.
+- [x] **B5 Task reminders.** The task path uses **A's `EscalationScheduling`** for due-time reminders and the deadline alarm.
   *Done when:* a task due in 5 minutes (time-travel) triggers a reminder.
 
 ### 🔄 Sync 2 (end of Day 2): the full money flow
@@ -95,11 +95,11 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
 ### Dev B
 - [x] **B6 Scoreboard + ledger.** `CompletionLedger` implementation; "ADHD Tax Refunded" screen: $ back · tasks unfrozen · **best run** (no shame); monthly list.
   *Done when:* the numbers are right after cancel, keep (no $), task done, and snooze (nothing).
-- [ ] **B7 Celebration + share.** Confetti + haptics on every win; "Share my wins" renders an image card.
+- [x] **B7 Celebration + share.** Confetti + haptics on every win; "Share my wins" renders an image card.
   *Done when:* smooth on device; the share sheet exports the image.
-- [ ] **B8 Widgets.** Money countdown ("Hulu · $17.99 in 3 days") + task variant ("Essay · Step 3 of 7"), reading SharedKit data from the App Group.
+- [x] **B8 Widgets.** Money countdown ("Hulu · $17.99 in 3 days") + task variant ("Essay · Step 3 of 7"), reading SharedKit data from the App Group.
   *Done when:* both widgets update after changes in the app.
-- [ ] **B9 Audio companion.** AVSpeechSynthesizer reads the step aloud (toggle) + gentle procedural ambient sound (AVAudioEngine; no licensed audio).
+- [x] **B9 Audio companion.** AVSpeechSynthesizer reads the step aloud (toggle) + gentle procedural ambient sound (AVAudioEngine; no licensed audio).
   *Done when:* on/off works; audio stops cleanly when the player closes.
 
 ### 🔄 Sync 3
@@ -115,13 +115,13 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
 - [ ] **A9 README: "How RevenueCat is used"** + money-path architecture notes.
 
 ### Dev B
-- [ ] **B10 Gating in Parachute.** "First step always free"; AI unfreeze + voice are Pro, via **A's `EntitlementsProviding`**. (Or 3/week if you chose that.)
+- [x] **B10 Gating in Parachute.** "First step always free"; AI unfreeze + voice are Pro, via **A's `EntitlementsProviding`**. (Or 3/week if you chose that.)
   *Done when:* the free user sees Step 1, then an upsell; a Pro user gets everything.
-- [ ] **B11 README: Foundation Models / Unfreeze section** + the Mermaid architecture diagram.
+- [x] **B11 README: Foundation Models / Unfreeze section** + the Mermaid architecture diagram.
 
 ### Both (afternoon)
 - [ ] **P1 Polish your own screens.** Dark Mode · Dynamic Type · VoiceOver labels · SF Symbols · smooth transitions.
-- [ ] **P2 Demo data.** A seed button in debug with realistic items (only Apple-billed trials go to Apple's page, per CLAUDE.md rule 8).
+- [x] **P2 Demo data.** A seed button in debug with realistic items (only Apple-billed trials go to Apple's page, per CLAUDE.md rule 8).
 - [ ] **🧊 FEATURE FREEZE at end of Day 4.** Only bug fixes after this.
 
 ### 🔄 Sync 4

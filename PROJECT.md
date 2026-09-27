@@ -17,13 +17,21 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
   - **S0.2** drafted: every model + protocol from `docs/interfaces.md` compiles in SharedKit, fakes in `SharedKit/Fakes`, wired in `App/AppDependencies.swift`. ☐ Needs Dev B's review.
   - ✅ **A0 passed 11/11 on a free Apple ID** (2026-09-26): AlarmKit Stop re-arms (even after force-quit), Decide opens the app and ends the chain, rings on Silent; local notifications work; RevenueCat Test Store purchase grants `parachute_pro`. Details + A4 notes: `docs/a0-platform-spike.md`.
 - ✅ Day 1 Dev A (branch `a/a1-money-deadlines`): A1 manual money deadlines with countdowns
-- ✅ Day 1–3 Dev B (branch `b/day1`, 2026-09-26):
+- ✅ **ALL Dev B milestones complete** (branch `b/day1`, 2026-09-27):
   - **B1** UnfreezeView: one-step-at-a-time player, 90s countdown ring, companion lines, ADHD-friendly copy
   - **B2** CancelStepsLoader + validation tests (validates CancelSteps.json structure)
   - **B3** UnfreezeEngine: curated → Apple path → AI fallback → non-AI fallback, with unit tests
   - **B4** FrozenTaskEntryView + TaskListView: "I'm frozen" task entry → plan → player
+  - **B5** TaskReminderService: wires EscalationScheduling for tasks with due dates
   - **B6** SwiftDataLedger (@ModelActor) + ScoreboardView: ADHD Tax Refunded, tasks unfrozen, best run
-- ⏭️ Next Dev B: B5 task reminders (uses A's EscalationScheduling), B7 celebration + share, B8 widgets, B9 audio
+  - **B7** CelebrationView (confetti + haptics) + ShareCardView (ImageRenderer) + ShareSheet
+  - **B8** Widgets: MoneyWidget (small/medium, urgency colors) + TaskWidget (small, step progress)
+  - **B9** AudioCompanion: AVSpeechSynthesizer voice + AVAudioEngine ambient sine wave w/ fade in/out
+  - **B10** ProGateModifier + ProGatedFeature: async isPro check, "first step always free"
+  - **B11** README section: Foundation Models docs + Mermaid architecture diagram (in `docs/readme-dev-b.md`)
+  - **P2** DemoDataSeeder: realistic completion records, active task, money deadlines
+- ⏭️ Next Dev B: P1 polish (VoiceOver labels, transitions) + B0 atomizer spike (real device)
+- ⏭️ Next Dev A: A2 reminders, A4 alarm, A5 Decide, A8 paywall
 
 ## How to run
 1. `cp Config/Local.xcconfig.example Config/Local.xcconfig` and set your `DEVELOPMENT_TEAM` + a `BUNDLE_ID_PREFIX` unique to you (free Apple IDs can't share bundle IDs).

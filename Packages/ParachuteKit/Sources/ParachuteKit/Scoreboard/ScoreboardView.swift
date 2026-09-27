@@ -128,8 +128,24 @@ public struct ScoreboardView: View {
         }
     }
     
+    @State private var showingShare = false
+
     private func shareWins() {
-        // Placeholder for sharing functionality
+        showingShare = true
+    }
+}
+
+extension ScoreboardView {
+    var shareSheet: some View {
+        self.sheet(isPresented: $showingShare) {
+            if let image = ShareCardView(
+                totalCentsRefunded: totalRefunded,
+                tasksUnfrozen: tasksUnfrozen,
+                bestRun: bestRun
+            ).renderImage() {
+                ShareSheet(items: [image])
+            }
+        }
     }
 }
 

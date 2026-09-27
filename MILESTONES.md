@@ -21,7 +21,7 @@ Every milestone has a **Done when**. Nothing is done until it runs on a real iPh
 
 ---
 
-> **Dev B status (2026-09-27):** 🟡 = code complete + logic tests pass (30/30, compiled on macOS), **not yet built for iOS or run on a device.** Tick each one after it runs on an iPhone.
+> **Dev B status (2026-09-27):** 🟡 = code complete, builds in Xcode 27, all tests pass on the iOS simulator, main flows checked in the simulator. **Not yet run on a real iPhone.** Tick each one after it runs on an iPhone.
 
 ## Phase 0: Setup & spikes (Fri Sep 25, today/tonight)
 

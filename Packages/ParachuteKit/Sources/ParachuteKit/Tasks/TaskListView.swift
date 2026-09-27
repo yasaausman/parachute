@@ -1,144 +1,117 @@
-import SwiftUI
-import SwiftData
 import SharedKit
+import SwiftData
+import SwiftUI
 
+/// The Tasks tab: active tasks to pick back up, then finished ones. Tap to resume; swipe to let one go.
 public struct TaskListView: View {
     @Query(sort: \FrozenTask.createdAt, order: .reverse) private var tasks: [FrozenTask]
-    @Environment(\.modelContext) private var modelContext
-    
-    var unfreezeProvider: any UnfreezeProviding
-    
-    @State private var showingAddView = false
-    
-    public init(unfreezeProvider: any UnfreezeProviding) {
-        self.unfreezeProvider = unfreezeProvider
-    }
-    
+    @Environment(\.modelContext) private var context
+    @Environment(\.parachute) private var services
+    @State private var showingEntry = false
+    @State private var playing: FrozenTask?
+
+    public init() {}
+
+    private var active: [FrozenTask] { tasks.filter { $0.status == .active } }
+    private var finished: [FrozenTask] { tasks.filter { $0.status == .done } }
+
     public var body: some View {
         NavigationStack {
             Group {
-                if tasks.isEmpty {
-                    emptyState
+                if active.isEmpty && finished.isEmpty {
+                    ContentUnavailableView {
+                        Label("Nothing frozen right now", systemImage: "snowflake")
+                    } description: {
+                        Text("When something feels too big to start, tap I'm frozen.")
+                    } actions: {
+                        frozenButton
+                    }
                 } else {
                     List {
-                        ForEach(tasks) { task in
-                            TaskRow(task: task)
-                                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                                .listRowSeparator(.hidden)
-                                .listRowBackground(Color.clear)
+                        if !active.isEmpty {
+                            Section("Pick up where you left off") {
+                                ForEach(active) { task in
+                                    Button { playing = task } label: { TaskRow(task: task) }
+                                        .swipeActions {
+                                            Button("Let it go", systemImage: "leaf") { letGo(task) }
+                                                .tint(.gray)
+                                        }
+                                        .accessibilityHint("Resumes this task")
+                                }
+                            }
+                        }
+                        if !finished.isEmpty {
+                            Section("Unfrozen") {
+                                ForEach(finished) { TaskRow(task: $0) }
+                                    .onDelete { offsets in
+                                        offsets.map { finished[$0] }.forEach(context.delete)
+                                        try? context.save()
+                                    }
+                            }
                         }
                     }
-                    .listStyle(.plain)
                 }
             }
             .navigationTitle("Tasks")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    Button(action: { showingAddView = true }) {
-                        Image(systemName: "plus")
-                            .foregroundColor(Theme.frozen)
-                    }
+                    Button("I'm frozen", systemImage: "plus") { showingEntry = true }
                 }
             }
-            .sheet(isPresented: $showingAddView) {
-                FrozenTaskEntryView(unfreezeProvider: unfreezeProvider)
+            .sheet(isPresented: $showingEntry) { FrozenTaskEntryView() }
+            .fullScreenCover(item: $playing) { task in
+                TaskPlayerView(task: task) { playing = nil }
             }
         }
     }
-    
-    private var emptyState: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "snow")
-                .font(.system(size: 60))
-                .foregroundColor(Theme.frozen)
-            Text("No tasks yet.\nTap 'I'm frozen' whenever something feels too big to start.")
-                .font(.title3)
-                .multilineTextAlignment(.center)
-                .foregroundColor(.secondary)
-            
-            Button(action: { showingAddView = true }) {
-                Text("I'm frozen")
-                    .fontWeight(.semibold)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Theme.frozen)
-                    .foregroundColor(.white)
-                    .cornerRadius(Theme.cornerRadius)
-            }
-            .padding(.top, 20)
-            .padding(.horizontal, 40)
-        }
-        .padding()
+
+    private var frozenButton: some View {
+        Button("I'm frozen", systemImage: "snowflake") { showingEntry = true }
+            .buttonStyle(.borderedProminent)
+            .tint(Theme.frozen)
+    }
+
+    /// No shame: the task just leaves the list and its reminders stop.
+    private func letGo(_ task: FrozenTask) {
+        let id = task.id
+        let services = services
+        TaskStore.setStatus(.abandoned, for: task, in: context)
+        Task { await services.reminders?.resolve(taskID: id) }
     }
 }
 
-private struct TaskRow: View {
+struct TaskRow: View {
     let task: FrozenTask
-    
-    private var completedSteps: Int {
-        task.steps.filter { $0.doneAt != nil }.count
-    }
-    
-    private var totalSteps: Int {
-        max(task.steps.count, 1)
-    }
-    
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
+        let total = task.steps.count
+        let done = task.steps.filter { $0.doneAt != nil }.count
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline) {
                 Text(task.title)
                     .font(.headline)
+                    .foregroundStyle(.primary)
                 Spacer()
-                statusBadge
-            }
-            
-            if let dueDate = task.dueDate {
-                HStack(spacing: 4) {
-                    Image(systemName: "calendar")
-                    Text(dueDate.formatted(date: .abbreviated, time: .shortened))
+                if task.status == .done {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(Theme.money)
+                        .accessibilityLabel("Done")
                 }
-                .font(.caption)
-                .foregroundColor(.secondary)
             }
-            
-            if !task.steps.isEmpty {
-                ProgressView(value: Double(completedSteps), total: Double(totalSteps))
+            if let due = task.dueDate, task.status == .active {
+                Label(due.formatted(.relative(presentation: .named)), systemImage: "clock")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            if total > 0, task.status == .active {
+                ProgressView(value: Double(done), total: Double(total))
                     .tint(Theme.frozen)
-                
-                HStack {
-                    Text("\(completedSteps)/\(task.steps.count) steps")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                }
+                Text("Step \(min(done + 1, total)) of \(total)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
-        .padding()
-        .background(Color(uiColor: .secondarySystemBackground))
-        .cornerRadius(Theme.cornerRadius)
-    }
-    
-    @ViewBuilder
-    private var statusBadge: some View {
-        let label: String = switch task.status {
-        case .active: "Active"
-        case .done: "Done"
-        case .abandoned: "Abandoned"
-        }
-        Text(label)
-            .font(.caption.bold())
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(statusColor.opacity(0.2))
-            .foregroundColor(statusColor)
-            .clipShape(Capsule())
-    }
-    
-    private var statusColor: Color {
-        switch task.status {
-        case .active: Theme.frozen
-        case .done: Theme.money
-        case .abandoned: .secondary
-        }
+        .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
     }
 }

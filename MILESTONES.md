@@ -21,6 +21,8 @@ Every milestone has a **Done when**. Nothing is done until it runs on a real iPh
 
 ---
 
+> **Dev B status (2026-09-27):** 🟡 = code complete + logic tests pass (30/30, compiled on macOS), **not yet built for iOS or run on a device.** Tick each one after it runs on an iPhone.
+
 ## Phase 0: Setup & spikes (Fri Sep 25, today/tonight)
 
 ### Together (≈1.5 h, pair on one screen)
@@ -36,7 +38,7 @@ Every milestone has a **Done when**. Nothing is done until it runs on a real iPh
   *Done when:* all three work, or you've written down what doesn't and the workaround.
 
 ### Dev B spikes
-- [ ] **B0 Atomizer spike.** Foundation Models `@Generable` → `[Step{text, seconds}]`. Run it on **20 real deadline tasks** (essays, forms, applications, emails) and **10 unknown services** ("how to cancel X").
+- [ ] 🟡 **B0 Atomizer spike.** (Kit ready: `docs/b0-atomizer-spike.md` + Home → ladybug → "Run B0 atomizer spike"; needs an Apple Intelligence iPhone.) Foundation Models `@Generable` → `[Step{text, seconds}]`. Run it on **20 real deadline tasks** (essays, forms, applications, emails) and **10 unknown services** ("how to cancel X").
   *Done when:* ≥ 15/20 task lists and ≥ 7/10 service lists are specific enough to follow without guessing; prompt + results saved in `docs/`. **If it fails, tell Dev A and cut or shrink the task path now.**
 
 ---
@@ -55,9 +57,9 @@ Every milestone has a **Done when**. Nothing is done until it runs on a real iPh
   *Status (2026-09-26):* 4 of 5 in `CancelSteps.json`: Spotify, Claude, Google AI Pro (web, followed to the final button on a Mac) and Apple One (Apple-billed, cancelled for real on the iPhone). Left: service #5, the 3 web page URLs, and an iPhone Safari check of the 3 web flows. B's validity test (B2) not written yet.
 
 ### Dev B
-- [x] **B1 Unfreeze player UI** (with a fake plan). One step on screen, 90-second ring, companion line, **Done / Break it smaller / Skip**, finish → callback.
+- [ ] 🟡 **B1 Unfreeze player UI** (with a fake plan). One step on screen, 90-second ring, companion line, **Done / Break it smaller / Skip**, finish → callback.
   *Done when:* a 5-step fake plan plays start to finish; works with Dynamic Type at the largest size.
-- [x] **B2 CancelSteps loader + validation.** Reads `CancelSteps.json` → `UnfreezePlan`; unit test rejects bad entries (missing steps, step > 90 s, empty text).
+- [ ] 🟡 **B2 CancelSteps loader + validation.** Reads `CancelSteps.json` → `UnfreezePlan`; unit test rejects bad entries (missing steps, step > 90 s, empty text).
   *Done when:* the test passes on A's real file.
 
 ### 🔄 Sync 1 (end of Day 1)
@@ -78,11 +80,11 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
   *Done when:* it opens the right screen on a real iPhone.
 
 ### Dev B
-- [x] **B3 UnfreezeEngine (real).** `UnfreezeProviding`: curated → Apple path → AI fallback ("Suggested steps," never invents URLs) → graceful non-AI fallback on devices without Apple Intelligence.
+- [ ] 🟡 **B3 UnfreezeEngine (real).** `UnfreezeProviding`: curated → Apple path → AI fallback ("Suggested steps," never invents URLs) → graceful non-AI fallback on devices without Apple Intelligence.
   *Done when:* the right source is picked for all 4 cases in unit tests.
-- [x] **B4 Task path.** Home "I'm frozen" → "What's overwhelming you?" → `FrozenTask` (+ optional due time) → atomizer → player. "Break it smaller" re-atomizes the current step.
+- [ ] 🟡 **B4 Task path.** Home "I'm frozen" → "What's overwhelming you?" → `FrozenTask` (+ optional due time) → atomizer → player. "Break it smaller" re-atomizes the current step.
   *Done when:* 5 of B0's test tasks go from typed description to finished on device.
-- [x] **B5 Task reminders.** The task path uses **A's `EscalationScheduling`** for due-time reminders and the deadline alarm.
+- [ ] 🟡 **B5 Task reminders.** The task path uses **A's `EscalationScheduling`** for due-time reminders and the deadline alarm.
   *Done when:* a task due in 5 minutes (time-travel) triggers a reminder.
 
 ### 🔄 Sync 2 (end of Day 2): the full money flow
@@ -97,13 +99,13 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
   *Done when:* 10 fixture screenshots → correct items in ≤ 2 taps (≥ 8/10 fully correct); fixtures committed.
 
 ### Dev B
-- [x] **B6 Scoreboard + ledger.** `CompletionLedger` implementation; "ADHD Tax Refunded" screen: $ back · tasks unfrozen · **best run** (no shame); monthly list.
+- [ ] 🟡 **B6 Scoreboard + ledger.** `CompletionLedger` implementation; "ADHD Tax Refunded" screen: $ back · tasks unfrozen · **best run** (no shame); monthly list.
   *Done when:* the numbers are right after cancel, keep (no $), task done, and snooze (nothing).
-- [x] **B7 Celebration + share.** Confetti + haptics on every win; "Share my wins" renders an image card.
+- [ ] 🟡 **B7 Celebration + share.** Confetti + haptics on every win; "Share my wins" renders an image card.
   *Done when:* smooth on device; the share sheet exports the image.
-- [x] **B8 Widgets.** Money countdown ("Hulu · $17.99 in 3 days") + task variant ("Essay · Step 3 of 7"), reading SharedKit data from the App Group.
+- [ ] 🟡 **B8 Widgets.** Money countdown ("Hulu · $17.99 in 3 days") + task variant ("Essay · Step 3 of 7"), reading SharedKit data from the App Group.
   *Done when:* both widgets update after changes in the app.
-- [x] **B9 Audio companion.** AVSpeechSynthesizer reads the step aloud (toggle) + gentle procedural ambient sound (AVAudioEngine; no licensed audio).
+- [ ] 🟡 **B9 Audio companion.** AVSpeechSynthesizer reads the step aloud (toggle) + gentle procedural ambient sound (AVAudioEngine; no licensed audio).
   *Done when:* on/off works; audio stops cleanly when the player closes.
 
 ### 🔄 Sync 3
@@ -119,13 +121,13 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
 - [ ] **A9 README: "How RevenueCat is used"** + money-path architecture notes.
 
 ### Dev B
-- [x] **B10 Gating in Parachute.** "First step always free"; AI unfreeze + voice are Pro, via **A's `EntitlementsProviding`**. (Or 3/week if you chose that.)
+- [ ] 🟡 **B10 Gating in Parachute.** "First step always free"; AI unfreeze + voice are Pro, via **A's `EntitlementsProviding`**. (Or 3/week if you chose that.)
   *Done when:* the free user sees Step 1, then an upsell; a Pro user gets everything.
 - [x] **B11 README: Foundation Models / Unfreeze section** + the Mermaid architecture diagram.
 
 ### Both (afternoon)
 - [ ] **P1 Polish your own screens.** Dark Mode · Dynamic Type · VoiceOver labels · SF Symbols · smooth transitions.
-- [x] **P2 Demo data.** A seed button in debug with realistic items (only Apple-billed trials go to Apple's page, per CLAUDE.md rule 8).
+- [ ] 🟡 **P2 Demo data.** A seed button in debug with realistic items (only Apple-billed trials go to Apple's page, per CLAUDE.md rule 8).
 - [ ] **🧊 FEATURE FREEZE at end of Day 4.** Only bug fixes after this.
 
 ### 🔄 Sync 4

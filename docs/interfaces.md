@@ -127,6 +127,22 @@ UnfreezeView(plan: UnfreezePlan, onFinish: (UnfreezeOutcome) -> Void)
 // → on .completed for a money item: ledger.record(.moneyCancelled, …) + escalation.resolve(id)
 ```
 
+### As implemented (B, 2026-09-27)
+- ParachuteKit reads everything from one environment value, `\.parachute` (`ParachuteServices`: `UnfreezeEngine`, ledger, scheduler, entitlements), set in `ParachuteApp`.
+- **For A5's 🧊 I'm frozen**, present `UnfreezeFlowView` full screen. It fetches the plan and plays it; the caller records the decision:
+  ```swift
+  .fullScreenCover(item: $frozen) { request in
+      UnfreezeFlowView(request: request, win: .money(cents: deadline.amountCents)) { outcome in
+          // .completed on a cancel → status .cancelled, ledger.record(.moneyCancelled, …), escalation.resolve(id)
+      }
+  }
+  ```
+  MoneyKit doesn't import ParachuteKit, so either A5 takes an `onFrozen` closure and `App/` presents this, or `App/` wraps `DecideView`.
+- `CelebrationView(win: .money(cents:)) { }` is public if you want confetti on a plain Cancel too.
+- **Task reminders:** `DecideRouter` receives task IDs too (B5). `App/RootView.swift`'s `DecideRoute` opens the task player for a `FrozenTask` ID and `DecideView` otherwise, so Decide never sees a task ID.
+- **Engine order:** curated → Apple settings → AI → template. An Apple-billed trial skips *web* curated steps (rule 8); curated ids starting `apple-` count as Apple's own. ⚠️ A: if you'd rather mark this in the JSON (e.g. `"billing": "apple"`), that's a SharedKit change; let's agree first.
+- `CancelStepsLoader` drops services that fail `CancelStepsValidator` (empty id/name/text, not verified, no steps, a step ≤ 0 s or > 90 s, non-https URL). `testBundledFileIsValid` fails on any of these in your file.
+
 ## 4. `CancelSteps.json` (content by A, loaded by B)
 Location: `Packages/SharedKit/Sources/SharedKit/Resources/CancelSteps.json`
 ```json

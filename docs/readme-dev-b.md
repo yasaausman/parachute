@@ -1,14 +1,17 @@
 ## Foundation Models & The Unfreeze Engine
 
 ### How Foundation Models Are Used
-Parachute leverages Apple's on-device Foundation Models framework to intelligently break down overwhelming tasks, entirely preserving user privacy.
+Parachute uses Apple's on-device Foundation Models framework (iOS 26+) to break a task, or the cancellation of a service we don't have curated steps for, into tiny steps.
 
-*   **On-Device AI (`@Generable` macro):** We use local models to parse and atomize tasks. Because it runs locally, there are no API keys to configure, it works offline, and no user data ever leaves the device.
-*   **The AI Atomizer:** When a user is "frozen" on a task, the AI breaks it into micro-steps. Each step is designed to be trivially small (≤ 90 seconds) and verb-first, ensuring the crucial *first step* is always free of friction.
-*   **Intelligent Fallbacks:** For unknown subscription cancellations, the AI provides "Suggested steps". It intelligently infers the process without ever inventing or hallucinating URLs.
-*   **Privacy First:** Everything runs locally and offline. No data leaves the device.
-*   **Graceful Degradation:** For devices lacking Apple Intelligence capabilities, Parachute gracefully falls back to generic, but concrete and actionable, step templates.
-*   **Structured Output:** We utilize the `LanguageModelSession.respond(to:generating:)` API to ensure the AI returns strongly typed, structured data that our app can reliably consume.
+*   **On-device, no keys:** the model runs on the phone, so there's no API key in the app and the atomizer's input never leaves the device. It needs an Apple Intelligence-capable device with Apple Intelligence turned on.
+*   **Structured output:** `LanguageModelSession.respond(to:generating:)` returns a `@Generable` `AtomizedSteps` value (at most 8 steps, each with `text` and `seconds`), not free text.
+*   **Tiny steps:** the instructions ask for verb-first physical actions of 90 seconds or less, with a silly-small first step, and forbid "think about / consider / plan" and any links.
+*   **Sanitized:** `StepSanitizer` cleans every AI list before it's shown: URLs and bare domains are stripped, seconds are clamped to 5–90, and empty or duplicate steps are dropped.
+*   **Labeled:** AI plans are shown as "Suggested steps."
+*   **Non-AI fallback:** if the model is unavailable, errors, or returns nothing usable, the app serves concrete templates from `Fallbacks` instead (CLAUDE.md rule 3).
+*   **Break it smaller:** re-atomizes just the current step into 2–4 smaller steps (template fallback when the model isn't available) and swaps them into the plan. It's never paywalled.
+
+Prompt, schema, and the on-device quality check: `docs/b0-atomizer-spike.md`.
 
 ### Parachute Architecture
 
@@ -56,24 +59,35 @@ flowchart TD
 
 ### The Unfreeze Engine
 
-The Unfreeze Engine is the core of ParachuteKit, responsible for dynamically generating an actionable `UnfreezePlan` when a user needs to tackle a deadline or a frozen task. It employs a thoughtful routing logic to guarantee the highest quality steps:
+`UnfreezeEngine` (ParachuteKit) builds an `UnfreezePlan` for a request.
 
-1.  **Curated Steps:** Hand-verified, pixel-perfect steps loaded from `CancelSteps.json` for known services. This is always the preferred path.
-2.  **Apple Subscriptions Path:** Directs users seamlessly to the Settings app for subscriptions billed through Apple.
-3.  **AI Fallback (Suggested):** If a service isn't in our curated list, we use Foundation Models to atomize the cancellation process on the fly. These are explicitly labeled as "Suggested" to manage expectations.
-4.  **Non-AI Fallback:** A robust safety net providing generic, actionable steps for devices that cannot run the AI models.
+**Cancel a service**, in this order:
 
-**Structured Generation Snippet:**
+1.  **Curated steps** from `CancelSteps.json`, hand-verified and logged in `docs/cancel-steps-verification.md`.
+2.  **Apple's subscription settings** (Settings → your name → Subscriptions) for trials billed by Apple. Apple-billed trials skip a service's web curated steps, since those only work for web signups (CLAUDE.md rule 8).
+3.  **AI "Suggested steps"** from the on-device atomizer for services we haven't curated.
+4.  **Non-AI template** when the model isn't available.
+
+**A task** goes straight to the AI atomizer, with the non-AI template as fallback.
+
+**Gating:** curated and Apple-settings plans are free. AI plans (and the templates that stand in for them) show step 1 free, then the Pro upsell. Voice and ambient sound are Pro.
+
+**Audio:** steps are read aloud with `AVSpeechSynthesizer`; the ambient bed is brown noise generated live with `AVAudioEngine`, so there's no licensed audio.
+
+**Structured generation schema:**
 
 ```swift
 @Generable
-struct AtomizedSteps: Sendable {
+struct AtomizedSteps {
+    @Guide(description: "The tiny steps, in order. The first one takes about 10 seconds.", .maximumCount(8))
     var steps: [AtomizedStep]
 }
 
 @Generable
-struct AtomizedStep: Sendable {
+struct AtomizedStep {
+    @Guide(description: "One physical action that starts with a verb, e.g. 'Open a blank doc. Type your name.' No links or web addresses.")
     var text: String
+    @Guide(description: "Seconds it takes, from 5 to 90.", .range(5...90))
     var seconds: Int
 }
 ```

@@ -1,5 +1,7 @@
 import MoneyKit
+import ParachuteKit
 import SharedKit
+import SwiftData
 import SwiftUI
 
 struct RootView: View {
@@ -7,17 +9,17 @@ struct RootView: View {
 
     var body: some View {
         TabView {
-            Tab("Home", systemImage: "parachute") {
-                placeholder("Home", detail: "I'm frozen → task path (B4)")
+            Tab("Home", systemImage: "house") {
+                HomeView()
             }
             Tab("Money", systemImage: "dollarsign.circle") {
                 NavigationStack { MoneyListView() }
             }
             Tab("Tasks", systemImage: "checklist") {
-                placeholder("Tasks", detail: "Frozen tasks (B4)")
+                TaskListView()
             }
             Tab("Refunded", systemImage: "trophy") {
-                placeholder("ADHD Tax Refunded", detail: "Scoreboard (B6)")
+                ScoreboardView()
             }
             #if DEBUG
             Tab("Debug", systemImage: "ladybug") {
@@ -27,14 +29,27 @@ struct RootView: View {
         }
         .tint(Theme.accent)
         .sheet(item: $decide.pending) { request in
-            DecideView(itemID: request.itemID)
+            DecideRoute(itemID: request.itemID)
         }
     }
+}
 
-    private func placeholder(_ title: String, detail: String) -> some View {
-        NavigationStack {
-            ContentUnavailableView(title, systemImage: "hammer", description: Text(detail))
-                .navigationTitle(title)
+/// Reminders and alarms carry an item ID. Task IDs (B5) resume the task; money IDs open Decide.
+private struct DecideRoute: View {
+    @Environment(\.dismiss) private var dismiss
+    @Query private var tasks: [FrozenTask]
+    let itemID: UUID
+
+    init(itemID: UUID) {
+        self.itemID = itemID
+        _tasks = Query(filter: #Predicate<FrozenTask> { $0.id == itemID })
+    }
+
+    var body: some View {
+        if let task = tasks.first {
+            TaskPlayerView(task: task) { dismiss() }
+        } else {
+            DecideView(itemID: itemID)
         }
     }
 }

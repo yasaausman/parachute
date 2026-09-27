@@ -1,125 +1,271 @@
+import SharedKit
+import SwiftData
 import SwiftUI
 import WidgetKit
-import SwiftData
-import SharedKit
+
+// Widgets read the shared App Group store and immediately copy what they need into plain
+// Sendable value snapshots. @Model objects never leave the fetch helper: they are not Sendable
+// and become invalid once their ModelContext goes away.
+
+// MARK: - Snapshots
+
+struct DeadlineSnapshot: Sendable, Hashable, Identifiable {
+    let id: UUID
+    let serviceName: String
+    let amountCents: Int
+    let currencyCode: String
+    let dueDate: Date
+}
+
+struct TaskSnapshot: Sendable, Hashable, Identifiable {
+    let id: UUID
+    let title: String
+    /// 1-based index of the next step to do (equals `totalSteps` when everything is done).
+    let stepIndex: Int
+    let totalSteps: Int
+    /// Nil when there are no steps yet or every step is done.
+    let nextStepText: String?
+}
+
+// MARK: - Fetching
+
+enum WidgetStore {
+    static func upcomingDeadlines(now: Date = .now, limit: Int = 3) -> [DeadlineSnapshot] {
+        guard let container = try? SharedStore.makeContainer() else { return [] }
+        let context = ModelContext(container)
+
+        let tracking = DeadlineStatus.tracking.rawValue
+        // Keep ones due today or yesterday; skip anything more than a day past due.
+        let cutoff = now.addingTimeInterval(-24 * 60 * 60)
+        var descriptor = FetchDescriptor<MoneyDeadline>(
+            predicate: #Predicate<MoneyDeadline> { $0.statusRaw == tracking && $0.dueDate >= cutoff },
+            sortBy: [SortDescriptor(\MoneyDeadline.dueDate, order: .forward)]
+        )
+        descriptor.fetchLimit = limit
+
+        let deadlines = (try? context.fetch(descriptor)) ?? []
+        return deadlines.map {
+            DeadlineSnapshot(
+                id: $0.id,
+                serviceName: $0.serviceName,
+                amountCents: $0.amountCents,
+                currencyCode: $0.currencyCode,
+                dueDate: $0.dueDate
+            )
+        }
+    }
+
+    static func activeTask() -> TaskSnapshot? {
+        guard let container = try? SharedStore.makeContainer() else { return nil }
+        let context = ModelContext(container)
+
+        let active = TaskStatus.active.rawValue
+        var descriptor = FetchDescriptor<FrozenTask>(
+            predicate: #Predicate<FrozenTask> { $0.statusRaw == active },
+            sortBy: [SortDescriptor(\FrozenTask.createdAt, order: .reverse)]
+        )
+        descriptor.fetchLimit = 1
+
+        guard let task = (try? context.fetch(descriptor))?.first else { return nil }
+
+        let steps = task.steps.sorted { $0.order < $1.order }
+        let doneCount = steps.filter { $0.doneAt != nil }.count
+        let next = steps.first { $0.doneAt == nil }
+        return TaskSnapshot(
+            id: task.id,
+            title: task.title,
+            stepIndex: min(doneCount + 1, max(steps.count, 1)),
+            totalSteps: steps.count,
+            nextStepText: next?.text
+        )
+    }
+}
+
+// MARK: - Countdown helpers
+
+enum Countdown {
+    /// Whole calendar days from `reference` to `date` (negative when past).
+    static func days(until date: Date, from reference: Date, calendar: Calendar = .current) -> Int {
+        let start = calendar.startOfDay(for: reference)
+        let end = calendar.startOfDay(for: date)
+        return calendar.dateComponents([.day], from: start, to: end).day ?? 0
+    }
+
+    static func text(days: Int) -> String {
+        switch days {
+        case ..<0: return "due yesterday"
+        case 0: return "today"
+        case 1: return "tomorrow"
+        default: return "in \(days) days"
+        }
+    }
+
+    static func color(days: Int) -> Color {
+        if days <= 1 { return .red }
+        if days <= 3 { return .orange }
+        return Theme.money
+    }
+}
 
 // MARK: - Money Widget
 
 struct MoneyEntry: TimelineEntry {
     let date: Date
-    let deadlines: [MoneyDeadline]
+    let deadlines: [DeadlineSnapshot]
 }
 
 struct MoneyProvider: TimelineProvider {
     func placeholder(in context: Context) -> MoneyEntry {
-        MoneyEntry(date: Date(), deadlines: [])
+        MoneyEntry(date: .now, deadlines: MoneyEntry.sampleDeadlines)
     }
-    
+
     func getSnapshot(in context: Context, completion: @escaping (MoneyEntry) -> Void) {
-        let entry = MoneyEntry(date: Date(), deadlines: fetchDeadlines())
-        completion(entry)
+        if context.isPreview {
+            completion(placeholder(in: context))
+            return
+        }
+        completion(MoneyEntry(date: .now, deadlines: WidgetStore.upcomingDeadlines()))
     }
-    
+
     func getTimeline(in context: Context, completion: @escaping (Timeline<MoneyEntry>) -> Void) {
-        let entry = MoneyEntry(date: Date(), deadlines: fetchDeadlines())
-        
-        let nextDay = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
-        let startOfNextDay = Calendar.current.startOfDay(for: nextDay)
-        let timeline = Timeline(entries: [entry], policy: .after(startOfNextDay))
-        completion(timeline)
-    }
-    
-    private func fetchDeadlines() -> [MoneyDeadline] {
-        guard let container = try? SharedStore.makeContainer(inMemory: false) else { return [] }
-        let context = ModelContext(container)
-        var descriptor = FetchDescriptor<MoneyDeadline>(
-            predicate: #Predicate { $0.statusRaw == "tracking" },
-            sortBy: [SortDescriptor(\.dueDate, order: .forward)]
-        )
-        descriptor.fetchLimit = 3
-        let deadlines = (try? context.fetch(descriptor)) ?? []
-        return deadlines
+        let now = Date.now
+        let deadlines = WidgetStore.upcomingDeadlines(now: now)
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: now)
+
+        // One entry now, then one at each of the next 3 midnights so "in 3 days" stays correct.
+        var entries = [MoneyEntry(date: now, deadlines: deadlines)]
+        for offset in 1...3 {
+            if let day = calendar.date(byAdding: .day, value: offset, to: today) {
+                entries.append(MoneyEntry(date: day, deadlines: deadlines))
+            }
+        }
+        completion(Timeline(entries: entries, policy: .atEnd))
     }
 }
 
 struct MoneyWidgetView: View {
-    var entry: MoneyProvider.Entry
-    @Environment(\.widgetFamily) var family
+    let entry: MoneyEntry
+    @Environment(\.widgetFamily) private var family
+
+    /// Re-applies the "more than a day past due" cut against this entry's date.
+    private var visible: [DeadlineSnapshot] {
+        entry.deadlines.filter { days(for: $0) >= -1 }
+    }
+
+    private func days(for deadline: DeadlineSnapshot) -> Int {
+        Countdown.days(until: deadline.dueDate, from: entry.date)
+    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if entry.deadlines.isEmpty {
-                Text("No deadlines")
-                    .font(.headline)
-                Text("You're all clear! 🌿")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            } else {
-                if family == .systemMedium {
-                    ForEach(entry.deadlines) { deadline in
-                        deadlineRow(deadline)
-                    }
-                    Spacer(minLength: 0)
+        content
+            .widgetURL(URL(string: "parachute://money"))
+            .containerBackground(for: .widget) {
+                if family == .accessoryRectangular {
+                    Color.clear
                 } else {
-                    if let first = entry.deadlines.first {
-                        deadlineCard(first)
-                    }
+                    Color(uiColor: .systemBackground)
                 }
             }
-        }
-        .containerBackground(for: .widget) {
-            Color(UIColor.systemBackground)
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        switch family {
+        case .accessoryRectangular:
+            accessory
+        case .systemMedium:
+            medium
+        default:
+            small
         }
     }
-    
+
+    // Lock Screen: one line.
     @ViewBuilder
-    private func deadlineRow(_ deadline: MoneyDeadline) -> some View {
-        HStack {
-            Text(deadline.serviceName)
-                .font(.subheadline)
-                .bold()
-            Spacer()
-            Text(deadline.amountCents.formattedCents(currencyCode: deadline.currencyCode))
-                .font(.subheadline)
-            Text("· \(daysString(for: deadline.dueDate))")
-                .font(.subheadline)
-                .foregroundColor(color(for: deadline.dueDate))
-        }
-    }
-    
-    @ViewBuilder
-    private func deadlineCard(_ deadline: MoneyDeadline) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(deadline.serviceName)
+    private var accessory: some View {
+        if let first = visible.first {
+            let d = days(for: first)
+            ViewThatFits {
+                Text("\(first.serviceName) · \(first.amountCents.formattedCents(currencyCode: first.currencyCode)) \(Countdown.text(days: d))")
+                Text("\(first.serviceName) · \(Countdown.text(days: d))")
+            }
+            .font(.headline)
+            .lineLimit(1)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } else {
+            Text("No trials to watch.")
                 .font(.headline)
-            Text(deadline.amountCents.formattedCents(currencyCode: deadline.currencyCode))
-                .font(.title2)
-                .bold()
-            Spacer()
-            Text(daysString(for: deadline.dueDate))
-                .font(.subheadline)
-                .foregroundColor(color(for: deadline.dueDate))
-                .bold()
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
-    
-    private func daysString(for date: Date) -> String {
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.day], from: calendar.startOfDay(for: Date()), to: calendar.startOfDay(for: date))
-        let days = components.day ?? 0
-        if days < 0 { return "Overdue" }
-        if days == 0 { return "Today" }
-        if days == 1 { return "In 1 day" }
-        return "In \(days) days"
+
+    @ViewBuilder
+    private var small: some View {
+        if let first = visible.first {
+            let d = days(for: first)
+            VStack(alignment: .leading, spacing: 4) {
+                Label("Next charge", systemImage: "dollarsign.circle")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text(first.serviceName)
+                    .font(.headline)
+                    .lineLimit(1)
+                Text(first.amountCents.formattedCents(currencyCode: first.currencyCode))
+                    .font(.system(.title, design: .rounded).bold())
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                Spacer(minLength: 0)
+                Text(Countdown.text(days: d))
+                    .font(.subheadline.bold())
+                    .foregroundStyle(Countdown.color(days: d))
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        } else {
+            emptyState
+        }
     }
-    
-    private func color(for date: Date) -> Color {
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.day], from: calendar.startOfDay(for: Date()), to: calendar.startOfDay(for: date))
-        let days = components.day ?? 0
-        if days <= 0 { return .red }
-        if days <= 3 { return .orange }
-        return Theme.money
+
+    @ViewBuilder
+    private var medium: some View {
+        if visible.isEmpty {
+            emptyState
+        } else {
+            VStack(alignment: .leading, spacing: 8) {
+                Label("Trials to watch", systemImage: "dollarsign.circle")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                ForEach(visible.prefix(3)) { deadline in
+                    let d = days(for: deadline)
+                    HStack(spacing: 8) {
+                        Text(deadline.serviceName)
+                            .font(.subheadline.bold())
+                            .lineLimit(1)
+                        Spacer(minLength: 4)
+                        Text(deadline.amountCents.formattedCents(currencyCode: deadline.currencyCode))
+                            .font(.subheadline)
+                        Text(Countdown.text(days: d))
+                            .font(.subheadline.bold())
+                            .foregroundStyle(Countdown.color(days: d))
+                    }
+                }
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        }
+    }
+
+    private var emptyState: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Image(systemName: "dollarsign.circle")
+                .foregroundStyle(Theme.money)
+            Text("No trials to watch.")
+                .font(.headline)
+            Text("Add one when you sign up for something.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 }
 
@@ -130,88 +276,137 @@ struct MoneyWidget: Widget {
         StaticConfiguration(kind: kind, provider: MoneyProvider()) { entry in
             MoneyWidgetView(entry: entry)
         }
-        .configurationDisplayName("Money Deadlines")
-        .description("Keep track of upcoming subscriptions.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .configurationDisplayName("Trial countdown")
+        .description("See your next free-trial charge before it happens.")
+        .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
     }
+}
+
+extension MoneyEntry {
+    static let sampleDeadlines: [DeadlineSnapshot] = [
+        DeadlineSnapshot(id: UUID(), serviceName: "Hulu", amountCents: 1799, currencyCode: "USD",
+                         dueDate: .now.addingTimeInterval(3 * 24 * 60 * 60)),
+        DeadlineSnapshot(id: UUID(), serviceName: "Peacock", amountCents: 799, currencyCode: "USD",
+                         dueDate: .now.addingTimeInterval(1 * 24 * 60 * 60)),
+        DeadlineSnapshot(id: UUID(), serviceName: "Duolingo", amountCents: 1299, currencyCode: "USD",
+                         dueDate: .now.addingTimeInterval(9 * 24 * 60 * 60)),
+    ].sorted { $0.dueDate < $1.dueDate }
 }
 
 // MARK: - Task Widget
 
 struct TaskEntry: TimelineEntry {
     let date: Date
-    let activeTask: FrozenTask?
+    let task: TaskSnapshot?
 }
 
 struct TaskProvider: TimelineProvider {
     func placeholder(in context: Context) -> TaskEntry {
-        TaskEntry(date: Date(), activeTask: nil)
+        TaskEntry(date: .now, task: TaskEntry.sampleTask)
     }
-    
+
     func getSnapshot(in context: Context, completion: @escaping (TaskEntry) -> Void) {
-        let entry = TaskEntry(date: Date(), activeTask: fetchActiveTask())
-        completion(entry)
+        if context.isPreview {
+            completion(placeholder(in: context))
+            return
+        }
+        completion(TaskEntry(date: .now, task: WidgetStore.activeTask()))
     }
-    
+
     func getTimeline(in context: Context, completion: @escaping (Timeline<TaskEntry>) -> Void) {
-        let entry = TaskEntry(date: Date(), activeTask: fetchActiveTask())
-        let nextUpdate = Date().addingTimeInterval(15 * 60)
-        let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
-        completion(timeline)
-    }
-    
-    private func fetchActiveTask() -> FrozenTask? {
-        guard let container = try? SharedStore.makeContainer(inMemory: false) else { return nil }
-        let context = ModelContext(container)
-        var descriptor = FetchDescriptor<FrozenTask>(
-            predicate: #Predicate { $0.statusRaw == "active" }
-        )
-        descriptor.fetchLimit = 1
-        return try? context.fetch(descriptor).first
+        let now = Date.now
+        let entry = TaskEntry(date: now, task: WidgetStore.activeTask())
+        let next = now.addingTimeInterval(30 * 60)
+        completion(Timeline(entries: [entry], policy: .after(next)))
     }
 }
 
 struct TaskWidgetView: View {
-    var entry: TaskProvider.Entry
+    let entry: TaskEntry
+    @Environment(\.widgetFamily) private var family
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if let task = entry.activeTask {
+        content
+            .widgetURL(URL(string: "parachute://tasks"))
+            .containerBackground(for: .widget) {
+                if family == .accessoryRectangular {
+                    Color.clear
+                } else {
+                    Color(uiColor: .systemBackground)
+                }
+            }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if family == .accessoryRectangular {
+            accessory
+        } else {
+            small
+        }
+    }
+
+    private func progressText(_ task: TaskSnapshot) -> String {
+        if task.totalSteps == 0 { return "Ready when you are" }
+        if task.nextStepText == nil { return "All \(task.totalSteps) steps done" }
+        return "Step \(task.stepIndex) of \(task.totalSteps)"
+    }
+
+    @ViewBuilder
+    private var accessory: some View {
+        if let task = entry.task {
+            VStack(alignment: .leading, spacing: 0) {
+                Text("\(task.title) · \(progressText(task))")
+                    .font(.headline)
+                    .lineLimit(1)
+                if let next = task.nextStepText {
+                    Text(next)
+                        .font(.caption)
+                        .lineLimit(2)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } else {
+            Text("Nothing frozen right now.")
+                .font(.headline)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    @ViewBuilder
+    private var small: some View {
+        if let task = entry.task {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(task.title)
                     .font(.headline)
-                    .foregroundColor(Theme.frozen)
-                
-                let steps = task.steps.sorted { $0.order < $1.order }
-                let doneCount = steps.filter { $0.doneAt != nil }.count
-                let totalCount = steps.count
-                
-                if totalCount > 0 {
-                    Text("Step \(doneCount + 1) of \(totalCount)")
-                        .font(.subheadline)
-                        .bold()
-                        .foregroundColor(.secondary)
-                    
-                    if let nextStep = steps.first(where: { $0.doneAt == nil }) {
-                        Text(nextStep.text)
-                            .font(.caption)
-                            .lineLimit(3)
-                    }
-                } else {
-                    Text("No steps yet")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
+                    .foregroundStyle(Theme.frozen)
+                    .lineLimit(2)
+                Text(progressText(task))
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.secondary)
                 Spacer(minLength: 0)
-            } else {
-                Text("No active tasks.")
-                    .font(.headline)
-                Text("You're all caught up! 🎉")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                if let next = task.nextStepText {
+                    Text(next)
+                        .font(.caption)
+                        .lineLimit(3)
+                } else if task.totalSteps == 0 {
+                    Text("Open Parachute for your first tiny step.")
+                        .font(.caption)
+                        .lineLimit(3)
+                }
             }
-        }
-        .containerBackground(for: .widget) {
-            Color(UIColor.systemBackground)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        } else {
+            VStack(alignment: .leading, spacing: 4) {
+                Image(systemName: "snowflake")
+                    .foregroundStyle(Theme.frozen)
+                Text("Nothing frozen right now.")
+                    .font(.headline)
+                Text("If something feels stuck, Parachute can break it down.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
     }
 }
@@ -223,10 +418,20 @@ struct TaskWidget: Widget {
         StaticConfiguration(kind: kind, provider: TaskProvider()) { entry in
             TaskWidgetView(entry: entry)
         }
-        .configurationDisplayName("Active Task")
-        .description("Your current unfrozen task.")
-        .supportedFamilies([.systemSmall])
+        .configurationDisplayName("Next tiny step")
+        .description("The one small step to take next on your frozen task.")
+        .supportedFamilies([.systemSmall, .accessoryRectangular])
     }
+}
+
+extension TaskEntry {
+    static let sampleTask = TaskSnapshot(
+        id: UUID(),
+        title: "Essay",
+        stepIndex: 3,
+        totalSteps: 7,
+        nextStepText: "Write one sentence about why the war started."
+    )
 }
 
 // MARK: - Widget Bundle
@@ -237,4 +442,32 @@ struct ParachuteWidgetBundle: WidgetBundle {
         MoneyWidget()
         TaskWidget()
     }
+}
+
+// MARK: - Previews
+
+#Preview("Money small", as: .systemSmall) {
+    MoneyWidget()
+} timeline: {
+    MoneyEntry(date: .now, deadlines: MoneyEntry.sampleDeadlines)
+    MoneyEntry(date: .now, deadlines: [])
+}
+
+#Preview("Money medium", as: .systemMedium) {
+    MoneyWidget()
+} timeline: {
+    MoneyEntry(date: .now, deadlines: MoneyEntry.sampleDeadlines)
+}
+
+#Preview("Task small", as: .systemSmall) {
+    TaskWidget()
+} timeline: {
+    TaskEntry(date: .now, task: TaskEntry.sampleTask)
+    TaskEntry(date: .now, task: nil)
+}
+
+#Preview("Task lock screen", as: .accessoryRectangular) {
+    TaskWidget()
+} timeline: {
+    TaskEntry(date: .now, task: TaskEntry.sampleTask)
 }

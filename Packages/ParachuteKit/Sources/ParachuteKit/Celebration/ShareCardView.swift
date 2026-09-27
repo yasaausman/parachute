@@ -1,66 +1,61 @@
-import SwiftUI
 import SharedKit
+import SwiftUI
 
+/// B7: the "Share my wins" image. Always dark so it looks the same wherever it's posted.
 public struct ShareCardView: View {
-    let totalCentsRefunded: Int
+    let refundedCents: Int
     let tasksUnfrozen: Int
     let bestRun: Int
-    
-    public init(totalCentsRefunded: Int, tasksUnfrozen: Int, bestRun: Int) {
-        self.totalCentsRefunded = totalCentsRefunded
+
+    public init(refundedCents: Int, tasksUnfrozen: Int, bestRun: Int) {
+        self.refundedCents = refundedCents
         self.tasksUnfrozen = tasksUnfrozen
         self.bestRun = bestRun
     }
-    
+
     public var body: some View {
         VStack(spacing: Theme.spacing) {
-            Text("ADHD TAX REFUNDED")
+            Label("ADHD TAX REFUNDED", systemImage: "trophy.fill")
                 .font(.headline.bold())
-                .foregroundColor(Theme.accent)
-            
-            Text(totalCentsRefunded.formattedCents(currencyCode: "USD"))
+                .foregroundStyle(Theme.accent)
+
+            Text(refundedCents.formattedCents())
                 .font(.system(size: 64, weight: .bold, design: .rounded))
-                .foregroundColor(Theme.money)
-            
-            HStack(spacing: 32) {
-                VStack {
-                    Text("\(tasksUnfrozen)")
-                        .font(.title2.bold())
-                        .foregroundColor(.white)
-                    Text("Tasks Unfrozen")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
-                
-                VStack {
-                    Text("\(bestRun)")
-                        .font(.title2.bold())
-                        .foregroundColor(.white)
-                    Text("Best Run")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
+                .foregroundStyle(Theme.money)
+
+            HStack(spacing: 40) {
+                stat("\(tasksUnfrozen)", tasksUnfrozen == 1 ? "task unfrozen" : "tasks unfrozen")
+                stat("\(bestRun) \(bestRun == 1 ? "day" : "days")", "best run")
             }
-            .padding(.top, 8)
-            
-            Text("Parachute - Your brain works.")
+
+            Text("Parachute · my brain works, it just needed a parachute")
                 .font(.caption2)
-                .foregroundColor(.gray)
+                .foregroundStyle(.gray)
                 .padding(.top, Theme.spacing)
         }
         .padding(32)
-        .background(Color.black)
-        .cornerRadius(Theme.cornerRadius)
-        .overlay(
-            RoundedRectangle(cornerRadius: Theme.cornerRadius)
-                .stroke(Theme.accent.opacity(0.3), lineWidth: 1)
-        )
+        .frame(width: 360)
+        .background(Color.black, in: RoundedRectangle(cornerRadius: Theme.cornerRadius))
+        .overlay(RoundedRectangle(cornerRadius: Theme.cornerRadius).stroke(Theme.accent.opacity(0.3), lineWidth: 1))
+        .environment(\.colorScheme, .dark)
     }
-    
+
+    private func stat(_ value: String, _ label: String) -> some View {
+        VStack {
+            Text(value).font(.title2.bold()).foregroundStyle(.white)
+            Text(label).font(.caption).foregroundStyle(.gray)
+        }
+    }
+
+    /// Renders at 3× for a crisp image in the share sheet.
     @MainActor
-    public func renderImage() -> UIImage? {
+    public func image() -> Image? {
         let renderer = ImageRenderer(content: self)
-        renderer.scale = 3.0
-        return renderer.uiImage
+        renderer.scale = 3
+        return renderer.uiImage.map { Image(uiImage: $0) }
     }
+}
+
+#Preview {
+    ShareCardView(refundedCents: 21400, tasksUnfrozen: 12, bestRun: 5)
 }

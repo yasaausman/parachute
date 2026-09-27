@@ -4,6 +4,8 @@ import SwiftUI
 public extension EnvironmentValues {
     /// Injected by the app; nil in previews, where nothing gets scheduled.
     @Entry var moneyEscalation: EscalationScheduler?
+    /// Injected by the app (A8); nil in previews and the share extension.
+    @Entry var proEntitlements: ProEntitlements?
 }
 
 extension EscalationScheduler {

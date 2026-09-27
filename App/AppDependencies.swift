@@ -10,26 +10,31 @@ final class AppDependencies {
     let moneyEscalation: EscalationScheduler
     var escalation: any EscalationScheduling { moneyEscalation }
     let unfreeze: any UnfreezeProviding
-    let entitlements: any EntitlementsProviding
+    /// MoneyKit's RevenueCat-backed entitlements; `entitlements` is the same object for B's gating.
+    let pro: ProEntitlements
+    var entitlements: any EntitlementsProviding { pro }
     let ledger: any CompletionLedger
 
     init(
         moneyEscalation: EscalationScheduler,
         unfreeze: any UnfreezeProviding,
-        entitlements: any EntitlementsProviding,
+        pro: ProEntitlements,
         ledger: any CompletionLedger
     ) {
         self.moneyEscalation = moneyEscalation
         self.unfreeze = unfreeze
-        self.entitlements = entitlements
+        self.pro = pro
         self.ledger = ledger
     }
 
+    @MainActor
     static var live: AppDependencies {
-        AppDependencies(
-            moneyEscalation: EscalationScheduler(),       // real since A2; A4 adds the alarm
+        let pro = ProEntitlements()                      // real since A8 (RevenueCat)
+        let alarmIsPro = ProFeatures.finalDayAlarmIsPro
+        return AppDependencies(
+            moneyEscalation: EscalationScheduler(alarmsAllowed: { alarmIsPro ? await pro.isPro : true }), // A2 + A4
             unfreeze: FakeUnfreezeProvider(),            // → ParachuteKit UnfreezeEngine (B3)
-            entitlements: FakeEntitlements(isPro: false), // → MoneyKit RevenueCat entitlements (A8)
+            pro: pro,
             ledger: InMemoryLedger()                     // → ParachuteKit ledger (B6)
         )
     }

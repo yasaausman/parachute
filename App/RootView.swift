@@ -7,6 +7,7 @@ struct RootView: View {
     @State private var router = SheetRouter()
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.moneyEscalation) private var escalation
+    @Environment(\.proEntitlements) private var pro
     @Query private var deadlines: [MoneyDeadline]
     private let decide = DecideRouter.shared
 
@@ -39,7 +40,19 @@ struct RootView: View {
                 }
             case .unfreeze(let request, let itemID):
                 UnfreezeHost(request: request, itemID: itemID)
+            case .paywall:
+                if let pro { PaywallView(entitlements: pro) }
             }
+        }
+        // `presentPaywall()` (A's list limit, B's gating) lands here.
+        .onChange(of: pro?.isPaywallPresented) { _, presented in
+            guard presented == true else { return }
+            router.sheet = .paywall
+            pro?.isPaywallPresented = false
+        }
+        // Pro arms the final-day alarms; losing it disarms them.
+        .onChange(of: pro?.isProNow) { _, _ in
+            Task { await escalation?.resync(deadlines) }
         }
         // Trials saved from the share sheet get their alarm when the app comes to the front.
         .onChange(of: scenePhase) { _, phase in

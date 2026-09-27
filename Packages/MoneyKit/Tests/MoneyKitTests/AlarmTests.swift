@@ -159,3 +159,36 @@ final class FakeAlarmClient: AlarmClient {
         #expect(center.ids.isEmpty)
     }
 }
+
+@Suite struct ProAlarmGateTests {
+    let center = FakeNotificationCenter()
+    let client = FakeAlarmClient()
+    let suite = "test.alarms.\(UUID().uuidString)"
+    let now = DeadlineAlarmPlannerTests.date(2026, 9, 26, 18, 20)
+
+    func scheduler(pro: Bool) -> EscalationScheduler {
+        let now = self.now
+        let alarms = DeadlineAlarms(suiteName: suite, client: client, now: { now }, timeTravel: { false })
+        return EscalationScheduler(center: center, alarms: alarms, alarmsAllowed: { pro }, now: { now })
+    }
+
+    func snapshot(_ id: UUID) -> MoneyDeadlineSnapshot {
+        MoneyDeadlineSnapshot(id: id, serviceName: "Spotify", amountCents: 699, dueDate: now.addingTimeInterval(7 * 86_400), billedByApple: false)
+    }
+
+    @Test func freeUsersGetRemindersButNoAlarm() async throws {
+        let id = UUID()
+        try await scheduler(pro: false).schedule(deadline: snapshot(id))
+        #expect(center.ids.count == 2)
+        #expect(client.live.isEmpty)
+    }
+
+    @Test func losingProDisarmsTheChain() async throws {
+        let id = UUID()
+        try await scheduler(pro: true).schedule(deadline: snapshot(id))
+        #expect(client.live.count == 1)
+        try await scheduler(pro: false).schedule(deadline: snapshot(id))
+        #expect(client.live.isEmpty)
+        #expect(center.ids.count == 2, "reminders stay free")
+    }
+}

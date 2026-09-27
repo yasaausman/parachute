@@ -23,7 +23,8 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
   - **A5** on `a/a5-decide`: full Decide screen (Cancel it · I'm frozen · Keep it · Snooze), ledger writes, Unfreeze hand-off via `SheetRouter`. ☐ iPhone run.
   - **A6** on `a/a6-apple-path`: "Open Apple Subscriptions" + Apple's own steps for Apple-billed trials; shared with B3 via `SharedKit.AppleSubscriptions`. ☐ Device check of the link.
   - **A7** on `a/a7-share-extension`: share a screenshot/text → on-device OCR + extraction → "Track it?" → saved. 10/10 fixtures, 4/5 real. ☐ iPhone run.
-- ⏭️ Next (Dev A): A8 paywall → A9 README → P1/P2; then one combined iPhone test of A5–A8 before merging to `main` (Snooze-until, I'm frozen, ledger, design) → finish A3 (service #5, URLs, iPhone Safari check).
+  - **A8** on `a/a8-paywall`: RevenueCat entitlements + custom paywall (lifetime headline, ironic banner, restore) + Pro gating of the final-day alarm and >5 trials. Simulated purchase flips Pro. ☐ Real-price products in the dashboard · ☐ iPhone run.
+- ⏭️ Next (Dev A): A9 README → A9 README → P1/P2; then one combined iPhone test of A5–A8 before merging to `main` (Snooze-until, I'm frozen, ledger, design) → finish A3 (service #5, URLs, iPhone Safari check).
 
 ## How to run
 1. `cp Config/Local.xcconfig.example Config/Local.xcconfig` and set your `DEVELOPMENT_TEAM` + a `BUNDLE_ID_PREFIX` unique to you (free Apple IDs can't share bundle IDs).
@@ -33,6 +34,7 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
 5. Changing targets, Info.plist keys, or entitlements: edit `project.yml`, then `xcodegen generate`. Adding files in `App/`, `Widgets/`, `ShareExtension/` also needs a regenerate; files inside a package don't.
 
 ## Decisions & why (newest first)
+- 2026-09-27: **Custom paywall instead of RevenueCatUI**, so the copy can be ADHD-first (lifetime headline, "no trial to forget", the ironic banner) and prices still come from the RevenueCat offering. RevenueCatUI dropped from MoneyKit (unused; keeps the share extension small).
 - 2026-09-27: **Capture = patterns first, AI as a fact-checked second opinion.** The on-device model may choose among values printed in the text, never add new ones (no invented prices, dates, or names). Works fully without Apple Intelligence (CLAUDE.md rule 3). The share extension doesn't touch AlarmKit; the app arms the alarm on its next foreground resync.
 - 2026-09-27: **MoneyKit package also targets macOS 26**, only so `TrialCaptureEval` can score the extractor on the Mac. The app is still iOS-only.
 - 2026-09-27: **Apple path = deep link + Apple's written steps.** `AppStore.showManageSubscriptions(in:)` only manages *this* app's subscription (Apple docs), so it can't cancel someone's Spotify-via-Apple. The button uses `apps.apple.com/account/subscriptions` ⚠️ (confirm on device); the steps come from Apple Support 118428.
@@ -60,6 +62,8 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
 - 2026-09-25: Friction's app lock parked (needs the $99 Program + iOS 26.5). Syllabus parser dropped (crowded).
 
 ## Open questions / blockers
+- **RevenueCat dashboard (Dev A):** create Test Store products at **$29.99 lifetime**, **$24.99/yr**, **$3.99/mo** (add a 7-day free trial to yearly/monthly if the form offers it; ⚠️ Test Store trials aren't mentioned in RevenueCat's docs), attach them to `parachute_pro`, and swap them into the `default` offering. Existing products can't be re-priced.
+- **Is the final-day alarm Pro?** `PLAN.md` §6 says yes, so it's gated (`ProFeatures.finalDayAlarmIsPro`). Flip that constant if the free tier should include it.
 - Sep 30 sprint or longer? (`MILESTONES.md` assumes Sep 30.)
 - Free Apple ID or $99 Program?
 - Which 5 services to curate? (Need real accounts; include one Apple-billed trial.)

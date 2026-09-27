@@ -10,9 +10,11 @@ final class SheetRouter {
     enum Sheet: Identifiable {
         case decide(itemID: UUID)
         case unfreeze(UnfreezeRequest, itemID: UUID?)
+        case paywall
 
         var id: String {
             switch self {
+            case .paywall: "paywall"
             case .decide(let itemID): "decide-\(itemID)"
             case .unfreeze(_, let itemID): "unfreeze-\(itemID?.uuidString ?? "task")"
             }

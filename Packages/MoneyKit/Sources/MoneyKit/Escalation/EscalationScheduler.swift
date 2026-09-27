@@ -50,15 +50,19 @@ public actor EscalationScheduler: EscalationScheduling {
 
     private let center: any NotificationCenterClient
     private let alarms: DeadlineAlarms
+    private let alarmsAllowed: @Sendable () async -> Bool
     private let now: @Sendable () -> Date
 
+    /// - Parameter alarmsAllowed: whether the final-day alarm may be armed (Pro, `ProFeatures`).
     public init(
         center: any NotificationCenterClient = SystemNotificationCenter(),
         alarms: DeadlineAlarms = DeadlineAlarms(),
+        alarmsAllowed: @escaping @Sendable () async -> Bool = { true },
         now: @escaping @Sendable () -> Date = { .now }
     ) {
         self.center = center
         self.alarms = alarms
+        self.alarmsAllowed = alarmsAllowed
         self.now = now
     }
 
@@ -88,6 +92,10 @@ public actor EscalationScheduler: EscalationScheduling {
         )
         try await add(reminders)
 
+        guard await alarmsAllowed() else {
+            alarms.disarm(itemID: deadline.id)
+            return
+        }
         let title = DeadlineAlarmPlanner.moneyTitle(
             serviceName: deadline.serviceName,
             amountCents: deadline.amountCents,

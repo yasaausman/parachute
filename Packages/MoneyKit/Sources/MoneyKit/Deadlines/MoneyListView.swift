@@ -6,6 +6,7 @@ import SwiftUI
 public struct MoneyListView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.moneyEscalation) private var escalation
+    @Environment(\.proEntitlements) private var pro
     @Query(sort: \MoneyDeadline.dueDate) private var deadlines: [MoneyDeadline]
     @State private var editing: MoneyDeadline?
     @State private var isAdding = false
@@ -19,7 +20,7 @@ public struct MoneyListView: View {
         .navigationTitle("Money")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button("Add trial", systemImage: "plus") { isAdding = true }
+                Button("Add trial", systemImage: "plus") { add() }
             }
         }
         .task {
@@ -44,17 +45,26 @@ public struct MoneyListView: View {
             } description: {
                 Text("Add a free trial and Parachute will count down to the charge.")
             } actions: {
-                Button("Add a trial") { isAdding = true }
+                Button("Add a trial") { add() }
                     .buttonStyle(.borderedProminent)
             }
         } else {
             List {
                 if !open.isEmpty {
-                    Section("Coming up") {
+                    Section {
                         ForEach(open) { deadline in
                             row(deadline, now: now)
                         }
                         .onDelete { delete(open, at: $0) }
+                    } header: {
+                        Text("Coming up")
+                    } footer: {
+                        if let pro, !pro.isProNow {
+                            Button("Reminders are on. The final-day alarm that keeps coming back is Pro. See Pro") {
+                                pro.presentPaywall()
+                            }
+                            .font(.footnote)
+                        }
                     }
                 }
                 if !done.isEmpty {
@@ -90,6 +100,16 @@ public struct MoneyListView: View {
             if deadline.isOpen {
                 Button("Decide", systemImage: "arrow.up.forward.app") { DecideRouter.shared.request(itemID: deadline.id) }
             }
+        }
+    }
+
+    /// Free users can track `ProFeatures.freeTrialLimit` open trials; the next one shows the paywall.
+    private func add() {
+        let openCount = deadlines.filter(\.isOpen).count
+        if let pro, !pro.isProNow, openCount >= ProFeatures.freeTrialLimit {
+            pro.presentPaywall()
+        } else {
+            isAdding = true
         }
     }
 

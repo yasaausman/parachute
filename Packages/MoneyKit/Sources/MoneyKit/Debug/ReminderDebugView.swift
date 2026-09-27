@@ -108,12 +108,31 @@ struct ReminderDebugView: View {
 
 /// The Debug tab: every Dev A test bench in one place.
 public struct MoneyDebugMenu: View {
+    @Environment(\.proEntitlements) private var pro
+    @AppStorage(ProEntitlements.forceProKey, store: AppGroup.defaults) private var forcePro = false
+
     public init() {}
 
     public var body: some View {
         List {
             NavigationLink("Platform spike (A0)") { PlatformSpikeView() }
             NavigationLink("Reminders, alarm + time travel (A2, A4)") { ReminderDebugView() }
+
+            if let pro {
+                Section {
+                    LabeledContent("Pro", value: pro.isProNow ? "yes" : "no")
+                    Toggle("Force Pro (no purchase)", isOn: $forcePro)
+                        .onChange(of: forcePro) { _, on in pro.setForcedPro(on) }
+                    Button("Show paywall") { pro.presentPaywall() }
+                    Button("Preview \"trial ends tomorrow\" reminder in 1 minute") {
+                        Task { await ProEntitlements.scheduleTrialReminder(endsAt: .now.addingTimeInterval(24 * 60 * 60 + 60)) }
+                    }
+                } header: {
+                    Text("Paywall (A8)")
+                } footer: {
+                    Text("Test Store purchases are simulated. Monthly plans renew every few minutes there, so Pro can lapse on its own.")
+                }
+            }
         }
         .navigationTitle("Debug")
     }

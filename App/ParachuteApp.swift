@@ -26,6 +26,8 @@ struct ParachuteApp: App {
                 .environment(dependencies)
                 .environment(\.moneyEscalation, dependencies.moneyEscalation)
                 .environment(\.completionLedger, dependencies.ledger)
+                .environment(\.proEntitlements, dependencies.pro)
+                .task { await dependencies.pro.start() }
         }
         .modelContainer(container)
     }

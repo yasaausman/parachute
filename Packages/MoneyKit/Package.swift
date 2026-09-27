@@ -22,7 +22,6 @@ let package = Package(
                 "SharedKit",
                 "TrialCapture",
                 .product(name: "RevenueCat", package: "purchases-ios-spm"),
-                .product(name: "RevenueCatUI", package: "purchases-ios-spm"),
             ]
         ),
         // Screenshot/text → trial fields. Vision + Foundation Models, no SharedKit, no UI.

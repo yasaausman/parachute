@@ -97,6 +97,7 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
 ### Dev A
 - [ ] **A7 Share extension.** Screenshot/text → Vision OCR → Foundation Models extraction (service, amount, end date, billed by Apple?) → "Found: X. Track it?" → one tap. Falls back to a pre-filled manual form if AI is unavailable.
   *Done when:* 10 fixture screenshots → correct items in ≤ 2 taps (≥ 8/10 fully correct); fixtures committed.
+  *Status (2026-09-27):* built on `a/a7-share-extension`. `TrialCapture` target: Vision OCR → `PatternExtractor` (non-AI, always on) + `AIExtractor` (Foundation Models `@Generable`, greedy) → a fact-check merge that throws out any AI price/date/name not printed in the text. Share sheet card: "Found: Spotify · $11.99 · charges Oct 26" → **Track it** (one tap) → saved to the App Group store with reminders; the app arms the alarm when it's next active. **Eval: 10/10 synthetic fixtures (committed, `Packages/MoneyKit/Fixtures/`), 4/5 on real screenshots** (not committed: personal data). Simulator: Photos → Share → Parachute → Track it → shows in the Money tab. 12 new tests. ☐ iPhone: share a real screenshot; check whether the AI runs inside the extension.
 
 ### Dev B
 - [ ] **B6 Scoreboard + ledger.** `CompletionLedger` implementation; "ADHD Tax Refunded" screen: $ back · tasks unfrozen · **best run** (no shame); monthly list.

@@ -1,9 +1,13 @@
 import MoneyKit
 import SharedKit
+import SwiftData
 import SwiftUI
 
 struct RootView: View {
     @State private var router = SheetRouter()
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.moneyEscalation) private var escalation
+    @Query private var deadlines: [MoneyDeadline]
     private let decide = DecideRouter.shared
 
     var body: some View {
@@ -36,6 +40,11 @@ struct RootView: View {
             case .unfreeze(let request, let itemID):
                 UnfreezeHost(request: request, itemID: itemID)
             }
+        }
+        // Trials saved from the share sheet get their alarm when the app comes to the front.
+        .onChange(of: scenePhase) { _, phase in
+            guard phase == .active else { return }
+            Task { await escalation?.resync(deadlines) }
         }
         // Alarm "Decide", reminder taps and trial rows all land here.
         .onChange(of: decide.pending) { _, request in

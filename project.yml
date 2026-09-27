@@ -117,6 +117,7 @@ targets:
           - $(PARACHUTE_APP_GROUP)
     dependencies:
       - package: SharedKit
+      - package: MoneyKit
 
 schemes:
   Parachute:
@@ -131,5 +132,6 @@ schemes:
         - package: SharedKit/SharedKitTests
         - package: MoneyKit/MoneyKitTests
         - package: ParachuteKit/ParachuteKitTests
+        - package: MoneyKit/TrialCaptureTests
     archive:
       config: Release

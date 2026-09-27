@@ -1,0 +1,171 @@
+import SharedKit
+import SwiftData
+import SwiftUI
+import TrialCapture
+
+/// A7: the share sheet. Screenshot or text in → "Found: Spotify · $11.99 · Oct 26. Track it?"
+/// One tap saves. Anything missing or wrong is editable right there (CLAUDE.md rule 3).
+public struct TrackTrialView: View {
+    public enum Input: Sendable {
+        case image(Data)
+        case text(String)
+        case nothing
+    }
+
+    enum Phase: Equatable {
+        case reading
+        case ready(TrialCandidate.Source)
+        case saved
+    }
+
+    private let load: @Sendable () async -> Input
+    private let onDone: () -> Void
+
+    @State private var phase: Phase = .reading
+    @State private var serviceName = ""
+    @State private var amount: Decimal?
+    @State private var chargeDate = Calendar.current.date(byAdding: .day, value: 7, to: .now) ?? .now
+    @State private var billedByApple = false
+    @State private var editing = false
+    @State private var saveFailed = false
+
+    public init(load: @escaping @Sendable () async -> Input, onDone: @escaping () -> Void) {
+        self.load = load
+        self.onDone = onDone
+    }
+
+    private var canSave: Bool {
+        !serviceName.trimmingCharacters(in: .whitespaces).isEmpty && (amount ?? 0) > 0
+    }
+
+    public var body: some View {
+        NavigationStack {
+            Group {
+                switch phase {
+                case .reading:
+                    ProgressView("Reading it…")
+                case .ready(let source):
+                    form(source: source)
+                case .saved:
+                    ContentUnavailableView {
+                        Label("Tracking \(serviceName)", systemImage: "checkmark.circle.fill")
+                    } description: {
+                        Text("Parachute will remind you before the charge. Open the app once to arm the final-day alarm.")
+                    }
+                    .foregroundStyle(Theme.accent)
+                }
+            }
+            .navigationTitle("Parachute")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(phase == .saved ? "Done" : "Cancel") { onDone() }
+                }
+            }
+        }
+        .tint(Theme.accent)
+        .task { await read() }
+    }
+
+    private func form(source: TrialCandidate.Source) -> some View {
+        Form {
+            Section {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(canSave ? "Found:" : "Almost there. Fill in what's missing:")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    Text(summary)
+                        .font(.title3.bold())
+                }
+                .padding(.vertical, 4)
+
+                Button {
+                    save()
+                } label: {
+                    Label("Track it", systemImage: "bell.badge.fill")
+                        .frame(maxWidth: .infinity)
+                        .font(.headline)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .disabled(!canSave)
+            } footer: {
+                Text(source == .ai ? "Read on this iPhone with Apple Intelligence. Nothing left your phone." : "Read on this iPhone. Nothing left your phone.")
+            }
+
+            Section(isExpanded: .constant(editing || !canSave)) {
+                TextField("Service, e.g. Spotify", text: $serviceName)
+                    .textInputAutocapitalization(.words)
+                TextField("Amount", value: $amount, format: .currency(code: "USD"))
+                    .keyboardType(.decimalPad)
+                DatePicker("Charges on", selection: $chargeDate, displayedComponents: .date)
+                Toggle("Billed by Apple", isOn: $billedByApple)
+            } header: {
+                Button(editing ? "Hide details" : "Something's wrong? Edit") { editing.toggle() }
+                    .font(.subheadline)
+                    .textCase(nil)
+            }
+
+            if saveFailed {
+                Text("Couldn't save. Open Parachute and add it there.").foregroundStyle(.red)
+            }
+        }
+    }
+
+    private var summary: String {
+        let name = serviceName.isEmpty ? "?" : serviceName
+        let price = amount.map { (DeadlineMath.cents(from: $0)).formattedCents() } ?? "?"
+        let date = chargeDate.formatted(.dateTime.month(.abbreviated).day())
+        return "\(name) · \(price) · charges \(date)"
+    }
+
+    private func read() async {
+        let known = CuratedServices.load().map(CuratedServices.shortName)
+        let candidate: TrialCandidate
+        switch await load() {
+        case .image(let data):
+            if let text = try? await TextRecognizer.text(inImageData: data) {
+                candidate = await TrialExtractor.extract(fromText: text, knownServices: known)
+            } else {
+                candidate = TrialCandidate()
+            }
+        case .text(let text):
+            candidate = await TrialExtractor.extract(fromText: text, knownServices: known)
+        case .nothing:
+            candidate = TrialCandidate()
+        }
+        serviceName = candidate.serviceName ?? ""
+        amount = candidate.amountCents.map { Decimal($0) / 100 }
+        if let date = candidate.chargeDate { chargeDate = date }
+        billedByApple = candidate.billedByApple
+        phase = .ready(candidate.source)
+    }
+
+    private func save() {
+        do {
+            let container = try SharedStore.makeContainer()
+            let context = ModelContext(container)
+            let name = serviceName.trimmingCharacters(in: .whitespaces)
+            let deadline = MoneyDeadline(
+                serviceName: name,
+                serviceID: CuratedServices.serviceID(for: name, in: CuratedServices.load()),
+                amountCents: DeadlineMath.cents(from: amount ?? 0),
+                dueDate: DeadlineMath.normalizedDueDate(chargeDate),
+                billedByApple: billedByApple
+            )
+            context.insert(deadline)
+            try context.save()
+            let snapshot = MoneyDeadlineSnapshot(deadline)
+            // Reminders now; AlarmKit is left to the app, which arms the alarm next time it's active.
+            let scheduler = EscalationScheduler(alarms: DeadlineAlarms(client: NoAlarmClient()))
+            Task { try? await scheduler.schedule(deadline: snapshot) }
+            phase = .saved
+            Task {
+                try? await Task.sleep(for: .seconds(1.5))
+                onDone()
+            }
+        } catch {
+            saveFailed = true
+        }
+    }
+}

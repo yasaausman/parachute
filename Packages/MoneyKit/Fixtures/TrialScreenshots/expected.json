@@ -1,0 +1,65 @@
+{
+  "fixtures" : {
+    "01-apple-one-sheet.png" : {
+      "amountCents" : 2195,
+      "billedByApple" : true,
+      "chargeDate" : "2026-10-26",
+      "serviceName" : "Apple One"
+    },
+    "02-spotify-email.png" : {
+      "amountCents" : 1199,
+      "billedByApple" : false,
+      "chargeDate" : "2026-10-26",
+      "serviceName" : "Spotify"
+    },
+    "03-hulu-web.png" : {
+      "amountCents" : 1899,
+      "billedByApple" : false,
+      "chargeDate" : "2026-10-03",
+      "serviceName" : "Hulu"
+    },
+    "04-google-one.png" : {
+      "amountCents" : 1999,
+      "billedByApple" : false,
+      "chargeDate" : "2026-12-07",
+      "serviceName" : "Google One|Google AI Pro"
+    },
+    "05-duolingo-apple.png" : {
+      "amountCents" : 1299,
+      "billedByApple" : true,
+      "chargeDate" : "2026-10-11",
+      "serviceName" : "Duolingo"
+    },
+    "06-netflix-account.png" : {
+      "amountCents" : 1799,
+      "billedByApple" : false,
+      "chargeDate" : "2026-11-02",
+      "serviceName" : "Netflix"
+    },
+    "07-disney-email.png" : {
+      "amountCents" : 999,
+      "billedByApple" : false,
+      "chargeDate" : "2026-10-04",
+      "serviceName" : "Disney+"
+    },
+    "08-adobe-checkout.png" : {
+      "amountCents" : 2299,
+      "billedByApple" : false,
+      "chargeDate" : "2026-10-10",
+      "serviceName" : "Adobe"
+    },
+    "09-audible-email.png" : {
+      "amountCents" : 1495,
+      "billedByApple" : false,
+      "chargeDate" : "2026-10-27",
+      "serviceName" : "Audible"
+    },
+    "10-youtube-premium.png" : {
+      "amountCents" : 1399,
+      "billedByApple" : false,
+      "chargeDate" : "2026-10-12",
+      "serviceName" : "YouTube Premium"
+    }
+  },
+  "today" : "2026-09-27"
+}

@@ -73,6 +73,15 @@ public struct AlarmKitClient: AlarmClient {
     }
 }
 
+/// For places that can't use AlarmKit (the share extension): arming is skipped, and the app arms
+/// the alarm on its next resync.
+public struct NoAlarmClient: AlarmClient {
+    public init() {}
+    public func requestAuthorizationIfNeeded() async -> Bool { false }
+    public func schedule(alarmID: UUID, itemID: UUID, title: String, at date: Date) async throws {}
+    public func cancel(alarmID: UUID) {}
+}
+
 /// A4: the final-day alarm chain. Stop re-arms, Decide opens the app (and still re-arms as a
 /// safety net), and only `disarm` (a recorded decision) ends it.
 public struct DeadlineAlarms: Sendable {

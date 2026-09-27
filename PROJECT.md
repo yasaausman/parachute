@@ -22,7 +22,8 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
   - ✅ **A4**: real final-day alarm chain (Stop re-arms, Decide opens the app, a decision ends it) + a minimal Decide screen; full chain confirmed on Dev A's iPhone.
   - **A5** on `a/a5-decide`: full Decide screen (Cancel it · I'm frozen · Keep it · Snooze), ledger writes, Unfreeze hand-off via `SheetRouter`. ☐ iPhone run.
   - **A6** on `a/a6-apple-path`: "Open Apple Subscriptions" + Apple's own steps for Apple-billed trials; shared with B3 via `SharedKit.AppleSubscriptions`. ☐ Device check of the link.
-- ⏭️ Next (Dev A): A7 share extension → A8 paywall → A9 README → P1/P2; then one combined iPhone test of A5–A8 before merging to `main` (Snooze-until, I'm frozen, ledger, design) → finish A3 (service #5, URLs, iPhone Safari check).
+  - **A7** on `a/a7-share-extension`: share a screenshot/text → on-device OCR + extraction → "Track it?" → saved. 10/10 fixtures, 4/5 real. ☐ iPhone run.
+- ⏭️ Next (Dev A): A8 paywall → A9 README → P1/P2; then one combined iPhone test of A5–A8 before merging to `main` (Snooze-until, I'm frozen, ledger, design) → finish A3 (service #5, URLs, iPhone Safari check).
 
 ## How to run
 1. `cp Config/Local.xcconfig.example Config/Local.xcconfig` and set your `DEVELOPMENT_TEAM` + a `BUNDLE_ID_PREFIX` unique to you (free Apple IDs can't share bundle IDs).
@@ -32,6 +33,8 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
 5. Changing targets, Info.plist keys, or entitlements: edit `project.yml`, then `xcodegen generate`. Adding files in `App/`, `Widgets/`, `ShareExtension/` also needs a regenerate; files inside a package don't.
 
 ## Decisions & why (newest first)
+- 2026-09-27: **Capture = patterns first, AI as a fact-checked second opinion.** The on-device model may choose among values printed in the text, never add new ones (no invented prices, dates, or names). Works fully without Apple Intelligence (CLAUDE.md rule 3). The share extension doesn't touch AlarmKit; the app arms the alarm on its next foreground resync.
+- 2026-09-27: **MoneyKit package also targets macOS 26**, only so `TrialCaptureEval` can score the extractor on the Mac. The app is still iOS-only.
 - 2026-09-27: **Apple path = deep link + Apple's written steps.** `AppStore.showManageSubscriptions(in:)` only manages *this* app's subscription (Apple docs), so it can't cancel someone's Spotify-via-Apple. The button uses `apps.apple.com/account/subscriptions` ⚠️ (confirm on device); the steps come from Apple Support 118428.
 - 2026-09-27: **Dev A finishes A6–A9 + P1/P2 on stacked branches; Dev A tests them together on the iPhone before any of it merges to `main`.**
 - 2026-09-26: **Tapping a trial opens Decide** (the main job); editing moved to swipe/long-press. **Snooze can't pass the last moment to act.** **"Cancelled" only claims money while the charge is still ahead** (the ledger records the real amount at decision time). `completionLedger` is a SharedKit environment value so both packages can write wins.

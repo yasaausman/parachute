@@ -1,12 +1,14 @@
 // swift-tools-version: 6.2
 import PackageDescription
 
-// Dev A: money deadlines, escalation + alarm, Decide, entitlements (RevenueCat).
+// Dev A: money deadlines, escalation + alarm, Decide, capture, entitlements (RevenueCat).
 let package = Package(
     name: "MoneyKit",
-    platforms: [.iOS(.v26)],
+    // macOS only so `swift run TrialCaptureEval` can score the extractor on this Mac (A7).
+    platforms: [.iOS(.v26), .macOS(.v26)],
     products: [
         .library(name: "MoneyKit", targets: ["MoneyKit"]),
+        .library(name: "TrialCapture", targets: ["TrialCapture"]),
     ],
     dependencies: [
         .package(path: "../SharedKit"),
@@ -18,10 +20,15 @@ let package = Package(
             name: "MoneyKit",
             dependencies: [
                 "SharedKit",
+                "TrialCapture",
                 .product(name: "RevenueCat", package: "purchases-ios-spm"),
                 .product(name: "RevenueCatUI", package: "purchases-ios-spm"),
             ]
         ),
+        // Screenshot/text → trial fields. Vision + Foundation Models, no SharedKit, no UI.
+        .target(name: "TrialCapture"),
+        .executableTarget(name: "TrialCaptureEval", dependencies: ["TrialCapture"]),
         .testTarget(name: "MoneyKitTests", dependencies: ["MoneyKit"]),
+        .testTarget(name: "TrialCaptureTests", dependencies: ["TrialCapture"]),
     ]
 )

@@ -9,7 +9,7 @@ public extension EnvironmentValues {
 extension EscalationScheduler {
     /// Brings every open deadline's reminders in line with the store (after launch, edits, or a time-travel toggle).
     @MainActor
-    func resync(_ deadlines: [MoneyDeadline]) async {
+    public func resync(_ deadlines: [MoneyDeadline]) async {
         let snapshots = deadlines.map(MoneyDeadlineSnapshot.init)
         for snapshot in snapshots {
             try? await schedule(deadline: snapshot)

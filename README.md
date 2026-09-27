@@ -23,12 +23,12 @@ SwiftUI · SwiftData · AlarmKit · Apple Foundation Models (on-device) · Visio
 - `docs/interfaces.md`: contracts between the Money and Parachute modules
 - `docs/readme-dev-b.md`: how the Unfreeze engine and on-device atomizer work (+ architecture diagram)
 - `docs/b0-atomizer-spike.md`: the on-device AI test plan and results
+- `research/`: background evidence
 
 ## Build
 1. `cp Config/Local.xcconfig.example Config/Local.xcconfig` and set your team ID + bundle prefix.
 2. `brew install xcodegen && xcodegen generate`, then open `Parachute.xcodeproj` (Xcode 27) and run.
 3. Tests: `xcodebuild -project Parachute.xcodeproj -scheme Parachute -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test`
-- `research/`: background evidence
 
 ## License
 MIT; see `LICENSE`.

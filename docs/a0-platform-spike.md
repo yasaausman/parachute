@@ -1,7 +1,7 @@
 # A0 platform spike (Dev A)
 
 **Goal:** prove the three platform bets on a real iPhone with a **free Apple ID** before building on them.
-**Where:** Debug builds → **Debug** tab → *Platform spike* (`Packages/MoneyKit/Sources/MoneyKit/Spike/`). Throwaway code; delete it once A4/A8 land.
+**Where:** the spike code lived in `Packages/MoneyKit/Sources/MoneyKit/Spike/` and was removed on 2026-09-27 once A4 (alarm) and A8 (paywall) replaced it; see git history.
 
 ## Setup
 1. `cp Config/Local.xcconfig.example Config/Local.xcconfig`, fill in your team ID + a bundle prefix that's unique to you.

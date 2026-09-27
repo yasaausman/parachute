@@ -118,7 +118,6 @@ public struct MoneyDebugMenu: View {
 
     public var body: some View {
         List {
-            NavigationLink("Platform spike (A0)") { PlatformSpikeView() }
             NavigationLink("Reminders, alarm + time travel (A2, A4)") { ReminderDebugView() }
 
             Section {

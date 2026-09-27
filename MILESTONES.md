@@ -145,6 +145,7 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
 - [ ] **V1 Video** (A records the money segments, B records the unfreeze/task segments; one person edits). Under 2 minutes, captions, device frames. QuickTime is free.
 - [ ] **V2 README final:** icon + 3 screenshots (1179×2556) · pitch · architecture · badges · RevenueCat section · build steps · privacy · MIT.
 - [ ] **V3 Code sweep:** no secrets; **Test Store key only in Debug**; no dead code; tests green.
+  *Dev A side done early (2026-09-27):* no keys or team ID in tracked files (only the `test_XXXX` placeholder); Release build's `RevenueCatAPIKey` is empty and the key isn't in the binary; A0 spike code removed (its App Intents were still registered in Release); all tests green (67). ☐ Re-run at the end with Dev B's code.
 - [ ] **V4 Devpost:** description (what it does in the first line), video link, repo link, license visible. **The Representative submits by ~6pm PDT**, leaving hours of buffer before 11:45pm PDT.
   *Done when:* the submission is confirmed and someone who's never seen the app understands it from the video's first 15 seconds.
 

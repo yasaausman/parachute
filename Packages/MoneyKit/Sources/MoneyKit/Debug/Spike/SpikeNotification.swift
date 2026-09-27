@@ -15,15 +15,3 @@ public enum SpikeNotification {
         return true
     }
 }
-
-/// Shows banners while the app is in the foreground.
-public final class ForegroundNotificationPresenter: NSObject, UNUserNotificationCenterDelegate, Sendable {
-    public static let shared = ForegroundNotificationPresenter()
-
-    public func userNotificationCenter(
-        _ center: UNUserNotificationCenter,
-        willPresent notification: UNNotification
-    ) async -> UNNotificationPresentationOptions {
-        [.banner, .sound, .list]
-    }
-}

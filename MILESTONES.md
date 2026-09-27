@@ -44,12 +44,15 @@ Every milestone has a **Done when**. Nothing is done until it runs on a real iPh
 ## Day 1: Foundation (Sat Sep 26)
 
 ### Dev A
-- [ ] **A1 Money deadlines, manual.** Add/edit/delete `MoneyDeadline` (service, amount, trial end date, billed by Apple?); list with countdowns ("Hulu · $17.99 in 3 days").
+- [x] **A1 Money deadlines, manual.** Add/edit/delete `MoneyDeadline` (service, amount, trial end date, billed by Apple?); list with countdowns ("Hulu · $17.99 in 3 days").
   *Done when:* items persist across launches; date-math tests pass.
-- [ ] **A2 Reminder ladder.** `EscalationScheduler` (real implementation): local notifications at −3 days and −1 day, with money-first copy ("$17.99 leaves your account tomorrow").
+  *Status (2026-09-26):* code done on `a/a1-money-deadlines`: Money tab list ("Spotify · $6.99 in 7 days"), add/edit/delete, curated quick-pick chips, Apple-billed items show "cancel by" a day early. 19 date-math/matching tests pass (incl. DST); add, edit, delete and persistence across a relaunch checked in the simulator; add, edit, sorting and the Apple "cancel by" line confirmed on Dev A's iPhone (iOS 27, dark mode).
+- [x] **A2 Reminder ladder.** `EscalationScheduler` (real implementation): local notifications at −3 days and −1 day, with money-first copy ("$17.99 leaves your account tomorrow").
   *Done when:* in debug time-travel mode, both reminders fire for a test item.
+  *Status (2026-09-26):* `EscalationScheduler` (real `EscalationScheduling`) on `a/a2-reminders`. Money ladder at 10:00, 3 days and 1 day before the last day to act (a day earlier for Apple-billed items); task ladder for B5 (1 day, 1 hour, at due). Saving a trial schedules, deleting resolves, the Money tab resyncs on open. Debug → *Reminders + time travel* shows what's pending and squeezes 1 day into 1 minute. 11 new tests (planner dates/copy, replace-not-duplicate, resolve, snooze, task path). **Simulator run:** Spotify $6.99 due Oct 3 → real schedule Sep 30 and Oct 2 at 10:00 → time travel → both fired at 6:29:30 and 6:31:30 PM ("Spotify · $6.99 in 3 days", "Spotify · $6.99 tomorrow / $6.99 leaves your account tomorrow"). **iPhone run (iOS 27):** Apple-billed Spotify $7.00 due Oct 3 → time travel → both fired at 6:49:53 and 6:51:53 PM in order ("in 4 days · cancel at least a day before Oct 3", "in 2 days · cancel by tomorrow to skip the Oct 3 charge"), also mirrored to the Mac. Time travel switched back off.
 - [ ] **A3 Curate 5 services.** Hand-verify cancel steps on real accounts → `SharedKit/Resources/CancelSteps.json` + a log in `docs/cancel-steps-verification.md` (date, screenshots).
   *Done when:* each of the 5 was followed end to end; the JSON passes B's validity test.
+  *Status (2026-09-26):* 4 of 5 in `CancelSteps.json`: Spotify, Claude, Google AI Pro (web, followed to the final button on a Mac) and Apple One (Apple-billed, cancelled for real on the iPhone). Left: service #5, the 3 web page URLs, and an iPhone Safari check of the 3 web flows. B's validity test (B2) not written yet.
 
 ### Dev B
 - [x] **B1 Unfreeze player UI** (with a fake plan). One step on screen, 90-second ring, companion line, **Done / Break it smaller / Skip**, finish → callback.
@@ -66,8 +69,9 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
 ## Day 2: The follow-through (Sun Sep 27)
 
 ### Dev A
-- [ ] **A4 Final-day alarm.** AlarmKit alarm on the deadline day: **Stop → `stopIntent` re-arms in 30 min**; secondary button **"Decide"** opens the app. It stops only when a decision is recorded.
+- [x] **A4 Final-day alarm.** AlarmKit alarm on the deadline day: **Stop → `stopIntent` re-arms in 30 min**; secondary button **"Decide"** opens the app. It stops only when a decision is recorded.
   *Done when:* time-travel test: alarm → Stop → rings again → Decide → decision → no more alarms.
+  *Status (2026-09-26):* built on `a/a4-alarm`. `DeadlineAlarms` chain in MoneyKit: rings at 9:00 on the last day to act ("Spotify charges $6.99 today" / Apple: "Cancel Apple One today · $21.95 tomorrow"); Stop re-arms in 30 min (1 min under time travel), including from a force-quit app; Decide (icon `arrow.up.forward.app.fill`, readable in the icon-only banner) opens the app on a minimal Decide screen and keeps a safety re-ring; recording a decision disarms. Resyncing mid-chain doesn't reset it. Tapping a reminder also opens Decide. 13 new tests. **iPhone run (iOS 27, 2026-09-26):** rang with the new Decide arrow icon → Stop → rang again a minute later under time travel (rings: 1) → Decide opened the Decide screen → Keep it → chain disarmed and 0 reminders left. Decide screen now uses the orange tint; the Debug screen refreshes live.
 - [ ] **A5 Decide screen.** Cancel · Keep · Snooze-until · 🧊 I'm frozen. "I'm frozen" calls the injected `onFrozen(UnfreezeRequest)`; Cancel/Keep write a `CompletionRecord` via `CompletionLedger`.
   *Done when:* each of the 4 choices does the right thing, and Keep stops all nagging.
 - [ ] **A6 Apple subscriptions path.** For `billedByApple` items, the cancel step opens Apple's subscription management. ⚠️ Confirm the correct API/link on device.

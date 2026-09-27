@@ -165,6 +165,3 @@ public struct SpikeDecideIntent: LiveActivityIntent {
         return .result()
     }
 }
-
-/// Lets the app target pick up MoneyKit's intents (App Intents metadata for packages).
-public struct MoneyKitIntentsPackage: AppIntentsPackage {}

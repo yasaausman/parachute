@@ -1,3 +1,4 @@
+import MoneyKit
 import Observation
 import SharedKit
 
@@ -5,26 +6,28 @@ import SharedKit
 /// Swap each fake for the real implementation as it lands (docs/interfaces.md §5).
 @Observable
 final class AppDependencies {
-    let escalation: any EscalationScheduling
+    /// MoneyKit's concrete scheduler; `escalation` is the same object behind the shared protocol.
+    let moneyEscalation: EscalationScheduler
+    var escalation: any EscalationScheduling { moneyEscalation }
     let unfreeze: any UnfreezeProviding
     let entitlements: any EntitlementsProviding
     let ledger: any CompletionLedger
 
     init(
-        escalation: any EscalationScheduling,
+        moneyEscalation: EscalationScheduler,
         unfreeze: any UnfreezeProviding,
         entitlements: any EntitlementsProviding,
         ledger: any CompletionLedger
     ) {
-        self.escalation = escalation
+        self.moneyEscalation = moneyEscalation
         self.unfreeze = unfreeze
         self.entitlements = entitlements
         self.ledger = ledger
     }
 
-    static var fakes: AppDependencies {
+    static var live: AppDependencies {
         AppDependencies(
-            escalation: FakeEscalationScheduler(),       // → MoneyKit EscalationScheduler (A2/A4)
+            moneyEscalation: EscalationScheduler(),       // real since A2; A4 adds the alarm
             unfreeze: FakeUnfreezeProvider(),            // → ParachuteKit UnfreezeEngine (B3)
             entitlements: FakeEntitlements(isPro: false), // → MoneyKit RevenueCat entitlements (A8)
             ledger: InMemoryLedger()                     // → ParachuteKit ledger (B6)

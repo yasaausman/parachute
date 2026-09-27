@@ -108,6 +108,13 @@ public protocol CompletionLedger: Sendable {
 }
 ```
 
+### `EscalationScheduling` as implemented (A2, 2026-09-26)
+- `due` is **the moment to act by**. For `.money` the protocol path uses generic copy (no Apple flag); MoneyKit's own screens call `schedule(deadline:)`, which knows `billedByApple` and moves everything a day earlier for Apple-billed items.
+- `.task` (for B5): reminders **1 day before, 1 hour before, and at `due`**, skipping any already past, so a task due in 5 minutes still gets the at-due one. A4 adds the final-day alarm on top.
+- Calling `schedule` again for the same `itemID` **replaces** its reminders. `resolve` removes pending and delivered ones. `snooze(until:)` swaps the ladder for one nudge at `until`.
+- Notification `userInfo["itemID"]` carries the UUID string; tapping a reminder opens Decide via `DecideRouter`.
+- **A4:** `schedule` also arms the AlarmKit chain: money at 9:00 on the last day to act, `.task` at `due` (title "<title> is due now"). `resolve` disarms it; `snooze(until:)` moves it to `until`.
+
 ## 3. UI hand-off (App target wires it)
 ```swift
 // A's Decide screen never imports ParachuteKit. It just calls a closure:

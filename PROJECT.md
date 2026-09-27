@@ -12,26 +12,16 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
 
 ## Status
 - ✅ Done: idea validation, competitor research, claim audit, merged plan, two-person milestones, contracts (`docs/interfaces.md`), video script
-- ✅ Phase 0 (Dev A, branch `a/phase0-setup`):
+- 🔨 In progress (Dev A; Phase 0 through A4 merged to `main` on 2026-09-26):
   - **S0.1** scaffolded: `project.yml` (XcodeGen, generated project gitignored) with App + Widgets + ShareExtension, one App Group, iOS 26, Swift 6 mode; SharedKit / MoneyKit / ParachuteKit packages; RevenueCat 5.91.0 (in MoneyKit). Builds for simulator; built, signed (free team), installed over Wi-Fi and running on Dev A's iPhone (iOS 27.0).
   - **S0.2** drafted: every model + protocol from `docs/interfaces.md` compiles in SharedKit, fakes in `SharedKit/Fakes`, wired in `App/AppDependencies.swift`. ☐ Needs Dev B's review.
   - ✅ **A0 passed 11/11 on a free Apple ID** (2026-09-26): AlarmKit Stop re-arms (even after force-quit), Decide opens the app and ends the chain, rings on Silent; local notifications work; RevenueCat Test Store purchase grants `parachute_pro`. Details + A4 notes: `docs/a0-platform-spike.md`.
-- ✅ Day 1 Dev A (branch `a/a1-money-deadlines`): A1 manual money deadlines with countdowns
-- ✅ **ALL Dev B milestones complete** (branch `b/day1`, 2026-09-27):
-  - **B1** UnfreezeView: one-step-at-a-time player, 90s countdown ring, companion lines, ADHD-friendly copy
-  - **B2** CancelStepsLoader + validation tests (validates CancelSteps.json structure)
-  - **B3** UnfreezeEngine: curated → Apple path → AI fallback → non-AI fallback, with unit tests
-  - **B4** FrozenTaskEntryView + TaskListView: "I'm frozen" task entry → plan → player
-  - **B5** TaskReminderService: wires EscalationScheduling for tasks with due dates
-  - **B6** SwiftDataLedger (@ModelActor) + ScoreboardView: ADHD Tax Refunded, tasks unfrozen, best run
-  - **B7** CelebrationView (confetti + haptics) + ShareCardView (ImageRenderer) + ShareSheet
-  - **B8** Widgets: MoneyWidget (small/medium, urgency colors) + TaskWidget (small, step progress)
-  - **B9** AudioCompanion: AVSpeechSynthesizer voice + AVAudioEngine ambient sine wave w/ fade in/out
-  - **B10** ProGateModifier + ProGatedFeature: async isPro check, "first step always free"
-  - **B11** README section: Foundation Models docs + Mermaid architecture diagram (in `docs/readme-dev-b.md`)
-  - **P2** DemoDataSeeder: realistic completion records, active task, money deadlines
-- ⏭️ Next Dev B: P1 polish (VoiceOver labels, transitions) + B0 atomizer spike (real device)
-- ⏭️ Next Dev A: A2 reminders, A4 alarm, A5 Decide, A8 paywall
+  - **A3** 4 of 5 services curated (Spotify, Claude, Google AI Pro, Apple One); see `docs/cancel-steps-verification.md`.
+  - ✅ **A1**: Money tab with countdowns, add/edit/delete; persistence verified in the simulator, running on Dev A's iPhone.
+  - ✅ **A2**: real `EscalationScheduler` with the reminder ladder + debug time travel; both reminders fired on Dev A's iPhone. Real `EscalationScheduler` now replaces `FakeEscalationScheduler` in `AppDependencies`.
+  - ✅ **A4**: real final-day alarm chain (Stop re-arms, Decide opens the app, a decision ends it) + a minimal Decide screen; full chain confirmed on Dev A's iPhone.
+- ⏭️ Next (Dev A): A5 Decide screen (Snooze-until, I'm frozen, ledger, design) → finish A3 (service #5, URLs, iPhone Safari check).
+DEVB_STATUS_PLACEHOLDER
 
 ## How to run
 1. `cp Config/Local.xcconfig.example Config/Local.xcconfig` and set your `DEVELOPMENT_TEAM` + a `BUNDLE_ID_PREFIX` unique to you (free Apple IDs can't share bundle IDs).
@@ -41,6 +31,9 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
 5. Changing targets, Info.plist keys, or entitlements: edit `project.yml`, then `xcodegen generate`. Adding files in `App/`, `Widgets/`, `ShareExtension/` also needs a regenerate; files inside a package don't.
 
 ## Decisions & why (newest first)
+- 2026-09-26: **Final-day alarm at 9:00 on the last day to act**; Stop re-arms every 30 min; Decide also queues a re-ring so closing the app without deciding doesn't end the chain; only a recorded decision (or deleting the trial) disarms. Added on the last day after 9:00 → rings in a minute. ⚠️ Web services may charge early on the charge day, before 9:00; if that shows up in testing, move web alarms to the evening before.
+- 2026-09-26: **Merged Phase 0, A1, A2 and the A3 content straight to `main`** (fast-forward, Dev A's call) so Dev B can build on SharedKit now; any interface issues get fixed as they come up. New work continues on short `a/<feature>` branches.
+- 2026-09-26: **Reminders fire at 10:00 local**, 3 days and 1 day before the last day to act; past slots are skipped (a trial added the day before its charge relies on the A4 alarm). Debug "time travel" compresses 1 day into 1 minute. ⚠️ iOS reportedly keeps only the 64 soonest local notifications per app (not in Apple's docs page we checked); at 2 per trial that's fine for the sprint.
 - 2026-09-26: **Apple-billed deadline = charge date minus 24 h.** Apple's subscribe sheet: *"Cancel anytime in Settings > Apple Account at least a day before each renewal date."* A2 reminders and the A4 alarm anchor to that for `billedByApple` items. Also: cancelling an Apple free trial can end access immediately, so no "keep it until the end" copy for Apple trials.
 - 2026-09-26: **Curated services (4 of 5):** Spotify, Claude, Google AI Pro (Google One), Apple One (the Apple-billed one). Web ones followed to the final button on a Mac without tapping it; still need their page URLs + an iPhone Safari check. Log: `docs/cancel-steps-verification.md`.
 - 2026-09-26: **RevenueCat project "Parachute"** (Dev A's personal account): Test Store products `lifetime`, `yearly`, `monthly` (auto-created) → entitlement **`parachute_pro`** ("Parachute Pro") → offering **`default`** (current, 3 packages). `EntitlementsProviding.isPro` checks `parachute_pro`. Prices set to the paywall plan in A8.
@@ -67,9 +60,9 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
 - Does Dev B also have a student/academic email for joining the Devpost team? Anyone under 18 (guardian consent)? ⚠️ Confirm on the Shipaton Discord that every team member must be a student for Next Gen.
 
 ## Milestone checklist (details + owners in MILESTONES.md)
-- [ ] Phase 0: S0.1 project · S0.2 contracts + fakes · S0.3 decisions · A0 platform spike · B0 atomizer spike
-- [ ] Day 1: A1 manual deadlines · A2 reminders · A3 curate 5 services · B1 Unfreeze player · B2 CancelSteps loader · 🔄 Sync 1
-- [ ] Day 2: A4 alarm · A5 Decide · A6 Apple path · B3 UnfreezeEngine · B4 task path · B5 task reminders · 🔄 Sync 2 (full money flow)
+- [ ] Phase 0: S0.1 project ✅ (Dev A side) · S0.2 contracts + fakes (needs B's review) · S0.3 decisions (partly) · A0 platform spike ✅ · B0 atomizer spike (Dev B)
+- [ ] Day 1: A1 manual deadlines ✅ · A2 reminders ✅ · A3 curate 5 services (4/5) · B1 Unfreeze player · B2 CancelSteps loader · 🔄 Sync 1
+- [ ] Day 2: A4 alarm ✅ · A5 Decide · A6 Apple path · B3 UnfreezeEngine · B4 task path · B5 task reminders · 🔄 Sync 2 (full money flow)
 - [ ] Day 3: A7 share extension · B6 scoreboard · B7 celebration/share · B8 widgets · B9 audio · 🔄 Sync 3
 - [ ] Day 4: A8 paywall · A9 README (RevenueCat) · B10 gating · B11 README (FM) · P1 polish · P2 demo data · 🧊 freeze · 🔄 Sync 4
 - [ ] Day 5: V1 video · V2 README · V3 code sweep · V4 Devpost submit

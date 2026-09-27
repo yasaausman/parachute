@@ -71,6 +71,7 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
 ### Dev A
 - [ ] **A4 Final-day alarm.** AlarmKit alarm on the deadline day: **Stop → `stopIntent` re-arms in 30 min**; secondary button **"Decide"** opens the app. It stops only when a decision is recorded.
   *Done when:* time-travel test: alarm → Stop → rings again → Decide → decision → no more alarms.
+  *Status (2026-09-26):* built on `a/a4-alarm`. `DeadlineAlarms` chain in MoneyKit: rings at 9:00 on the last day to act ("Spotify charges $6.99 today" / Apple: "Cancel Apple One today · $21.95 tomorrow"); Stop re-arms in 30 min (1 min under time travel), including from a force-quit app; Decide (icon `arrow.up.forward.app.fill`, readable in the icon-only banner) opens the app on a minimal Decide screen and keeps a safety re-ring; recording a decision disarms. Resyncing mid-chain doesn't reset it. Tapping a reminder also opens Decide. 13 new tests. ☐ Dev A to run the chain on the iPhone.
 - [ ] **A5 Decide screen.** Cancel · Keep · Snooze-until · 🧊 I'm frozen. "I'm frozen" calls the injected `onFrozen(UnfreezeRequest)`; Cancel/Keep write a `CompletionRecord` via `CompletionLedger`.
   *Done when:* each of the 4 choices does the right thing, and Keep stops all nagging.
 - [ ] **A6 Apple subscriptions path.** For `billedByApple` items, the cancel step opens Apple's subscription management. ⚠️ Confirm the correct API/link on device.

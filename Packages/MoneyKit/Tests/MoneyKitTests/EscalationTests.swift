@@ -90,9 +90,11 @@ final class FakeNotificationCenter: NotificationCenterClient {
 @Suite struct EscalationSchedulerTests {
     let center = FakeNotificationCenter()
     let now = ReminderPlannerTests.date(2026, 9, 26, 18, 20)
+    let suite = "test.alarms.\(UUID().uuidString)"
     var scheduler: EscalationScheduler {
         let now = self.now
-        return EscalationScheduler(center: center, now: { now })
+        let alarms = DeadlineAlarms(suiteName: suite, client: FakeAlarmClient(), now: { now }, timeTravel: { false })
+        return EscalationScheduler(center: center, alarms: alarms, now: { now })
     }
 
     func snapshot(id: UUID, isOpen: Bool = true) -> MoneyDeadlineSnapshot {

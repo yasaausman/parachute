@@ -44,24 +44,35 @@ public struct SystemNotificationCenter: NotificationCenterClient {
     }
 }
 
-/// A2: the real `EscalationScheduling`. Local notifications only for now; A4 adds the final-day alarm.
+/// The real `EscalationScheduling`: reminder notifications (A2) plus the final-day alarm chain (A4).
 public actor EscalationScheduler: EscalationScheduling {
     public static let itemIDKey = "itemID"
 
     private let center: any NotificationCenterClient
+    private let alarms: DeadlineAlarms
     private let now: @Sendable () -> Date
 
-    public init(center: any NotificationCenterClient = SystemNotificationCenter(), now: @escaping @Sendable () -> Date = { .now }) {
+    public init(
+        center: any NotificationCenterClient = SystemNotificationCenter(),
+        alarms: DeadlineAlarms = DeadlineAlarms(),
+        now: @escaping @Sendable () -> Date = { .now }
+    ) {
         self.center = center
+        self.alarms = alarms
         self.now = now
     }
 
     // MARK: MoneyKit API (knows the Apple flag and currency)
 
-    /// Replaces any reminders for this deadline. Decided items get none.
+    /// Replaces this deadline's reminders and (re)arms its final-day alarm. Decided items get neither.
+    /// An alarm chain already running for the same plan is left alone, so resyncing mid-chain is safe.
     public func schedule(deadline: MoneyDeadlineSnapshot) async throws {
-        await resolve(itemID: deadline.id)
-        guard deadline.isOpen else { return }
+        guard deadline.isOpen else {
+            await resolve(itemID: deadline.id)
+            return
+        }
+        await clearReminders(itemID: deadline.id)
+        let current = now()
         let reminders = ReminderPlanner.moneyReminders(
             itemID: deadline.id,
             serviceName: deadline.serviceName,
@@ -69,30 +80,54 @@ public actor EscalationScheduler: EscalationScheduling {
             currencyCode: deadline.currencyCode,
             chargeDate: deadline.dueDate,
             billedByApple: deadline.billedByApple,
-            now: now()
+            now: current
         )
         try await add(reminders)
+
+        let title = DeadlineAlarmPlanner.moneyTitle(
+            serviceName: deadline.serviceName,
+            amountCents: deadline.amountCents,
+            currencyCode: deadline.currencyCode,
+            billedByApple: deadline.billedByApple
+        )
+        if let planned = DeadlineAlarmPlanner.moneyFireDate(chargeDate: deadline.dueDate, billedByApple: deadline.billedByApple, now: current) {
+            try await alarms.arm(itemID: deadline.id, title: title, planned: planned)
+        } else if Self.chargeDayIsOver(deadline.dueDate, now: current) {
+            alarms.disarm(itemID: deadline.id)
+        }
+    }
+
+    static func chargeDayIsOver(_ chargeDate: Date, now: Date, calendar: Calendar = .current) -> Bool {
+        guard let end = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: chargeDate)) else { return true }
+        return now >= end
     }
 
     // MARK: EscalationScheduling
 
     public func schedule(itemID: UUID, title: String, due: Date, kind: EscalationKind) async throws {
-        await resolve(itemID: itemID)
-        let reminders: [PlannedReminder]
+        await clearReminders(itemID: itemID)
+        let current = now()
         switch kind {
         case .money(let amountCents):
-            reminders = ReminderPlanner.genericMoneyReminders(itemID: itemID, title: title, amountCents: amountCents, due: due, now: now())
+            try await add(ReminderPlanner.genericMoneyReminders(itemID: itemID, title: title, amountCents: amountCents, due: due, now: current))
+            if let planned = DeadlineAlarmPlanner.moneyFireDate(chargeDate: due, billedByApple: false, now: current) {
+                let alarmTitle = DeadlineAlarmPlanner.moneyTitle(serviceName: title, amountCents: amountCents, currencyCode: "USD", billedByApple: false)
+                try await alarms.arm(itemID: itemID, title: alarmTitle, planned: planned)
+            }
         case .task:
-            reminders = ReminderPlanner.taskReminders(itemID: itemID, title: title, due: due, now: now())
+            try await add(ReminderPlanner.taskReminders(itemID: itemID, title: title, due: due, now: current))
+            if due > current {
+                try await alarms.arm(itemID: itemID, title: "\(title) is due now", planned: due)
+            }
         }
-        try await add(reminders)
     }
 
-    /// Clears the ladder and sends one gentle nudge at `until`, reusing the item's last title.
+    /// Clears the ladder, sends one gentle nudge at `until`, and moves any alarm there too.
     public func snooze(itemID: UUID, until: Date) async throws {
         let title = await center.pending()
             .first { $0.id.hasPrefix(itemID.uuidString) }?
             .title ?? "Parachute"
+        let alarm = alarms.record(for: itemID)
         await resolve(itemID: itemID)
         try await add([PlannedReminder(
             id: "\(itemID.uuidString).snooze",
@@ -101,9 +136,18 @@ public actor EscalationScheduler: EscalationScheduling {
             title: title,
             body: "You snoozed this. Ready to decide now?"
         )])
+        if let alarm {
+            try await alarms.arm(itemID: itemID, title: alarm.title, planned: until)
+        }
     }
 
+    /// A decision was recorded: no more reminders, no more alarm.
     public func resolve(itemID: UUID) async {
+        await clearReminders(itemID: itemID)
+        alarms.disarm(itemID: itemID)
+    }
+
+    private func clearReminders(itemID: UUID) async {
         let ids = await center.pending().map(\.id).filter { $0.hasPrefix(itemID.uuidString) }
         center.removePending(ids: ids)
         center.removeDelivered(ids: ids)

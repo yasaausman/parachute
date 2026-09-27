@@ -1,3 +1,4 @@
+import AlarmKit
 import SharedKit
 import SwiftData
 import SwiftUI
@@ -9,6 +10,8 @@ struct ReminderDebugView: View {
     @Query(sort: \MoneyDeadline.dueDate) private var deadlines: [MoneyDeadline]
     @AppStorage(TimeTravel.defaultsKey, store: AppGroup.defaults) private var timeTravel = false
     @State private var pending: [(id: String, title: String, fires: Date?)] = []
+    @State private var alarms: [(id: String, state: String, fires: Date?)] = []
+    @State private var chains: [AlarmRecord] = []
 
     var body: some View {
         List {
@@ -20,7 +23,29 @@ struct ReminderDebugView: View {
                 Text("With time travel on, a trial due in 7 days gets its 3-day reminder in about 4 minutes and its 1-day reminder in about 6. Lock the phone and wait.")
             }
 
-            Section("Pending (\(pending.count))") {
+            Section {
+                if let first = deadlines.first(where: \.isOpen) {
+                    Button("Ring \(first.serviceName)'s final alarm in 1 minute") {
+                        Task { await ringSoon(first) }
+                    }
+                }
+                ForEach(chains, id: \.itemID) { chain in
+                    VStack(alignment: .leading) {
+                        Text(chain.title).font(.subheadline)
+                        Text("rings so far: \(chain.rings)").font(.caption.monospaced()).foregroundStyle(.secondary)
+                    }
+                }
+                ForEach(alarms, id: \.id) { alarm in
+                    Text("\(alarm.id) · \(alarm.state) · \(alarm.fires.map { $0.formatted(date: .omitted, time: .standard) } ?? "-")")
+                        .font(.caption.monospaced())
+                }
+            } header: {
+                Text("Final-day alarm (A4)")
+            } footer: {
+                Text("Lock the phone. When it rings, use Stop: it comes back in 30 minutes (1 minute with time travel on). Tap Decide to open the Decide screen; a decision ends the chain.")
+            }
+
+            Section("Pending reminders (\(pending.count))") {
                 if pending.isEmpty {
                     Text("Nothing scheduled").foregroundStyle(.secondary)
                 }
@@ -34,7 +59,7 @@ struct ReminderDebugView: View {
                 }
             }
         }
-        .navigationTitle("Reminders (A2)")
+        .navigationTitle("Reminders + alarm")
         .refreshable { await loadPending() }
         .task { await loadPending() }
     }
@@ -44,7 +69,23 @@ struct ReminderDebugView: View {
         await loadPending()
     }
 
+    private func ringSoon(_ deadline: MoneyDeadline) async {
+        let title = DeadlineAlarmPlanner.moneyTitle(
+            serviceName: deadline.serviceName, amountCents: deadline.amountCents,
+            currencyCode: deadline.currencyCode, billedByApple: deadline.billedByApple
+        )
+        let alarms = DeadlineAlarms(timeTravel: { false })
+        alarms.disarm(itemID: deadline.id)
+        try? await alarms.arm(itemID: deadline.id, title: title, planned: .now.addingTimeInterval(60))
+        await loadPending()
+    }
+
     private func loadPending() async {
+        chains = DeadlineAlarms().records().values.sorted { $0.title < $1.title }
+        alarms = ((try? AlarmManager.shared.alarms) ?? []).map { alarm in
+            let fires: Date? = if case .fixed(let date) = alarm.schedule { date } else { nil }
+            return (id: String(alarm.id.uuidString.prefix(4)), state: String(describing: alarm.state), fires: fires)
+        }
         let requests = await UNUserNotificationCenter.current().pendingNotificationRequests()
         pending = requests
             .map { request in
@@ -66,7 +107,7 @@ public struct MoneyDebugMenu: View {
     public var body: some View {
         List {
             NavigationLink("Platform spike (A0)") { PlatformSpikeView() }
-            NavigationLink("Reminders + time travel (A2)") { ReminderDebugView() }
+            NavigationLink("Reminders, alarm + time travel (A2, A4)") { ReminderDebugView() }
         }
         .navigationTitle("Debug")
     }

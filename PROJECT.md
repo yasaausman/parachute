@@ -22,7 +22,7 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
   - ✅ **A4**: real final-day alarm chain (Stop re-arms, Decide opens the app, a decision ends it) + a minimal Decide screen; full chain confirmed on Dev A's iPhone.
   - **A5**: full Decide screen (Cancel it · I'm frozen · Keep it · Snooze), ledger writes, Unfreeze hand-off via `SheetRouter`. ☐ iPhone run.
   - ✅ **A6**: "Open Apple Subscriptions" + Apple's own steps for Apple-billed trials; the link opens Apple's Subscriptions page on the iPhone.
-  - **A7**: share a screenshot/text → on-device OCR + extraction → "Track it?" → saved. 10/10 fixtures, 4/5 real. ☐ iPhone run.
+  - ✅ **A7**: share a screenshot/text → on-device OCR + extraction → "Track it?" → saved. 10/10 fixtures, 4/5 real; on the iPhone a Google subscription screenshot was read correctly and tracked, and a cancelled-only screen correctly found nothing.
   - **A8**: RevenueCat entitlements + custom paywall (lifetime headline, ironic banner, restore) + Pro gating of the final-day alarm and >5 trials. Simulated purchase flips Pro. ☐ Real-price products in the dashboard · ☐ iPhone run.
   - ✅ **A9**: README "How RevenueCat is used", money-path architecture, build steps, privacy.
   - **P1 (Dev A screens) + P2**: dark mode + largest text checked, VoiceOver labels, demo-data seed and clear.

@@ -112,6 +112,7 @@ public struct MoneyDebugMenu: View {
     @Environment(\.modelContext) private var context
     @Environment(\.moneyEscalation) private var escalation
     @State private var confirmingClear = false
+    @State private var trialReminderNote: String?
     @AppStorage(ProEntitlements.forceProKey, store: AppGroup.defaults) private var forcePro = false
 
     public init() {}
@@ -138,7 +139,14 @@ public struct MoneyDebugMenu: View {
                         .onChange(of: forcePro) { _, on in pro.setForcedPro(on) }
                     Button("Show paywall") { pro.presentPaywall() }
                     Button("Preview \"trial ends tomorrow\" reminder in 1 minute") {
-                        Task { await ProEntitlements.scheduleTrialReminder(endsAt: .now.addingTimeInterval(24 * 60 * 60 + 60)) }
+                        Task {
+                            await ProEntitlements.scheduleTrialReminder(endsAt: .now.addingTimeInterval(24 * 60 * 60 + 60))
+                            let fires = Date.now.addingTimeInterval(60).formatted(date: .omitted, time: .shortened)
+                            trialReminderNote = "Scheduled for \(fires). Lock your phone and wait."
+                        }
+                    }
+                    if let trialReminderNote {
+                        Text(trialReminderNote).font(.footnote).foregroundStyle(.secondary)
                     }
                 } header: {
                     Text("Paywall (A8)")

@@ -38,7 +38,7 @@ Every milestone has a **Done when**. Nothing is done until it runs on a real iPh
   *Done when:* all three work, or you've written down what doesn't and the workaround.
 
 ### Dev B spikes
-- [ ] 🟡 **B0 Atomizer spike.** (Kit ready: `docs/b0-atomizer-spike.md` + Home → ladybug → "Run B0 atomizer spike"; needs an Apple Intelligence iPhone.) Foundation Models `@Generable` → `[Step{text, seconds}]`. Run it on **20 real deadline tasks** (essays, forms, applications, emails) and **10 unknown services** ("how to cancel X").
+- [ ] 🟡 **B0 Atomizer spike.** (Kit ready: `docs/b0-atomizer-spike.md` + Home → ladybug → "Run B0 atomizer spike"; needs an Apple Intelligence iPhone; the simulator refuses inference.) Foundation Models `@Generable` → `[Step{text, seconds}]`. Run it on **20 real deadline tasks** (essays, forms, applications, emails) and **10 unknown services** ("how to cancel X").
   *Done when:* ≥ 15/20 task lists and ≥ 7/10 service lists are specific enough to follow without guessing; prompt + results saved in `docs/`. **If it fails, tell Dev A and cut or shrink the task path now.**
 
 ---
@@ -132,7 +132,7 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
 - [x] **B11 README: Foundation Models / Unfreeze section** + the Mermaid architecture diagram.
 
 ### Both (afternoon)
-- [ ] **P1 Polish your own screens.** Dark Mode · Dynamic Type · VoiceOver labels · SF Symbols · smooth transitions.
+- [ ] 🟡 **P1 Polish your own screens.** (Dev B: done in the simulator 2026-09-28; contrast, largest text, dark mode.) Dark Mode · Dynamic Type · VoiceOver labels · SF Symbols · smooth transitions.
   *Dev A status (2026-09-27, `a/p-polish-demo`):* Money list, Decide, and paywall checked in dark mode at the largest accessibility text size; Decide buttons stack icon over text at accessibility sizes; decorative icons hidden from VoiceOver; choice buttons read as one labelled button with a hint; trial rows get a hint plus an "Edit" VoiceOver action. ☐ Dev B's screens · ☐ app icon (logo later).
 - [x] **P2 Demo data.** A seed button in debug with realistic items (only Apple-billed trials go to Apple's page, per CLAUDE.md rule 8).
   *Status (2026-09-27):* Debug → Demo data: Spotify (3 days), Duolingo via Apple (tomorrow), Claude, Google AI Pro, a cancelled Apple One; "Clear all trials" removes trials, reminders, and alarm chains. Checked in the simulator.

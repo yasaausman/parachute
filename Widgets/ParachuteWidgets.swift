@@ -1,6 +1,7 @@
 import SharedKit
 import SwiftData
 import SwiftUI
+import UIKit
 import WidgetKit
 
 // Widgets read the shared App Group store and immediately copy what they need into plain
@@ -101,9 +102,24 @@ enum Countdown {
     }
 
     static func color(days: Int) -> Color {
-        if days <= 1 { return .red }
-        if days <= 3 { return .orange }
-        return Theme.money
+        if days <= 1 { return WidgetInk.urgent }
+        if days <= 3 { return WidgetInk.soon }
+        return WidgetInk.money
+    }
+}
+
+/// Contrast-safe text colors (WCAG AA on white and on dark backgrounds); same values as ParachuteKit's `Palette`.
+private enum WidgetInk {
+    static let money = adaptive(light: (0x1E, 0x7A, 0x35), dark: (0x30, 0xD1, 0x58))
+    static let frozen = adaptive(light: (0x00, 0x6E, 0x8C), dark: (0x32, 0xD2, 0xF5))
+    static let soon = adaptive(light: (0xB3, 0x54, 0x00), dark: (0xFF, 0x9F, 0x0A))
+    static let urgent = adaptive(light: (0xC4, 0x28, 0x1C), dark: (0xFF, 0x45, 0x3A))
+
+    private static func adaptive(light: (Int, Int, Int), dark: (Int, Int, Int)) -> Color {
+        func color(_ c: (Int, Int, Int)) -> UIColor {
+            UIColor(red: CGFloat(c.0) / 255, green: CGFloat(c.1) / 255, blue: CGFloat(c.2) / 255, alpha: 1)
+        }
+        return Color(uiColor: UIColor { $0.userInterfaceStyle == .dark ? color(dark) : color(light) })
     }
 }
 
@@ -258,7 +274,7 @@ struct MoneyWidgetView: View {
     private var emptyState: some View {
         VStack(alignment: .leading, spacing: 4) {
             Image(systemName: "dollarsign.circle")
-                .foregroundStyle(Theme.money)
+                .foregroundStyle(WidgetInk.money)
             Text("No trials to watch.")
                 .font(.headline)
             Text("Add one when you sign up for something.")
@@ -379,7 +395,7 @@ struct TaskWidgetView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(task.title)
                     .font(.headline)
-                    .foregroundStyle(Theme.frozen)
+                    .foregroundStyle(WidgetInk.frozen)
                     .lineLimit(2)
                 Text(progressText(task))
                     .font(.subheadline.bold())
@@ -399,7 +415,7 @@ struct TaskWidgetView: View {
         } else {
             VStack(alignment: .leading, spacing: 4) {
                 Image(systemName: "snowflake")
-                    .foregroundStyle(Theme.frozen)
+                    .foregroundStyle(WidgetInk.frozen)
                 Text("Nothing frozen right now.")
                     .font(.headline)
                 Text("If something feels stuck, Parachute can break it down.")

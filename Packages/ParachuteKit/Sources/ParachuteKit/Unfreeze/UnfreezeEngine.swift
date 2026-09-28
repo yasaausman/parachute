@@ -26,7 +26,7 @@ public actor UnfreezeEngine: UnfreezeProviding {
                 return curated.plan
             }
             if billedByApple {
-                return UnfreezePlan(steps: Self.appleSubscriptionSteps(serviceName), source: .appleSubscriptions, isSuggested: false)
+                return UnfreezePlan(steps: AppleSubscriptions.steps(serviceName: serviceName), source: .appleSubscriptions, isSuggested: false)
             }
             return UnfreezePlan(steps: await atomizer.atomizeCancel(serviceName: serviceName), source: .ai, isSuggested: true)
 
@@ -38,18 +38,6 @@ public actor UnfreezeEngine: UnfreezeProviding {
     /// "Break it smaller" for the step someone is stuck on.
     public func smallerSteps(for step: PlanStep, goal: String) async -> [PlanStep] {
         await atomizer.breakSmaller(step, goal: goal)
-    }
-
-    /// Settings → your name → Subscriptions, as in Apple's "Cancel a subscription from Apple" guide.
-    /// ⚠️ A6 (Dev A) confirms the in-app shortcut to this screen on device.
-    static func appleSubscriptionSteps(_ serviceName: String) -> [PlanStep] {
-        [
-            PlanStep(text: "Open Settings. Tap your name at the top.", seconds: 20),
-            PlanStep(text: "Tap 'Subscriptions'.", seconds: 10),
-            PlanStep(text: "Find '\(serviceName)' and tap it.", seconds: 15),
-            PlanStep(text: "Tap 'Cancel Subscription' (or 'Cancel Free Trial').", seconds: 10),
-            PlanStep(text: "Confirm. Take a screenshot of the confirmation.", seconds: 15),
-        ]
     }
 }
 

@@ -57,6 +57,7 @@ public struct UnfreezeView: View {
     public var body: some View {
         VStack(spacing: 0) {
             topBar
+                .opacity(celebrating ? 0 : 1)
             Group {
                 if !started {
                     intro
@@ -157,33 +158,35 @@ public struct UnfreezeView: View {
     }
 
     private var intro: some View {
-        VStack(spacing: Theme.spacing * 2) {
-            Spacer()
-            Image(systemName: "snowflake")
-                .font(.system(size: 56))
-                .foregroundStyle(Theme.frozen)
-                .accessibilityHidden(true)
-            Text("Let's do this.\nOne tiny step at a time.")
-                .font(.largeTitle.bold())
-                .multilineTextAlignment(.center)
-            if !goal.isEmpty {
-                Text(goal)
-                    .font(.title3)
-                    .foregroundStyle(.secondary)
+        FittingScreen {
+            VStack(spacing: Theme.spacing * 2) {
+                Spacer()
+                Image(systemName: "snowflake")
+                    .font(.system(size: 56))
+                    .foregroundStyle(Palette.frozenInk)
+                    .accessibilityHidden(true)
+                Text("Let's do this.\nOne tiny step at a time.")
+                    .font(.largeTitle.bold())
                     .multilineTextAlignment(.center)
+                if !goal.isEmpty {
+                    Text(goal)
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                if isSuggested { suggestedBadge }
+                Spacer()
+                primaryButton("Start", systemImage: "play.fill") {
+                    started = true
+                    showStep()
+                }
+                Text(line)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .padding(.bottom)
             }
-            if isSuggested { suggestedBadge }
-            Spacer()
-            primaryButton("Start", systemImage: "play.fill") {
-                started = true
-                showStep()
-            }
-            Text(line)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .padding(.bottom)
+            .padding()
         }
-        .padding()
     }
 
     private func stepScreen(_ step: PlanStep) -> some View {
@@ -204,7 +207,7 @@ public struct UnfreezeView: View {
                                 .font(.headline)
                         }
                         .buttonStyle(.bordered)
-                        .tint(Theme.frozen)
+                        .tint(Palette.frozenFill)
                     }
                     ring(total: step.seconds)
                     Text(remaining == 0 ? "Take all the time you need." : line)
@@ -249,21 +252,21 @@ public struct UnfreezeView: View {
     private func ring(total: Int) -> some View {
         let size = min(ringSize, 180)
         return ZStack {
-            Circle().stroke(Theme.frozen.opacity(0.2), lineWidth: 8)
+            Circle().stroke(Palette.frozenInk.opacity(0.2), lineWidth: 8)
             Circle()
                 .trim(from: 0, to: total > 0 ? CGFloat(remaining) / CGFloat(total) : 0)
-                .stroke(Theme.frozen, style: StrokeStyle(lineWidth: 8, lineCap: .round))
+                .stroke(Palette.frozenInk, style: StrokeStyle(lineWidth: 8, lineCap: .round))
                 .rotationEffect(.degrees(-90))
                 .animation(.linear(duration: 1), value: remaining)
             if remaining > 0 {
                 Text("\(remaining)")
                     .font(.title.bold().monospacedDigit())
-                    .foregroundStyle(Theme.frozen)
+                    .foregroundStyle(Palette.frozenInk)
                     .contentTransition(.numericText(countsDown: true))
             } else {
                 Image(systemName: "hourglass")
                     .font(.title)
-                    .foregroundStyle(Theme.frozen)
+                    .foregroundStyle(Palette.frozenInk)
             }
         }
         .frame(width: size, height: size)
@@ -272,27 +275,29 @@ public struct UnfreezeView: View {
     }
 
     private var upsell: some View {
-        VStack(spacing: Theme.spacing * 1.5) {
-            Spacer()
-            Image(systemName: "checkmark.seal.fill")
-                .font(.system(size: 56))
-                .foregroundStyle(Theme.money)
-                .accessibilityHidden(true)
-            Text("Step 1: done.")
-                .font(.largeTitle.bold())
-            Text("You're already moving. Parachute Pro walks you through the rest of any task, and any service.")
-                .font(.title3)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-            Spacer()
-            primaryButton("Keep going with Pro", systemImage: "sparkles") {
-                services.entitlements.presentPaywall()
+        FittingScreen {
+            VStack(spacing: Theme.spacing * 1.5) {
+                Spacer()
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.system(size: 56))
+                    .foregroundStyle(Palette.moneyInk)
+                    .accessibilityHidden(true)
+                Text(index == 1 ? "Step 1: done." : "\(index) steps done.")
+                    .font(.largeTitle.bold())
+                Text("You're already moving. Parachute Pro walks you through the rest of any task, and any service.")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                Spacer()
+                primaryButton("Keep going with Pro", systemImage: "sparkles") {
+                    services.entitlements.presentPaywall()
+                }
+                Button("Stop here for now") { leave(.snoozed(until: .now.addingTimeInterval(3600))) }
+                    .foregroundStyle(.secondary)
+                    .padding(.bottom)
             }
-            Button("Stop here for now") { leave(.snoozed(until: .now.addingTimeInterval(3600))) }
-                .foregroundStyle(.secondary)
-                .padding(.bottom)
+            .padding()
         }
-        .padding()
         .task {
             // Pick up a purchase made on the paywall without making anyone tap again.
             while !isPro, !Task.isCancelled {
@@ -303,23 +308,25 @@ public struct UnfreezeView: View {
     }
 
     private var finish: some View {
-        VStack(spacing: Theme.spacing * 2) {
-            Spacer()
-            Image(systemName: "party.popper.fill")
-                .font(.system(size: 64))
-                .foregroundStyle(Theme.frozen)
-                .accessibilityHidden(true)
-            Text("You did it.")
-                .font(.largeTitle.bold())
-            Text("That was the hard part, and you did it anyway.")
-                .font(.title3)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-            Spacer()
-            primaryButton("Finish", systemImage: "checkmark") { leave(.completed) }
-                .padding(.bottom)
+        FittingScreen {
+            VStack(spacing: Theme.spacing * 2) {
+                Spacer()
+                Image(systemName: "party.popper.fill")
+                    .font(.system(size: 64))
+                    .foregroundStyle(Palette.frozenInk)
+                    .accessibilityHidden(true)
+                Text("You did it.")
+                    .font(.largeTitle.bold())
+                Text("That was the hard part, and you did it anyway.")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                Spacer()
+                primaryButton("Finish", systemImage: "checkmark") { leave(.completed) }
+                    .padding(.bottom)
+            }
+            .padding()
         }
-        .padding()
         // Hidden under the confetti so "You did it." doesn't show through the win title.
         .opacity(celebrating ? 0 : 1)
         .animation(.easeInOut(duration: 0.3), value: celebrating)
@@ -342,12 +349,14 @@ public struct UnfreezeView: View {
         Button(action: action) {
             Label(title, systemImage: systemImage)
                 .font(.title3.bold())
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 6)
         }
         .buttonStyle(.borderedProminent)
         .controlSize(.large)
-        .tint(Theme.frozen)
+        .tint(Palette.frozenFill)
     }
 
     // MARK: - Flow
@@ -400,6 +409,21 @@ public struct UnfreezeView: View {
     private func leave(_ outcome: UnfreezeOutcome) {
         audio.stop()
         onFinish(outcome)
+    }
+}
+
+/// Fills the screen at normal text sizes (so Spacers work) and scrolls at accessibility sizes instead of truncating.
+private struct FittingScreen<Content: View>: View {
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        GeometryReader { proxy in
+            ScrollView {
+                content()
+                    .frame(maxWidth: .infinity, minHeight: proxy.size.height)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+        }
     }
 }
 

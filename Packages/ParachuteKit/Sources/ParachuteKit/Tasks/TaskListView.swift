@@ -32,6 +32,7 @@ public struct TaskListView: View {
                             Section("Pick up where you left off") {
                                 ForEach(active) { task in
                                     Button { playing = task } label: { TaskRow(task: task) }
+                                        .buttonStyle(.plain)
                                         .swipeActions {
                                             Button("Let it go", systemImage: "leaf") { letGo(task) }
                                                 .tint(.gray)
@@ -68,7 +69,7 @@ public struct TaskListView: View {
     private var frozenButton: some View {
         Button("I'm frozen", systemImage: "snowflake") { showingEntry = true }
             .buttonStyle(.borderedProminent)
-            .tint(Theme.frozen)
+            .tint(Palette.frozenFill)
     }
 
     /// No shame: the task just leaves the list and its reminders stop.
@@ -94,7 +95,7 @@ struct TaskRow: View {
                 Spacer()
                 if task.status == .done {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(Theme.money)
+                        .foregroundStyle(Palette.moneyInk)
                         .accessibilityLabel("Done")
                 }
             }
@@ -105,13 +106,14 @@ struct TaskRow: View {
             }
             if total > 0, task.status == .active {
                 ProgressView(value: Double(done), total: Double(total))
-                    .tint(Theme.frozen)
+                    .tint(Palette.frozenFill)
                 Text("Step \(min(done + 1, total)) of \(total)")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
         }
         .padding(.vertical, 4)
+        .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
     }
 }

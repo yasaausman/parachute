@@ -206,6 +206,10 @@ Per `MILESTONES.md`: **tell Dev A the same day, and cut or shrink the task path 
 
 Record the decision in `PROJECT.md`.
 
+## Simulator and Mac (tried 2026-09-28)
+- **iOS simulator:** `SystemLanguageModel.default` reports *available*, but every call fails in the safety guardrail with `InferenceError::operationNotAllowed::Simulator is not supported`. The spike screen then marks all 30 as "Model failed". Don't score simulator runs.
+- **This Mac (native):** reports `unavailable(modelNotReady)` (Apple Intelligence off or still downloading).
+
 ## 7. How to run on device (about 20 minutes)
 
 **Needs:** an Apple Intelligence-capable iPhone (iPhone 15 Pro or later ⚠️ verify the current device list on Apple's Apple Intelligence page), Apple Intelligence turned on in Settings, and device and Siri language set to English. The model must have finished downloading; if `SystemLanguageModel.default.isAvailable` is false, every list will be a fallback and the run doesn't count.

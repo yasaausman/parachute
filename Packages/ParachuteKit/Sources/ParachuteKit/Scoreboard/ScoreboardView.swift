@@ -113,7 +113,7 @@ public struct ScoreboardView: View {
             Spacer()
             if refundedCents > 0 {
                 Text("+" + refundedCents.formattedCents())
-                    .foregroundStyle(Theme.money)
+                    .foregroundStyle(Palette.moneyInk)
             }
         }
         .accessibilityElement(children: .combine)
@@ -130,9 +130,9 @@ public struct ScoreboardView: View {
             : AnyLayout(HStackLayout(alignment: .top, spacing: Theme.spacing / 2))
 
         return layout {
-            StatCard(title: "ADHD Tax Refunded", value: refunded.formattedCents(), color: Theme.money)
-            StatCard(title: "Tasks unfrozen", value: "\(tasks)", color: Theme.frozen)
-            StatCard(title: "Best run", value: "\(run) \(run == 1 ? "day" : "days")", color: Theme.accent)
+            StatCard(title: "ADHD Tax Refunded", value: refunded.formattedCents(), color: Palette.moneyInk)
+            StatCard(title: "Tasks unfrozen", value: "\(tasks)", color: Palette.frozenInk)
+            StatCard(title: "Best run", value: "\(run) \(run == 1 ? "day" : "days")", color: Palette.accentInk)
         }
     }
 }
@@ -195,14 +195,14 @@ private struct WinRow: View {
         case .moneyCancelled:
             Text("+" + (record.amountCents ?? 0).formattedCents())
                 .font(.body.weight(.semibold))
-                .foregroundStyle(Theme.money)
+                .foregroundStyle(Palette.moneyInk)
         case .moneyKept:
             Text("Kept")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         case .taskDone:
             Image(systemName: "checkmark.circle.fill")
-                .foregroundStyle(Theme.frozen)
+                .foregroundStyle(Palette.frozenInk)
                 .imageScale(.large)
         }
     }

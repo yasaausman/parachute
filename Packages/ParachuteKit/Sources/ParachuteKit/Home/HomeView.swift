@@ -12,6 +12,9 @@ public struct HomeView: View {
     @State private var showingDebug = false
     #endif
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    private var isLarge: Bool { dynamicTypeSize.isAccessibilitySize }
+
     public init() {}
 
     private var current: FrozenTask? { tasks.first { $0.status == .active } }
@@ -48,17 +51,20 @@ public struct HomeView: View {
         Button { showingEntry = true } label: {
             HStack(alignment: .center, spacing: Theme.spacing) {
                 VStack(alignment: .leading, spacing: 6) {
+                    // At accessibility sizes the icon and chevron steal width from the words.
                     Label("I'm frozen", systemImage: "snowflake")
                         .font(.system(.largeTitle, design: .rounded).bold())
-                        .labelStyle(.titleAndIcon)
+                        .labelStyle(isLarge ? AnyLabelStyle(.titleOnly) : AnyLabelStyle(.titleAndIcon))
                     Text("Tell me what's too big. I'll make the first step tiny.")
                         .font(.body)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer(minLength: 0)
-                Image(systemName: "chevron.right")
-                    .font(.title3.weight(.semibold))
-                    .accessibilityHidden(true)
+                if !isLarge {
+                    Image(systemName: "chevron.right")
+                        .font(.title3.weight(.semibold))
+                        .accessibilityHidden(true)
+                }
             }
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -74,10 +80,12 @@ public struct HomeView: View {
         Button { playing = task } label: {
             HStack {
                 TaskRow(task: task)
-                Image(systemName: "play.circle.fill")
-                    .font(.title)
-                    .foregroundStyle(Palette.frozenInk)
-                    .accessibilityHidden(true)
+                if !isLarge {
+                    Image(systemName: "play.circle.fill")
+                        .font(.title)
+                        .foregroundStyle(Palette.frozenInk)
+                        .accessibilityHidden(true)
+                }
             }
             .padding()
             .background(.fill.quaternary, in: RoundedRectangle(cornerRadius: Theme.cornerRadius))

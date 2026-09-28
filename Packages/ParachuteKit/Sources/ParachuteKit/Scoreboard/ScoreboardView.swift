@@ -5,6 +5,8 @@ import SwiftUI
 /// B6: the "ADHD Tax Refunded" scoreboard. Lives directly in a tab, so it owns its NavigationStack.
 /// All numbers come from `ScoreMath` so the view and the tests agree.
 public struct ScoreboardView: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @State private var shareImage: Image?
     @Query(sort: \CompletionRecord.date, order: .reverse) private var records: [CompletionRecord]
 
     public init() {}
@@ -49,26 +51,38 @@ public struct ScoreboardView: View {
             }
         }
         .tint(Palette.frozenInk)
+        // Render the share card only when its numbers change, not on every body update.
+        .task(id: shareNumbers) {
+            let n = shareNumbers
+            shareImage = ShareCardView(refundedCents: n.refunded, tasksUnfrozen: n.tasks, bestRun: n.run).image()
+        }
+    }
+
+    private var shareNumbers: ShareNumbers {
+        let current = entries
+        return ShareNumbers(
+            refunded: ScoreMath.refundedCents(current),
+            tasks: ScoreMath.tasksUnfrozen(current),
+            run: ScoreMath.bestRun(current)
+        )
+    }
+
+    private struct ShareNumbers: Hashable {
+        var refunded: Int
+        var tasks: Int
+        var run: Int
     }
 
     // MARK: Share
 
     @ViewBuilder
     private var shareButton: some View {
-        if !records.isEmpty {
-            let current = entries
-            let card = ShareCardView(
-                refundedCents: ScoreMath.refundedCents(current),
-                tasksUnfrozen: ScoreMath.tasksUnfrozen(current),
-                bestRun: ScoreMath.bestRun(current)
-            )
-            if let image = card.image() {
-                ShareLink(
-                    item: image,
-                    preview: SharePreview("My ADHD Tax Refunded", image: image)
-                ) {
-                    Label("Share my wins", systemImage: "square.and.arrow.up")
-                }
+        if !records.isEmpty, let image = shareImage {
+            ShareLink(
+                item: image,
+                preview: SharePreview("My ADHD Tax Refunded", image: image)
+            ) {
+                Label("Share my wins", systemImage: "square.and.arrow.up")
             }
         }
     }
@@ -108,9 +122,12 @@ public struct ScoreboardView: View {
     }
 
     private func monthHeader(month: Date, refundedCents: Int) -> some View {
-        HStack {
+        // Stacked at accessibility sizes so the month name isn't squeezed into "Sep-tember".
+        AnyLayout(dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 4))
+            : AnyLayout(HStackLayout())) {
             Text(month.formatted(.dateTime.month(.wide).year()))
-            Spacer()
+            if !dynamicTypeSize.isAccessibilitySize { Spacer() }
             if refundedCents > 0 {
                 Text("+" + refundedCents.formattedCents())
                     .foregroundStyle(Palette.moneyInk)
@@ -149,8 +166,13 @@ public struct ScoreboardView: View {
 private struct WinRow: View {
     let record: CompletionRecord
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     var body: some View {
-        HStack(spacing: 12) {
+        // Stacked at accessibility sizes so amounts never wrap mid-number.
+        AnyLayout(dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 6))
+            : AnyLayout(HStackLayout(spacing: 12))) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(record.title)
                     .font(.body)
@@ -158,7 +180,7 @@ private struct WinRow: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            Spacer(minLength: 8)
+            if !dynamicTypeSize.isAccessibilitySize { Spacer(minLength: 8) }
             trailing
         }
         .accessibilityElement(children: .ignore)

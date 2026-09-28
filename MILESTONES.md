@@ -33,7 +33,7 @@ Every milestone has a **Done when**. Nothing is done until it runs on a real iPh
   *Status (2026-09-28):* all models, protocols and fakes in SharedKit; Dev B's PR #1 builds on them and adds "As implemented (B)" notes to `docs/interfaces.md`. ☐ Both devs say "agreed" (a one-line note from Dev B is enough). Put the models + protocols from `docs/interfaces.md` into `SharedKit`, with **fake implementations** in `SharedKit/Fakes`.
   *Done when:* the app compiles with fakes wired in; you both agree the interfaces won't change without a heads-up.
 - [ ] **S0.3 Decisions.**
-  *Status (2026-09-28):* free Apple ID (Personal Team; everything works on it, A0) · Representative = Dev A · services: 4 of 5 (see A3) · ☐ Dev B's student/academic email for Devpost · ☐ confirm on the Shipaton Discord that every team member must be a student. Pick: free or $99 Apple account · the **5 services** to curate · the Representative. Both check you have a student/academic email for Devpost.
+  *Status (2026-09-28):* free Apple ID (Personal Team; everything works on it, A0) · Representative = Dev A · services: 4 of 5 (see A3) · ✅ confirmed on the Shipaton Discord that every team member must be a student, so ☐ Dev B's student/academic email for Devpost is **required** · final-day alarm stays Pro-only. Pick: free or $99 Apple account · the **5 services** to curate · the Representative. Both check you have a student/academic email for Devpost.
   *Done when:* written in `PROJECT.md`.
 
 ### Dev A spikes

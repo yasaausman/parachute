@@ -43,6 +43,8 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
 5. Changing targets, Info.plist keys, or entitlements: edit `project.yml`, then `xcodegen generate`. Adding files in `App/`, `Widgets/`, `ShareExtension/` also needs a regenerate; files inside a package don't.
 
 ## Decisions & why (newest first)
+- 2026-09-28: **The final-day alarm stays Pro-only** (Dev A, confirming `PLAN.md` §6). Free keeps reminders, hand-checked cancel steps and 5 open trials; `ProFeatures.finalDayAlarmIsPro` stays `true`.
+- 2026-09-28: **Next Gen eligibility: every team member must be a student** (confirmed by Dev A, the Representative, on the Shipaton Discord). So Dev B must join the Devpost team with a student/academic email.
 - 2026-09-28: **ParachuteKit uses its own contrast-safe colors** (`Palette.frozenFill/frozenInk/moneyInk/accentInk`, same values in the widget) instead of changing SharedKit's `Theme` (shared; Dev A's screens). ⚠️ A: `Theme.frozen/money/accent` as text on white are ~2:1; worth adopting the same values in `Theme` together.
 - 2026-09-28: **Merge to `main` per milestone, pull `main` before work, and each dev edits only their own `PROJECT.md` status.** Dev A's A5 through P2 sat on a branch for a day while Dev B built on `main`, so Dev B couldn't see Dev A's notes and both sides edited the same files. Rules added to CLAUDE.md Conventions and MILESTONES "How you work together".
 - 2026-09-28: **Real prices live in RevenueCat** (Test Store): `parachute_lifetime_2999` ($29.99, non-consumable), `parachute_yearly_2499` ($24.99/yr, **1-week free trial, eligibility: Everyone** so test accounts that bought before still see it), `parachute_monthly_399` ($3.99/mo, no trial), all on `parachute_pro`, swapped into the `default` offering's `$rc_lifetime` / `$rc_annual` / `$rc_monthly`. The old `lifetime`/`yearly`/`monthly` products stay in the dashboard but are unused. Trial only on yearly: monthly is already low-risk, and lifetime has "no trial to forget".
@@ -78,15 +80,14 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
 - 2026-09-25: Friction's app lock parked (needs the $99 Program + iOS 26.5). Syllabus parser dropped (crowded).
 
 ## Open questions / blockers
-- **Is the final-day alarm Pro?** (still open) `PLAN.md` §6 says yes, so it's gated (`ProFeatures.finalDayAlarmIsPro`). Flip that constant if the free tier should include it.
 - Sep 30 sprint or longer? (`MILESTONES.md` assumes Sep 30.)
 - ~~Free Apple ID or $99 Program?~~ Free Apple ID: everything works on it (A0, 2026-09-26).
 - Which 5 services to curate? 4 done (Spotify, Claude, Google AI Pro, Apple One); service #5 still open.
 - Free unfreeze limit: breadth-gated (recommended) or 3/week?
-- Does Dev B also have a student/academic email for joining the Devpost team? Anyone under 18 (guardian consent)? ⚠️ Confirm on the Shipaton Discord that every team member must be a student for Next Gen.
+- **Dev B needs a student/academic email on Devpost** (every team member must be a student, confirmed). Anyone under 18 needs guardian consent.
 
 ## Milestone checklist (details + owners in MILESTONES.md)
-- [ ] Phase 0: S0.1 project (☐ Dev B on iPhone) · S0.2 contracts (☐ Dev B "agreed") · S0.3 decisions (☐ Dev B student email, Discord check) · A0 ✅ · B0 atomizer spike (Dev B)
+- [ ] Phase 0: S0.1 project (☐ Dev B on iPhone) · S0.2 contracts (☐ Dev B "agreed") · S0.3 decisions (☐ Dev B student email; Discord check ✅) · A0 ✅ · B0 atomizer spike (Dev B)
 - [ ] Day 1: A1 ✅ · A2 ✅ · A3 curate 5 services (4/5) · B1 · B2 (Dev B) · 🔄 Sync 1 (simulator ✅)
 - [ ] Day 2: A4 ✅ · A5 ✅ · A6 ✅ · B3 · B4 · B5 (Dev B) · 🔄 Sync 2 (full money flow)
 - [ ] Day 3: A7 ✅ · B6 · B7 · B8 · B9 (Dev B) · 🔄 Sync 3

@@ -118,8 +118,15 @@ public struct DeadlineAlarms: Sendable {
     /// Schedules the first ring at `planned`. If a chain for the same plan is already running
     /// (e.g. the Money tab resyncs mid-chain), it's left alone.
     public func arm(itemID: UUID, title: String, planned: Date) async throws {
+        let fire = DeadlineAlarmPlanner.effectiveFireDate(planned, now: now(), timeTravel: timeTravel())
         if let existing = record(for: itemID) {
-            if existing.planned == planned, existing.title == title { return }
+            // Same plan: keep a running chain (it has rung) and anything armed under time travel
+            // while time travel is still on; otherwise only if it rings at the right time. (A chain
+            // armed under time travel must move back to the real date once time travel is off.)
+            if existing.planned == planned, existing.title == title,
+               existing.rings > 0 || timeTravel() || existing.fireDate == nil || existing.fireDate == fire {
+                return
+            }
             // Leave a Debug test ring alone until it has had its chance to ring.
             if existing.isTest == true, let fire = existing.fireDate, fire > now().addingTimeInterval(-5 * 60) {
                 log("Kept test alarm for \(existing.title)")
@@ -130,7 +137,6 @@ public struct DeadlineAlarms: Sendable {
             log("Not armed (no AlarmKit permission): \(title)")
             return
         }
-        let fire = DeadlineAlarmPlanner.effectiveFireDate(planned, now: now(), timeTravel: timeTravel())
         try await replace(itemID: itemID, title: title, planned: planned, at: fire, rings: 0, isTest: false)
     }
 

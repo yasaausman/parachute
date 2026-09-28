@@ -130,6 +130,21 @@ final class FakeAlarmClient: AlarmClient {
         #expect(client.live.first?.date == now.addingTimeInterval(60))
     }
 
+    /// Dev A's iPhone, 2026-09-28: armed under time travel (Dec 7 squeezed to ~71 minutes),
+    /// then time travel off → the resync kept the squeezed time, so it would ring at midnight.
+    @Test func turningTimeTravelOffMovesTheAlarmBackToTheRealDate() async throws {
+        let travel = TimeTravelSwitch(on: true)
+        let now = self.now
+        let chain = DeadlineAlarms(suiteName: suite, client: client, now: { now }, timeTravel: { travel.on })
+        let planned = now.addingTimeInterval(70 * 86_400)
+        try await chain.arm(itemID: item, title: "T", planned: planned)
+        #expect(client.live.first?.date == now.addingTimeInterval(70 * 60))
+        travel.on = false
+        try await chain.arm(itemID: item, title: "T", planned: planned)
+        #expect(client.live.count == 1)
+        #expect(client.live.first?.date == planned)
+    }
+
     @Test func aDecisionEndsTheChainForGood() async throws {
         try await alarms.arm(itemID: item, title: "T", planned: now)
         try await alarms.stopTapped(itemID: item)
@@ -200,4 +215,9 @@ final class FakeAlarmClient: AlarmClient {
         #expect(client.live.isEmpty)
         #expect(center.ids.count == 2, "reminders stay free")
     }
+}
+
+final class TimeTravelSwitch: @unchecked Sendable {
+    var on: Bool
+    init(on: Bool) { self.on = on }
 }

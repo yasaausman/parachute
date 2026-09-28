@@ -36,8 +36,8 @@ Build installed on Dev A's iPhone on 2026-09-27 (branch `a/p-polish-demo`, which
 - [x] **Track it** → "Tracking …" → open Parachute → it's in the Money tab
 
 ## 5. Alarm with Pro (A4 recheck)
-- [ ] Debug → Reminders, alarm + time travel → **Ring …'s final alarm in 1 minute** → it rings; Decide opens the new Decide screen
-- [ ] Time travel **off** at the end
+- [x] Debug → Reminders, alarm + time travel → **Ring …'s final alarm in 1 minute** → it rings; Decide opens the new Decide screen (Google AI Pro, Pro on, 2026-09-28)
+- [x] Time travel **off** at the end (then "Reschedule all reminders" to move time-travel alarms back to real dates)
 
 ## Results
 _Fill in: what failed, screenshots._

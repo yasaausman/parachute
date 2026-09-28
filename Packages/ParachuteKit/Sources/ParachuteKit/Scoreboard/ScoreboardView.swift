@@ -6,7 +6,6 @@ import SwiftUI
 /// All numbers come from `ScoreMath` so the view and the tests agree.
 public struct ScoreboardView: View {
     @Query(sort: \CompletionRecord.date, order: .reverse) private var records: [CompletionRecord]
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     public init() {}
 
@@ -49,6 +48,7 @@ public struct ScoreboardView: View {
                 }
             }
         }
+        .tint(Palette.frozenInk)
     }
 
     // MARK: Share
@@ -119,52 +119,28 @@ public struct ScoreboardView: View {
         .accessibilityElement(children: .combine)
     }
 
+    /// One number carries the screen; the other two stats read as a sentence under it.
     private var statCards: some View {
         let current = entries
-        let refunded = ScoreMath.refundedCents(current)
         let tasks = ScoreMath.tasksUnfrozen(current)
         let run = ScoreMath.bestRun(current)
-
-        let layout = dynamicTypeSize.isAccessibilitySize
-            ? AnyLayout(VStackLayout(spacing: Theme.spacing / 2))
-            : AnyLayout(HStackLayout(alignment: .top, spacing: Theme.spacing / 2))
-
-        return layout {
-            StatCard(title: "ADHD Tax Refunded", value: refunded.formattedCents(), color: Palette.moneyInk)
-            StatCard(title: "Tasks unfrozen", value: "\(tasks)", color: Palette.frozenInk)
-            StatCard(title: "Best run", value: "\(run) \(run == 1 ? "day" : "days")", color: Palette.accentInk)
-        }
-    }
-}
-
-// MARK: - Stat card
-
-private struct StatCard: View {
-    let title: String
-    let value: String
-    let color: Color
-
-    var body: some View {
-        VStack(spacing: 6) {
-            Text(value)
-                .font(.system(.title2, design: .rounded).bold())
-                .foregroundStyle(color)
-                .lineLimit(1)
-                .minimumScaleFactor(0.6)
-            Text(title)
-                .font(.caption)
+        return VStack(alignment: .leading, spacing: 4) {
+            Text("ADHD Tax Refunded")
+                .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+            Text(ScoreMath.refundedCents(current).formattedCents())
+                .font(.system(size: 56, weight: .bold, design: .rounded).monospacedDigit())
+                .foregroundStyle(Palette.moneyInk)
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
+            Text("**\(tasks)** \(tasks == 1 ? "task" : "tasks") unfrozen · best run **\(run) \(run == 1 ? "day" : "days")**")
+                .font(.body)
+                .foregroundStyle(.secondary)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, Theme.spacing)
-        .padding(.horizontal, 8)
-        .background(
-            Color(uiColor: .secondarySystemGroupedBackground),
-            in: RoundedRectangle(cornerRadius: Theme.cornerRadius)
-        )
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(verbatim: "\(title), \(value)"))
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 4)
+        .padding(.vertical, Theme.spacing / 2)
+        .accessibilityElement(children: .combine)
     }
 }
 

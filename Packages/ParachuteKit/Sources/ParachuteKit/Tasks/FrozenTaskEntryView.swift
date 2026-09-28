@@ -15,8 +15,29 @@ public struct FrozenTaskEntryView: View {
     @State private var isWorking = false
     @State private var task: FrozenTask?
     @FocusState private var focused: Bool
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     public init() {}
+
+    private var startButton: some View {
+        Button(action: start) {
+            Group {
+                if isWorking {
+                    HStack { ProgressView(); Text("Finding your first step…") }
+                } else {
+                    Label("Help me start", systemImage: "arrow.right.circle.fill")
+                }
+            }
+            .font(.title3.bold())
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 6)
+        }
+        .buttonStyle(.borderedProminent)
+        .controlSize(.large)
+        .tint(Palette.frozenFill)
+        .disabled(trimmed.isEmpty || isWorking)
+    }
 
     private var trimmed: String { title.trimmingCharacters(in: .whitespacesAndNewlines) }
 
@@ -44,25 +65,20 @@ public struct FrozenTaskEntryView: View {
                         Text("Parachute will nudge you before it's due.")
                     }
                 }
+
+                // At accessibility sizes the pinned button would cover the form, so it scrolls with it.
+                if dynamicTypeSize.isAccessibilitySize {
+                    Section { startButton }
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                }
             }
             .safeAreaInset(edge: .bottom) {
-                Button(action: start) {
-                    Group {
-                        if isWorking {
-                            HStack { ProgressView(); Text("Finding your first step…") }
-                        } else {
-                            Label("Help me start", systemImage: "arrow.right.circle.fill")
-                        }
-                    }
-                    .font(.title3.bold())
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 6)
+                if !dynamicTypeSize.isAccessibilitySize {
+                    startButton
+                        .padding()
+                        .background(.bar)
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .tint(Theme.frozen)
-                .disabled(trimmed.isEmpty || isWorking)
-                .padding()
             }
             .navigationTitle("I'm frozen")
             .navigationBarTitleDisplayMode(.inline)
@@ -77,7 +93,7 @@ public struct FrozenTaskEntryView: View {
             .onAppear { focused = true }
         }
         .interactiveDismissDisabled(task != nil)
-        .tint(Theme.frozen)
+        .tint(Palette.frozenFill)
     }
 
     private func start() {

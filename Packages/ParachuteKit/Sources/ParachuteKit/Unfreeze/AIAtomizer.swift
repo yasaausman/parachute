@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 import SharedKit
 #if canImport(FoundationModels)
 import FoundationModels
@@ -94,6 +95,7 @@ public struct AIAtomizer: StepAtomizing {
                 response.content.steps.map { PlanStep(text: $0.text, seconds: $0.seconds) })
             return steps.isEmpty ? nil : steps
         } catch {
+            Logger(subsystem: "Parachute", category: "Atomizer").error("Model call failed: \(String(describing: error), privacy: .public)")
             return nil
         }
         #else

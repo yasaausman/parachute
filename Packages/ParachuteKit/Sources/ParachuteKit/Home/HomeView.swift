@@ -54,13 +54,12 @@ public struct HomeView: View {
                 Text("Tell me what's too big. I'll make the first step tiny.")
                     .font(.callout)
                     .multilineTextAlignment(.center)
-                    .opacity(0.9)
             }
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 36)
             .padding(.horizontal)
-            .background(Theme.frozen.gradient, in: RoundedRectangle(cornerRadius: Theme.cornerRadius * 1.5))
+            .background(Palette.frozenFill, in: RoundedRectangle(cornerRadius: Theme.cornerRadius * 1.5))
         }
         .buttonStyle(.plain)
         .accessibilityHint("Breaks a task into tiny steps")
@@ -72,7 +71,7 @@ public struct HomeView: View {
                 TaskRow(task: task)
                 Image(systemName: "play.circle.fill")
                     .font(.title)
-                    .foregroundStyle(Theme.frozen)
+                    .foregroundStyle(Palette.frozenInk)
                     .accessibilityHidden(true)
             }
             .padding()
@@ -90,7 +89,7 @@ public struct HomeView: View {
                     .foregroundStyle(.secondary)
                 Text(ScoreMath.refundedCents(entries).formattedCents())
                     .font(.system(.title, design: .rounded).bold())
-                    .foregroundStyle(Theme.money)
+                    .foregroundStyle(Palette.moneyInk)
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 4) {
@@ -99,7 +98,7 @@ public struct HomeView: View {
                     .foregroundStyle(.secondary)
                 Text("\(ScoreMath.tasksUnfrozen(entries))")
                     .font(.system(.title, design: .rounded).bold())
-                    .foregroundStyle(Theme.frozen)
+                    .foregroundStyle(Palette.frozenInk)
             }
         }
         .padding()

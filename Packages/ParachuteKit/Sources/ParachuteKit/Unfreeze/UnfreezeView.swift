@@ -320,6 +320,9 @@ public struct UnfreezeView: View {
                 .padding(.bottom)
         }
         .padding()
+        // Hidden under the confetti so "You did it." doesn't show through the win title.
+        .opacity(celebrating ? 0 : 1)
+        .animation(.easeInOut(duration: 0.3), value: celebrating)
         .onAppear {
             audio.stop()
             celebrating = true

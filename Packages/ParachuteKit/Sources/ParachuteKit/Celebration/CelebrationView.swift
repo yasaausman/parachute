@@ -25,7 +25,7 @@ public struct CelebrationView: View {
 
     public var body: some View {
         ZStack {
-            Color.black.opacity(0.85).ignoresSafeArea()
+            Color.black.opacity(0.92).ignoresSafeArea()
 
             if !reduceMotion {
                 TimelineView(.animation) { timeline in

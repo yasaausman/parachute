@@ -28,9 +28,11 @@ Build installed on Dev A's iPhone on 2026-09-27 (branch `a/p-polish-demo`, which
 - [x] The Apple steps and "Or cancel on Apple's website" show below it
 
 ## 4. Share a screenshot (A7)
+- [x] Negative case: Settings → Subscriptions (all cancelled) → "No upcoming charge on this screen", nothing invented (after the 2026-09-28 fix)
 - [ ] Take a screenshot of any trial or subscription screen (e.g. Settings → Subscriptions, or a trial email)
 - [ ] Share it (tap the thumbnail, then Share) → **Parachute**
-- [ ] The card shows "Found: … · $… · charges …"; note whether it says "with Apple Intelligence" (the model ran inside the extension)
+- [x] The card says "Read on this iPhone with Apple Intelligence": the model runs inside the extension
+- [ ] The card shows "Found: … · $… · charges …"
 - [ ] **Track it** → "Tracking …" → open Parachute → it's in the Money tab
 
 ## 5. Alarm with Pro (A4 recheck)

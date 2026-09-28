@@ -15,7 +15,7 @@ Research archive: `research/` (original Untax plan + full 44-row audit, Parachut
 - ✅ *"Next Gen Award Projects will be evaluated using the demonstration video and code repository."* No judge promo code needed.
 - ✅ Must use the RevenueCat SDK *"to power at least one in-app or web purchase."*
 - ✅ Eligibility: *"an active student… use a qualifying student or academic email address on Devpost."* Minors need guardian consent.
-- ✅ Teams allowed: *"Teams of Eligible Individuals"*; one **Representative** submits and allocates any prize. ⚠️ The rules don't explicitly say *every* member must be a student for Next Gen → **assume both of you need student emails; confirm on the Shipaton Discord.**
+- ✅ Teams allowed: *"Teams of Eligible Individuals"*; one **Representative** submits and allocates any prize. The rules don't say it outright, but the Shipaton Discord confirmed (via Dev A, 2026-09-28): **every team member must be a student**.
 - ✅ Deadline **Wed Sep 30, 2026, 11:45pm PDT**. Video under 2 minutes.
 - ✅ Criteria (no weights): (1) clear, useful, original idea · (2) meaningful progress toward a working app · (3) thoughtful RevenueCat use · (4) thoughtful technical choices, product thinking, care in build **and presentation**.
 - ✅ Judges must read the description, watch 2 minutes of video, and review screenshots; testing is optional ([Shipaton blog](https://www.shipaton.com/blog/how-we-judge-shipaton)). **The video, README, and screenshots are the product.**
@@ -206,7 +206,7 @@ README: icon + 3 screenshots · pitch · Mermaid architecture · badges · **"Ho
 | Claim | Status |
 |---|---|
 | Next Gen: video + public repo w/ license; no store/paid account; no promo code | ✅ rules |
-| Teams allowed; Representative submits; all-student requirement for teams | ✅ / ⚠️ unclear |
+| Teams allowed; Representative submits; all-student requirement for teams | ✅ / ✅ every member must be a student (Shipaton Discord, via Dev A, 2026-09-28) |
 | RevenueCat SDK must power ≥ 1 purchase; deadline Sep 30 11:45pm PDT | ✅ rules |
 | AlarmKit: iOS 26+, Silent/Focus breakthrough, Stop + 1 button, stopIntent | ✅ Apple docs + WWDC25 |
 | Foundation Models: iOS 26+, on-device, needs Apple Intelligence | ✅ Apple docs |

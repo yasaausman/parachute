@@ -13,6 +13,10 @@ public struct AlarmRecord: Codable, Sendable, Hashable {
     /// The originally planned ring time. Re-planning with the same value keeps an ongoing chain.
     public var planned: Date
     public var rings: Int
+    /// When the currently scheduled alarm rings.
+    public var fireDate: Date?
+    /// A Debug "ring in 1 minute" alarm: a resync must not replace it before it rings.
+    public var isTest: Bool?
 }
 
 /// The AlarmKit calls the chain needs, so tests can use a fake.
@@ -114,19 +118,39 @@ public struct DeadlineAlarms: Sendable {
     /// Schedules the first ring at `planned`. If a chain for the same plan is already running
     /// (e.g. the Money tab resyncs mid-chain), it's left alone.
     public func arm(itemID: UUID, title: String, planned: Date) async throws {
-        if let existing = record(for: itemID), existing.planned == planned, existing.title == title {
+        if let existing = record(for: itemID) {
+            if existing.planned == planned, existing.title == title { return }
+            // Leave a Debug test ring alone until it has had its chance to ring.
+            if existing.isTest == true, let fire = existing.fireDate, fire > now().addingTimeInterval(-5 * 60) {
+                log("Kept test alarm for \(existing.title)")
+                return
+            }
+        }
+        guard await client.requestAuthorizationIfNeeded() else {
+            log("Not armed (no AlarmKit permission): \(title)")
             return
         }
-        guard await client.requestAuthorizationIfNeeded() else { return }
         let fire = DeadlineAlarmPlanner.effectiveFireDate(planned, now: now(), timeTravel: timeTravel())
-        try await replace(itemID: itemID, title: title, planned: planned, at: fire, rings: 0)
+        try await replace(itemID: itemID, title: title, planned: planned, at: fire, rings: 0, isTest: false)
+    }
+
+    /// Debug: ring this item's alarm at `date`, protected from resyncs until it rings.
+    public func ringForTest(itemID: UUID, title: String, at date: Date) async throws {
+        guard await client.requestAuthorizationIfNeeded() else {
+            log("Test not armed (no AlarmKit permission)")
+            return
+        }
+        try await replace(itemID: itemID, title: title, planned: date, at: date, rings: 0, isTest: true)
     }
 
     /// Stop was tapped: ring again later, unless a decision already ended the chain.
     public func stopTapped(itemID: UUID) async throws {
-        guard let current = record(for: itemID) else { return }
+        guard let current = record(for: itemID) else {
+            log("Stop with no chain (already decided)")
+            return
+        }
         let fire = now().addingTimeInterval(DeadlineAlarmPlanner.rearmDelay(timeTravel: timeTravel()))
-        try await replace(itemID: itemID, title: current.title, planned: current.planned, at: fire, rings: current.rings + 1)
+        try await replace(itemID: itemID, title: current.title, planned: current.planned, at: fire, rings: current.rings + 1, isTest: current.isTest)
     }
 
     /// Decide was tapped: open the Decide screen. The chain keeps a re-ring queued in case the
@@ -143,6 +167,7 @@ public struct DeadlineAlarms: Sendable {
         var all = records()
         all[itemID] = nil
         save(all)
+        log("Disarmed \(current.title)")
     }
 
     // MARK: Records
@@ -163,14 +188,28 @@ public struct DeadlineAlarms: Sendable {
         defaults.set(data, forKey: Self.recordsKey)
     }
 
-    private func replace(itemID: UUID, title: String, planned: Date, at fire: Date, rings: Int) async throws {
+    private func replace(itemID: UUID, title: String, planned: Date, at fire: Date, rings: Int, isTest: Bool?) async throws {
         if let old = record(for: itemID) {
             client.cancel(alarmID: old.alarmID)
         }
         let alarmID = UUID()
         try await client.schedule(alarmID: alarmID, itemID: itemID, title: title, at: fire)
         var all = records()
-        all[itemID] = AlarmRecord(itemID: itemID, alarmID: alarmID, title: title, planned: planned, rings: rings)
+        all[itemID] = AlarmRecord(itemID: itemID, alarmID: alarmID, title: title, planned: planned, rings: rings, fireDate: fire, isTest: isTest)
         save(all)
+        log("\(isTest == true ? "Test" : rings > 0 ? "Re-armed #\(rings)" : "Armed") \(title) for \(fire.formatted(date: .abbreviated, time: .shortened))")
+    }
+
+    // MARK: Log (Debug screen)
+
+    static let logKey = "alarm.log"
+
+    public var logLines: [String] {
+        defaults.stringArray(forKey: Self.logKey) ?? []
+    }
+
+    func log(_ message: String) {
+        let line = "\(now().formatted(date: .omitted, time: .standard))  \(message)"
+        defaults.set(Array((logLines + [line]).suffix(40)), forKey: Self.logKey)
     }
 }

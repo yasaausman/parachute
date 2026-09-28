@@ -12,6 +12,7 @@ struct ReminderDebugView: View {
     @State private var pending: [(id: String, title: String, fires: Date?)] = []
     @State private var alarms: [(id: String, state: String, fires: Date?)] = []
     @State private var chains: [AlarmRecord] = []
+    @State private var alarmLog: [String] = []
 
     var body: some View {
         List {
@@ -32,7 +33,8 @@ struct ReminderDebugView: View {
                 ForEach(chains, id: \.itemID) { chain in
                     VStack(alignment: .leading) {
                         Text(chain.title).font(.subheadline)
-                        Text("rings so far: \(chain.rings)").font(.caption.monospaced()).foregroundStyle(.secondary)
+                        Text("next ring: \(chain.fireDate.map { $0.formatted(date: .abbreviated, time: .shortened) } ?? "?") · rings so far: \(chain.rings)\(chain.isTest == true ? " · test" : "")")
+                            .font(.caption.monospaced()).foregroundStyle(.secondary)
                     }
                 }
                 ForEach(alarms, id: \.id) { alarm in
@@ -43,6 +45,15 @@ struct ReminderDebugView: View {
                 Text("Final-day alarm (A4)")
             } footer: {
                 Text("Lock the phone. When it rings, use Stop: it comes back in 30 minutes (1 minute with time travel on). Tap Decide to open the Decide screen; a decision ends the chain.")
+            }
+
+            Section("Alarm log") {
+                if alarmLog.isEmpty {
+                    Text("Nothing yet").foregroundStyle(.secondary)
+                }
+                ForEach(Array(alarmLog.enumerated().reversed()), id: \.offset) { _, line in
+                    Text(line).font(.caption.monospaced())
+                }
             }
 
             Section("Pending reminders (\(pending.count))") {
@@ -80,14 +91,13 @@ struct ReminderDebugView: View {
             serviceName: deadline.serviceName, amountCents: deadline.amountCents,
             currencyCode: deadline.currencyCode, billedByApple: deadline.billedByApple
         )
-        let alarms = DeadlineAlarms(timeTravel: { false })
-        alarms.disarm(itemID: deadline.id)
-        try? await alarms.arm(itemID: deadline.id, title: title, planned: .now.addingTimeInterval(60))
+        try? await DeadlineAlarms(timeTravel: { false }).ringForTest(itemID: deadline.id, title: title, at: .now.addingTimeInterval(60))
         await loadPending()
     }
 
     private func loadPending() async {
         chains = DeadlineAlarms().records().values.sorted { $0.title < $1.title }
+        alarmLog = DeadlineAlarms().logLines
         alarms = ((try? AlarmManager.shared.alarms) ?? []).map { alarm in
             let fires: Date? = if case .fixed(let date) = alarm.schedule { date } else { nil }
             return (id: String(alarm.id.uuidString.prefix(4)), state: String(describing: alarm.state), fires: fires)

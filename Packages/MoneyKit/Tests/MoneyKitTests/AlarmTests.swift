@@ -121,6 +121,15 @@ final class FakeAlarmClient: AlarmClient {
         #expect(client.live.count == 1, "still re-rings if the app is closed without deciding")
     }
 
+    /// Dev A's iPhone, 2026-09-28: a Debug "ring in 1 minute" alarm was replaced by the next
+    /// resync (foreground / Pro change) and never rang.
+    @Test func aResyncDoesNotReplaceAPendingTestRing() async throws {
+        try await alarms.ringForTest(itemID: item, title: "T", at: now.addingTimeInterval(60))
+        try await alarms.arm(itemID: item, title: "T", planned: now.addingTimeInterval(86_400))
+        #expect(client.live.count == 1)
+        #expect(client.live.first?.date == now.addingTimeInterval(60))
+    }
+
     @Test func aDecisionEndsTheChainForGood() async throws {
         try await alarms.arm(itemID: item, title: "T", planned: now)
         try await alarms.stopTapped(itemID: item)

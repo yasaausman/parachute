@@ -10,11 +10,11 @@ Build installed on Dev A's iPhone on 2026-09-27 (branch `a/p-polish-demo`, which
 - [x] Debug → Paywall: **Pro** says yes or no (earlier Test Store purchases may still count)
 - [x] **Show paywall**: Lifetime (BEST) $29.99, Yearly "1 week free, then $24.99/yr", Monthly $3.99 (2026-09-28)
 - [x] "Or try Pro free for 1 week" → Test Store yearly sheet → valid purchase → Pro = yes with Force Pro **off**
-- [ ] Buy **Lifetime** → *Test valid purchase* → sheet closes, Pro = yes
-- [ ] Paywall → **Restore purchases** → "Restored. You're Pro."
+- [x] Buy (trial via the shortcut) → *Test valid purchase* → sheet closes, Pro = yes
+- [x] Paywall → **Restore purchases** → "Restored. You're Pro."
 - [ ] Money tab footer "The final-day alarm … is Pro" disappears once Pro
 - [ ] (Optional) Force Pro off with no purchase: add a 6th open trial → the paywall appears instead of the form
-- [ ] **Preview "trial ends tomorrow" reminder** → notification in about a minute
+- [x] **Preview "trial ends tomorrow" reminder** → notification in about a minute ("Parachute Pro: your trial ends tomorrow", 2026-09-28)
 
 ## 2. Decide (A5)
 - [ ] Tap **Spotify** → Decide: Cancel it · I'm frozen · Keep it · Snooze

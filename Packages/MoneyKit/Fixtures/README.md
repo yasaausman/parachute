@@ -17,3 +17,6 @@ Add `--verbose` to see the OCR text and the model's raw answer per fixture.
 | 5 real screenshots from Dev A's accounts (kept out of the repo: they show an email and card digits) | 4/5 | 4/5 |
 
 Price and date were right on all 15. The one miss: Spotify's account page never prints "Spotify" (only "Premium Student" and "Access to Hulu"), so the name came out as "Hulu"; the share sheet shows the name field to fix it. The fixtures were written by the same person who tuned the extractor, so treat 10/10 as optimistic and add real screenshots when you can.
+
+## Regression (2026-09-28)
+Dev A's iPhone: sharing Settings → Subscriptions with only *cancelled* items produced "Apple TV · $190.00 · charges Sep 27". Causes: the status-bar clock ("5:44") read as today's date, and (likely, not reproduced on the Mac) the status bar read as a price. Fixed by skipping the top 6% of phone-shaped screenshots, accepting only real calendar dates, ignoring dates right after "Canceled/ended/expired", and showing "No upcoming charge on this screen" when there's no price and no date. Covered by `inactiveSubscriptionsScreenYieldsNoChargeOrPrice` and `clockTimesAreNotDates`.

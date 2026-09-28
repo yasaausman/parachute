@@ -28,6 +28,8 @@ public struct TrackTrialView: View {
     @State private var billedByApple = false
     @State private var editing = false
     @State private var saveFailed = false
+    /// No price and no charge date: probably not a trial screen (e.g. a list of cancelled subscriptions).
+    @State private var foundNothing = false
 
     public init(load: @escaping @Sendable () async -> Input, onDone: @escaping () -> Void) {
         self.load = load
@@ -71,11 +73,19 @@ public struct TrackTrialView: View {
         Form {
             Section {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(canSave ? "Found:" : "Almost there. Fill in what's missing:")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    Text(summary)
-                        .font(.title3.bold())
+                    if foundNothing {
+                        Text("No upcoming charge on this screen.")
+                            .font(.title3.bold())
+                        Text("Share the screen that shows the price and the date it charges (a trial confirmation or receipt), or fill it in below.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text(canSave ? "Found:" : "Almost there. Fill in what's missing:")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Text(summary)
+                            .font(.title3.bold())
+                    }
                 }
                 .padding(.vertical, 4)
 
@@ -121,18 +131,24 @@ public struct TrackTrialView: View {
 
     private func read() async {
         let known = CuratedServices.load().map(CuratedServices.shortName)
-        let candidate: TrialCandidate
+        var candidate: TrialCandidate
+        var readText = ""
         switch await load() {
         case .image(let data):
-            if let text = try? await TextRecognizer.text(inImageData: data) {
-                candidate = await TrialExtractor.extract(fromText: text, knownServices: known)
-            } else {
-                candidate = TrialCandidate()
-            }
+            readText = (try? await TextRecognizer.text(inImageData: data)) ?? ""
+            candidate = await TrialExtractor.extract(fromText: readText, knownServices: known)
         case .text(let text):
+            readText = text
             candidate = await TrialExtractor.extract(fromText: text, knownServices: known)
         case .nothing:
             candidate = TrialCandidate()
+        }
+        CaptureDebugLog.save(text: readText, candidate: candidate)
+        foundNothing = candidate.amountCents == nil && candidate.chargeDate == nil
+        if foundNothing {
+            // A name alone (e.g. from a list of cancelled subscriptions) isn't a trial.
+            candidate.serviceName = nil
+            editing = true
         }
         serviceName = candidate.serviceName ?? ""
         amount = candidate.amountCents.map { Decimal($0) / 100 }
@@ -167,5 +183,28 @@ public struct TrackTrialView: View {
         } catch {
             saveFailed = true
         }
+    }
+}
+
+/// Debug builds keep the last capture's OCR text and result, so a wrong card can be diagnosed
+/// from the Debug tab (the share extension runs in its own process).
+enum CaptureDebugLog {
+    static let key = "debug.capture.last"
+
+    static func save(text: String, candidate: TrialCandidate) {
+        #if DEBUG
+        let summary = [
+            "name: \(candidate.serviceName ?? "-")",
+            "amount: \(candidate.amountCents.map(String.init) ?? "-")",
+            "date: \(candidate.chargeDate.map { $0.formatted(date: .abbreviated, time: .omitted) } ?? "-")",
+            "apple: \(candidate.billedByApple)",
+            "source: \(candidate.source.rawValue)",
+        ].joined(separator: " · ")
+        AppGroup.defaults.set("\(Date.now.formatted())\n\(summary)\n\nOCR:\n\(text)", forKey: key)
+        #endif
+    }
+
+    static var last: String? {
+        AppGroup.defaults.string(forKey: key)
     }
 }

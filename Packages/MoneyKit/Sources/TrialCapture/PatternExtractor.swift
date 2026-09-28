@@ -111,13 +111,16 @@ public enum PatternExtractor {
             for match in detector.matches(in: text, range: range) {
                 guard let date = match.date, let swiftRange = Range(match.range, in: text) else { continue }
                 let matched = String(text[swiftRange])
-                // "Today", "then", "tomorrow" aren't printed dates; a charge date has digits.
-                guard matched.contains(where: \.isNumber) else { continue }
+                // A charge date names a day: "Oct 26", "10/3/2026", "7 Dec". Not "Today" or a clock time ("5:44").
+                guard looksLikeCalendarDate(matched) else { continue }
                 // "ends on October 26" comes back as a range from now to Oct 26: the end is the date.
                 let day = calendar.startOfDay(for: match.duration > 0 ? date.addingTimeInterval(match.duration) : date)
                 guard day >= today else { continue }
                 let start = text.distance(from: text.startIndex, to: swiftRange.lowerBound)
                 let end = text.distance(from: text.startIndex, to: swiftRange.upperBound)
+                // "Canceled February 15", "ended on…": a past event, not an upcoming charge.
+                let justBefore = lowered.slice(from: max(0, start - 16), to: start)
+                if ["cancel", "ended", "expired", "stopped", "since"].contains(where: justBefore.contains) { continue }
                 let context = lowered.slice(from: max(0, start - 40), to: end)
                 let keywords = ["end", "starting", "renew", "next payment", "next bill", "billing date", "charge", "until", "on "]
                 let score = keywords.filter { context.contains($0) }.count
@@ -128,6 +131,16 @@ public enum PatternExtractor {
         return found.enumerated()
             .sorted { $0.element.score != $1.element.score ? $0.element.score > $1.element.score : $0.offset < $1.offset }
             .map(\.element)
+    }
+
+    static let monthNames = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
+
+    static func looksLikeCalendarDate(_ text: String) -> Bool {
+        let lowered = text.lowercased()
+        guard lowered.contains(where: \.isNumber) else { return false }
+        if monthNames.contains(where: lowered.contains) { return true }
+        // 10/3/2026, 2026-10-03, 3.10.2026
+        return lowered.contains(/\d{1,4}[\/\-.]\d{1,2}[\/\-.]\d{1,4}/)
     }
 
     /// "7-day free trial", "1-month free trial", "14 day trial" → today + that length.

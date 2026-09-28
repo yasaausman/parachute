@@ -23,6 +23,38 @@ import Testing
         #expect(PatternExtractor.chargeDate(in: text, now: now, calendar: Self.calendar) == Self.day(2026, 10, 10))
     }
 
+    /// Dev A's iPhone, 2026-09-28: Settings → Subscriptions with everything cancelled came back as
+    /// "Apple TV · $190.00 · charges Sep 27". Nothing on that screen is an upcoming charge.
+    @Test func inactiveSubscriptionsScreenYieldsNoChargeOrPrice() {
+        let text = """
+            5:44 ~
+            90
+            Subscriptions
+            Inactive
+            Apple TV
+            Apple TV Channel
+            Canceled February 15
+            Apple Music
+            Individual
+            Canceled January 10
+            Options
+            Apple One
+            Get more when you bundle. Enjoy Apple TV,
+            Try It Free
+            """
+        let result = PatternExtractor.extract(from: text, now: now, calendar: Self.calendar)
+        #expect(result.chargeDate == nil)
+        #expect(result.amountCents == nil)
+    }
+
+    @Test func clockTimesAreNotDates() {
+        #expect(!PatternExtractor.looksLikeCalendarDate("5:44"))
+        #expect(!PatternExtractor.looksLikeCalendarDate("Today"))
+        #expect(PatternExtractor.looksLikeCalendarDate("Oct 26, 2026"))
+        #expect(PatternExtractor.looksLikeCalendarDate("10/3/2026"))
+        #expect(PatternExtractor.looksLikeCalendarDate("7 Dec 2026"))
+    }
+
     @Test func trialLengthCountsFromToday() {
         #expect(PatternExtractor.chargeDate(in: "14-day free trial\nThen $12.99/month", now: now, calendar: Self.calendar) == Self.day(2026, 10, 11))
         #expect(PatternExtractor.chargeDate(in: "1-month free trial", now: now, calendar: Self.calendar) == Self.day(2026, 10, 27))

@@ -123,6 +123,12 @@ public struct MoneyDebugMenu: View {
         List {
             NavigationLink("Reminders, alarm + time travel (A2, A4)") { ReminderDebugView() }
 
+            if let capture = CaptureDebugLog.last {
+                Section("Last share-sheet capture (A7)") {
+                    Text(capture).font(.caption.monospaced()).textSelection(.enabled)
+                }
+            }
+
             Section {
                 Button("Load demo trials") {
                     demoBusy = true

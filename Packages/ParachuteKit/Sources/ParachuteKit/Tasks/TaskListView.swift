@@ -64,6 +64,7 @@ public struct TaskListView: View {
                 TaskPlayerView(task: task) { playing = nil }
             }
         }
+        .tint(Palette.frozenInk)
     }
 
     private var frozenButton: some View {
@@ -99,17 +100,21 @@ struct TaskRow: View {
                         .accessibilityLabel("Done")
                 }
             }
-            if let due = task.dueDate, task.status == .active {
-                Label(due.formatted(.relative(presentation: .named)), systemImage: "clock")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            if task.status == .active {
+                HStack(spacing: 6) {
+                    if total > 0 { Text("\(done) of \(total) done") }
+                    // Only upcoming deadlines: a past one would read as "you're late" (CLAUDE.md rule 10).
+                    if let due = task.dueDate, due > .now {
+                        Text("·")
+                        Label(due.formatted(.relative(presentation: .named)), systemImage: "clock")
+                    }
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
             }
             if total > 0, task.status == .active {
-                ProgressView(value: Double(done), total: Double(total))
-                    .tint(Palette.frozenFill)
-                Text("Step \(min(done + 1, total)) of \(total)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                StepTicks(done: done, total: total)
+                    .padding(.top, 2)
             }
         }
         .padding(.vertical, 4)

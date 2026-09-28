@@ -14,7 +14,7 @@ public struct UnfreezeView: View {
 
     @Environment(\.parachute) private var services
     @Environment(\.openURL) private var openURL
-    @ScaledMetric(relativeTo: .title) private var ringSize: CGFloat = 110
+    @ScaledMetric(relativeTo: .title) private var ringSize: CGFloat = 72
 
     @State private var steps: [PlanStep]
     @State private var isSuggested: Bool
@@ -115,13 +115,11 @@ public struct UnfreezeView: View {
             }
             .accessibilityLabel("Close")
 
-            Spacer()
+            if !started || index >= steps.count { Spacer() }
 
             if started, index < steps.count {
-                Text("Step \(index + 1) of \(steps.count)")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                Spacer()
+                StepTicks(done: index, total: steps.count, height: 8)
+                    .padding(.horizontal, 12)
                 audioMenu
             }
         }
@@ -192,11 +190,11 @@ public struct UnfreezeView: View {
     private func stepScreen(_ step: PlanStep) -> some View {
         VStack(spacing: Theme.spacing) {
             ScrollView {
-                VStack(spacing: Theme.spacing * 1.5) {
+                // Left-aligned like a note card: the step reads as an instruction, not a slogan.
+                VStack(alignment: .leading, spacing: Theme.spacing * 1.5) {
                     if isSuggested { suggestedBadge }
                     Text(step.text)
                         .font(.system(.largeTitle, design: .rounded).bold())
-                        .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityAddTraits(.isHeader)
                     if let url = step.url {
@@ -209,15 +207,17 @@ public struct UnfreezeView: View {
                         .buttonStyle(.bordered)
                         .tint(Palette.frozenFill)
                     }
-                    ring(total: step.seconds)
-                    Text(remaining == 0 ? "Take all the time you need." : line)
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
+                    HStack(spacing: Theme.spacing) {
+                        ring(total: step.seconds)
+                        Text(remaining == 0 ? "Take all the time you need." : line)
+                            .font(.body)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, Theme.spacing * 1.25)
                 .padding(.top, Theme.spacing * 2)
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .scrollBounceBehavior(.basedOnSize)
 
@@ -235,13 +235,15 @@ public struct UnfreezeView: View {
                         }
                     }
                     .disabled(isBreaking)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Palette.frozenInk)
                     .accessibilityHint("Splits this step into even smaller ones")
                     Button("Skip") { advance() }
                         .frame(maxWidth: .infinity)
+                        .foregroundStyle(.primary)
                         .accessibilityHint("Moves on without this step")
                 }
                 .font(.body)
-                .foregroundStyle(.secondary)
                 .padding(.vertical, 10)
             }
             .padding(.horizontal)
@@ -250,7 +252,7 @@ public struct UnfreezeView: View {
     }
 
     private func ring(total: Int) -> some View {
-        let size = min(ringSize, 180)
+        let size = min(ringSize, 120)
         return ZStack {
             Circle().stroke(Palette.frozenInk.opacity(0.2), lineWidth: 8)
             Circle()

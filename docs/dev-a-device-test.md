@@ -3,8 +3,8 @@
 Build installed on Dev A's iPhone on 2026-09-27 (branch `a/p-polish-demo`, which contains A5 through P2). Tick each line; anything that fails goes to Claude with a screenshot.
 
 ## 0. Start clean
-- [ ] Debug → **Clear all trials** → **Load demo trials**
-- [ ] Money tab shows Duolingo (orange, "cancel by …, Apple needs a day"), Spotify, Claude, Google AI Pro, and a cancelled Apple One
+- [x] Debug → **Clear all trials** → **Load demo trials**
+- [x] Money tab shows Duolingo (orange, "cancel by …, Apple needs a day"), Spotify, Claude, Google AI Pro, and a cancelled Apple One
 
 ## 1. Paywall and Pro (A8)
 - [x] Debug → Paywall: **Pro** says yes or no (earlier Test Store purchases may still count)
@@ -17,11 +17,11 @@ Build installed on Dev A's iPhone on 2026-09-27 (branch `a/p-polish-demo`, which
 - [x] **Preview "trial ends tomorrow" reminder** → notification in about a minute ("Parachute Pro: your trial ends tomorrow", 2026-09-28)
 
 ## 2. Decide (A5)
-- [ ] Tap **Spotify** → Decide: Cancel it · I'm frozen · Keep it · Snooze
-- [ ] **Snooze → In 1 hour** → row says "Snoozed until …"
-- [ ] Tap Spotify → **Cancel it** → your hand-checked steps → **Done, it's cancelled** → "Cancelled · $11.99 won't be charged"
+- [x] Tap **Spotify** → Decide: Cancel it · I'm frozen · Keep it · Snooze
+- [x] **Snooze** screen: In 1 hour / Tomorrow at 9 (tonight at 8 correctly hidden after 8 PM), custom time capped at "decide by Sep 30, 11:59 PM". Row text after snoozing seen in the simulator only.
+- [x] Tap Spotify → **Cancel it** → your hand-checked steps → **Done, it's cancelled** → "Cancelled · $11.99 won't be charged"
 - [ ] Tap it → **Reopen** → tap again → **I'm frozen** → placeholder steps → **I did it** → cancelled again
-- [ ] Tap **Claude** → **Keep it** → moves to Decided, "Kept"
+- [x] Tap **Claude** → **Keep it** → moves to Decided, "Kept"
 
 ## 3. Apple path (A6)
 - [ ] Tap **Duolingo** → **Cancel it** → **Open Apple Subscriptions**: does it open the App Store's Subscriptions page? ⚠️ This is the unverified link.

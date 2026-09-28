@@ -113,6 +113,8 @@ public struct MoneyDebugMenu: View {
     @Environment(\.moneyEscalation) private var escalation
     @State private var confirmingClear = false
     @State private var trialReminderNote: String?
+    @State private var demoNote: String?
+    @State private var demoBusy = false
     @AppStorage(ProEntitlements.forceProKey, store: AppGroup.defaults) private var forcePro = false
 
     public init() {}
@@ -123,13 +125,25 @@ public struct MoneyDebugMenu: View {
 
             Section {
                 Button("Load demo trials") {
-                    Task { await DemoData.load(into: context, escalation: escalation) }
+                    demoBusy = true
+                    Task {
+                        let count = await DemoData.load(into: context, escalation: escalation)
+                        demoNote = "Loaded \(count) demo trials (anything else was cleared). See the Money tab."
+                        demoBusy = false
+                    }
                 }
+                .disabled(demoBusy)
                 Button("Clear all trials", role: .destructive) { confirmingClear = true }
+                    .disabled(demoBusy)
+                if demoBusy {
+                    ProgressView()
+                } else if let demoNote {
+                    Text(demoNote).font(.footnote).foregroundStyle(.secondary)
+                }
             } header: {
                 Text("Demo data (P2)")
             } footer: {
-                Text("Spotify (3 days), Duolingo via Apple (tomorrow), Claude, Google AI Pro, and a cancelled Apple One.")
+                Text("Replaces all trials with: Spotify (3 days), Duolingo via Apple (tomorrow), Claude, Google AI Pro, and a cancelled Apple One.")
             }
 
             if let pro {
@@ -158,7 +172,12 @@ public struct MoneyDebugMenu: View {
         .navigationTitle("Debug")
         .confirmationDialog("Delete every trial?", isPresented: $confirmingClear, titleVisibility: .visible) {
             Button("Delete all", role: .destructive) {
-                Task { await DemoData.clear(context, escalation: escalation) }
+                demoBusy = true
+                Task {
+                    let count = await DemoData.clear(context, escalation: escalation)
+                    demoNote = "Deleted \(count) trials, with their reminders and alarms."
+                    demoBusy = false
+                }
             }
         }
     }

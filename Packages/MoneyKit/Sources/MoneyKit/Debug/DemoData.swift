@@ -22,8 +22,11 @@ enum DemoData {
         Trial(name: "Apple One", serviceID: "apple-one", cents: 2195, daysAway: 9, billedByApple: true, status: .cancelled),
     ]
 
+    /// Replaces every trial with the demo set (so repeated taps can't pile up duplicates).
     @MainActor
-    static func load(into context: ModelContext, escalation: EscalationScheduler?) async {
+    @discardableResult
+    static func load(into context: ModelContext, escalation: EscalationScheduler?) async -> Int {
+        await clear(context, escalation: escalation)
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: .now)
         var added: [MoneyDeadline] = []
@@ -35,10 +38,12 @@ enum DemoData {
         }
         try? context.save()
         await escalation?.resync(added)
+        return added.count
     }
 
     @MainActor
-    static func clear(_ context: ModelContext, escalation: EscalationScheduler?) async {
+    @discardableResult
+    static func clear(_ context: ModelContext, escalation: EscalationScheduler?) async -> Int {
         let all = (try? context.fetch(FetchDescriptor<MoneyDeadline>())) ?? []
         for deadline in all {
             let id = deadline.id
@@ -46,5 +51,6 @@ enum DemoData {
             await escalation?.resolve(itemID: id)
         }
         try? context.save()
+        return all.count
     }
 }

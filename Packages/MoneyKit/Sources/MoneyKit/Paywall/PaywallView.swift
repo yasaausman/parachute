@@ -148,7 +148,9 @@ public struct PaywallView: View {
 
     private var buyTitle: String {
         guard let selected else { return "Choose a plan" }
-        if selectedHasTrial { return "Start free trial" }
+        if selectedHasTrial, let discount = selected.storeProduct.introductoryDiscount {
+            return "Start \(PlanRow.describe(discount.subscriptionPeriod)) free trial"
+        }
         if selected.packageType == .lifetime { return "Get Pro for \(selected.storeProduct.localizedPriceString)" }
         return "Subscribe for \(selected.storeProduct.localizedPriceString)"
     }
@@ -222,7 +224,7 @@ private struct FeatureRow: View {
     }
 }
 
-private struct PlanRow: View {
+struct PlanRow: View {
     let package: Package
     let isSelected: Bool
 
@@ -265,9 +267,33 @@ private struct PlanRow: View {
     }
 
     private var subtitle: String {
-        if let discount = package.storeProduct.introductoryDiscount, discount.paymentMode == .freeTrial {
-            return "Free trial, then \(package.storeProduct.localizedPriceString)"
+        let product = package.storeProduct
+        if let discount = product.introductoryDiscount, discount.paymentMode == .freeTrial {
+            return "\(Self.describe(discount.subscriptionPeriod)) free, then \(product.localizedPriceString)\(Self.perPeriod(product.subscriptionPeriod))"
         }
         return package.packageType == .lifetime ? "Pay once. Yours forever." : "Cancel anytime"
+    }
+
+    /// "1 week", "7 days", "1 month".
+    static func describe(_ period: SubscriptionPeriod) -> String {
+        let unit = switch period.unit {
+        case .day: "day"
+        case .week: "week"
+        case .month: "month"
+        case .year: "year"
+        @unknown default: "period"
+        }
+        return "\(period.value) \(unit)\(period.value == 1 ? "" : "s")"
+    }
+
+    /// "/yr", "/mo", or "" for non-subscriptions.
+    static func perPeriod(_ period: SubscriptionPeriod?) -> String {
+        guard let period, period.value == 1 else { return "" }
+        return switch period.unit {
+        case .year: "/yr"
+        case .month: "/mo"
+        case .week: "/wk"
+        default: ""
+        }
     }
 }

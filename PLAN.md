@@ -213,7 +213,7 @@ README: icon + 3 screenshots · pitch · Mermaid architecture · badges · **"Ho
 | Free Apple ID: App Groups yes; Push/SiwA/IAP/Time Sensitive no | ✅ Apple capabilities table |
 | RevenueCat Test Store: no setup, ≥ 5.43.0, never in release | ✅ RevenueCat docs |
 | Test Store product prices can't be edited after saving | ✅ RevenueCat docs (A8, 2026-09-27) |
-| Test Store supports free trials / intro offers | ⚠️ not in RevenueCat's Test Store docs |
+| Test Store supports free trials / intro offers | ✅ dashboard offers a free-trial period + eligibility on subscription products; purchase on device (2026-09-28) |
 | Clawback (Sep 24) & Nudgy (Aug) exist as described | ✅ App Store listings |
 | 79% / $45/mo (Dimers); 15.5M ADHD (CDC); $86 vs $219 (C+R) | ✅ |
 | Local notifications need no special capability | ✅ A0 on device (2026-09-26) |

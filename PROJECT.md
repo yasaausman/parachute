@@ -40,6 +40,7 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
 5. Changing targets, Info.plist keys, or entitlements: edit `project.yml`, then `xcodegen generate`. Adding files in `App/`, `Widgets/`, `ShareExtension/` also needs a regenerate; files inside a package don't.
 
 ## Decisions & why (newest first)
+- 2026-09-28: **Real prices live in RevenueCat** (Test Store): `parachute_lifetime_2999` ($29.99, non-consumable), `parachute_yearly_2499` ($24.99/yr, **1-week free trial, eligibility: Everyone** so test accounts that bought before still see it), `parachute_monthly_399` ($3.99/mo, no trial), all on `parachute_pro`, swapped into the `default` offering's `$rc_lifetime` / `$rc_annual` / `$rc_monthly`. The old `lifetime`/`yearly`/`monthly` products stay in the dashboard but are unused. Trial only on yearly: monthly is already low-risk, and lifetime has "no trial to forget".
 - 2026-09-27: **Merged Dev B's PR #1** (reviewed: shared `App/` changes follow the contracts; no keys or network code; AI steps are URL-stripped; builds, 30 XCTests pass). Integrated on `a/p-polish-demo`: "I'm frozen" now opens B's `UnfreezeFlowView` full screen (`App/UnfreezeHost.swift`), `ProEntitlements` backs B's gating, task IDs still route to B's task player. `parachute` isn't an SF Symbol, so the paywall uses `sparkles`. For Dev B: the celebration overlay lets the player's "You did it." show through behind "+$… ADHD Tax Refunded".
 - 2026-09-27: **Custom paywall instead of RevenueCatUI**, so the copy can be ADHD-first (lifetime headline, "no trial to forget", the ironic banner) and prices still come from the RevenueCat offering. RevenueCatUI dropped from MoneyKit (unused; keeps the share extension small).
 - 2026-09-27: **Capture = patterns first, AI as a fact-checked second opinion.** The on-device model may choose among values printed in the text, never add new ones (no invented prices, dates, or names). Works fully without Apple Intelligence (CLAUDE.md rule 3). The share extension doesn't touch AlarmKit; the app arms the alarm on its next foreground resync.
@@ -72,7 +73,6 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
 - 2026-09-25: Friction's app lock parked (needs the $99 Program + iOS 26.5). Syllabus parser dropped (crowded).
 
 ## Open questions / blockers
-- **RevenueCat dashboard (Dev A):** create Test Store products at **$29.99 lifetime**, **$24.99/yr**, **$3.99/mo** (add a 7-day free trial to yearly/monthly if the form offers it; ⚠️ Test Store trials aren't mentioned in RevenueCat's docs), attach them to `parachute_pro`, and swap them into the `default` offering. Existing products can't be re-priced.
 - **Is the final-day alarm Pro?** `PLAN.md` §6 says yes, so it's gated (`ProFeatures.finalDayAlarmIsPro`). Flip that constant if the free tier should include it.
 - Sep 30 sprint or longer? (`MILESTONES.md` assumes Sep 30.)
 - Free Apple ID or $99 Program?

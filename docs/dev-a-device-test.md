@@ -7,8 +7,9 @@ Build installed on Dev A's iPhone on 2026-09-27 (branch `a/p-polish-demo`, which
 - [ ] Money tab shows Duolingo (orange, "cancel by …, Apple needs a day"), Spotify, Claude, Google AI Pro, and a cancelled Apple One
 
 ## 1. Paywall and Pro (A8)
-- [ ] Debug → Paywall: **Pro** says yes or no (earlier Test Store purchases may still count)
-- [ ] **Show paywall**: Lifetime (BEST) first, then Yearly, Monthly; prices come from RevenueCat
+- [x] Debug → Paywall: **Pro** says yes or no (earlier Test Store purchases may still count)
+- [x] **Show paywall**: Lifetime (BEST) $29.99, Yearly "1 week free, then $24.99/yr", Monthly $3.99 (2026-09-28)
+- [x] "Or try Pro free for 1 week" → Test Store yearly sheet → valid purchase → Pro = yes with Force Pro **off**
 - [ ] Buy **Lifetime** → *Test valid purchase* → sheet closes, Pro = yes
 - [ ] Paywall → **Restore purchases** → "Restored. You're Pro."
 - [ ] Money tab footer "The final-day alarm … is Pro" disappears once Pro

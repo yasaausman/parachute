@@ -24,8 +24,8 @@ Build installed on Dev A's iPhone on 2026-09-27 (branch `a/p-polish-demo`, which
 - [x] Tap **Claude** → **Keep it** → moves to Decided, "Kept"
 
 ## 3. Apple path (A6)
-- [ ] Tap **Duolingo** → **Cancel it** → **Open Apple Subscriptions**: does it open the App Store's Subscriptions page? ⚠️ This is the unverified link.
-- [ ] The Apple steps and "Or cancel on Apple's website" show below it
+- [x] Tap **Duolingo** → **Cancel it** → **Open Apple Subscriptions** → Apple's Subscriptions page, with "◀ Parachute" back (2026-09-28)
+- [x] The Apple steps and "Or cancel on Apple's website" show below it
 
 ## 4. Share a screenshot (A7)
 - [ ] Take a screenshot of any trial or subscription screen (e.g. Settings → Subscriptions, or a trial email)

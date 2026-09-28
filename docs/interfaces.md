@@ -130,7 +130,7 @@ UnfreezeView(plan: UnfreezePlan, onFinish: (UnfreezeOutcome) -> Void)
 ```
 
 ### Apple-billed path (A6, for B3)
-`SharedKit.AppleSubscriptions.steps(serviceName:)` returns Apple Support's cancel steps as `[PlanStep]`; `manageURL` is the deep link (⚠️ device check) and `webURL` Apple's web page. B3 can return `UnfreezePlan(steps: AppleSubscriptions.steps(...), source: .appleSubscriptions, isSuggested: false)`.
+`SharedKit.AppleSubscriptions.steps(serviceName:)` returns Apple Support's cancel steps as `[PlanStep]`; `manageURL` is the deep link (✅ opens Subscriptions on iPhone, 2026-09-28) and `webURL` Apple's web page. B3 can return `UnfreezePlan(steps: AppleSubscriptions.steps(...), source: .appleSubscriptions, isSuggested: false)`.
 
 ### As implemented (B, 2026-09-27)
 - ParachuteKit reads everything from one environment value, `\.parachute` (`ParachuteServices`: `UnfreezeEngine`, ledger, scheduler, entitlements), set in `ParachuteApp`.

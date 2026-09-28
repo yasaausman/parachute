@@ -29,7 +29,7 @@ Build installed on Dev A's iPhone on 2026-09-27 (branch `a/p-polish-demo`, which
 
 ## 4. Share a screenshot (A7)
 - [x] Negative case: Settings → Subscriptions (all cancelled) → "No upcoming charge on this screen", nothing invented (after the 2026-09-28 fix)
-- [x] Take a screenshot of any trial or subscription screen (Google's subscription page in Safari) (e.g. Settings → Subscriptions, or a trial email)
+- [x] Take a screenshot of any trial or subscription screen (Google's subscription page, in Chrome on the iPhone) (e.g. Settings → Subscriptions, or a trial email)
 - [x] Share it (tap the thumbnail, then Share) → **Parachute**
 - [x] The card says "Read on this iPhone with Apple Intelligence": the model runs inside the extension
 - [x] The card shows "Found: Google One · $19.99 · charges Dec 7"

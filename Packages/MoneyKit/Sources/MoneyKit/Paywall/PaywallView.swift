@@ -34,6 +34,9 @@ public struct PaywallView: View {
                     case .ready:
                         plans
                         buyButton
+                        if let trial = trialPackage, !selectedHasTrial {
+                            trialButton(trial)
+                        }
                         if selectedHasTrial {
                             ironicBanner
                         }
@@ -115,6 +118,21 @@ public struct PaywallView: View {
         .disabled(selected == nil || working)
     }
 
+    /// Lifetime stays the headline, but the free trial is one tap away (not hidden behind "Yearly").
+    private func trialButton(_ package: Package) -> some View {
+        Button {
+            selected = package
+            Task { await buy() }
+        } label: {
+            Text("Or try Pro free for \(Self.trialLength(package) ?? "a week")")
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.bordered)
+        .controlSize(.large)
+        .disabled(working)
+    }
+
     private var ironicBanner: some View {
         Label("We'll remind you 24 hours before this trial ends too. Because that would be pretty ironic. 😉", systemImage: "bell.fill")
             .font(.subheadline)
@@ -142,8 +160,20 @@ public struct PaywallView: View {
     // MARK: Logic
 
     private var selectedHasTrial: Bool {
-        guard let discount = selected?.storeProduct.introductoryDiscount else { return false }
-        return discount.paymentMode == .freeTrial
+        selected.map(Self.hasTrial) ?? false
+    }
+
+    /// The first plan with a free trial (the yearly plan in our offering).
+    private var trialPackage: Package? {
+        packages.first(where: Self.hasTrial)
+    }
+
+    static func hasTrial(_ package: Package) -> Bool {
+        package.storeProduct.introductoryDiscount?.paymentMode == .freeTrial
+    }
+
+    static func trialLength(_ package: Package) -> String? {
+        package.storeProduct.introductoryDiscount.map { PlanRow.describe($0.subscriptionPeriod) }
     }
 
     private var buyTitle: String {

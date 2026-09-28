@@ -31,7 +31,9 @@ Swift 6.4 (strict concurrency) · SwiftUI · SwiftData in an App Group · Xcode 
 ## Conventions
 - Local Swift packages keep ownership clean: the app target is a thin composition root that injects protocol implementations (`EscalationScheduling`, `UnfreezeProviding`, `EntitlementsProviding`, `CompletionLedger`). Contracts: `docs/interfaces.md`.
 - Tests for: date math, escalation schedule, alarm re-arm, `CancelSteps.json` validity, atomizer output schema.
-- Small branches (`a/<feature>`, `b/<feature>`), daily merges at the sync points in `MILESTONES.md`.
+- Small branches (`a/<feature>`, `b/<feature>`). **Merge to `main` as soon as a milestone builds and its tests pass** (a PR or a fast-forward), not in a batch later. Never keep work off `main` overnight: the other dev builds on `main`, and unmerged branches caused duplicate fixes and conflicts in `App/`, `PROJECT.md`, and `MILESTONES.md` (2026-09-27). Device checks can happen after the merge; record them honestly in `MILESTONES.md`.
+- **Start every session with `git pull` on `main`** (and merge `main` into any open branch) so you see the other dev's latest work before touching shared files.
+- **`PROJECT.md`: edit only your own dev's status bullets** (Dev A / Dev B) plus new "Decisions" lines at the top; don't rewrite the other dev's lines.
 - After each chunk of work: update `PROJECT.md` (status + decisions) and tick boxes in `MILESTONES.md`.
 
 ## Submission (Next Gen)

@@ -12,7 +12,7 @@ Every milestone has a **Done when**. Nothing is done until it runs on a real iPh
 ---
 
 ## How you work together (read once)
-- **Branches:** `a/<feature>` and `b/<feature>` → merge to `main` at every **Sync** below. Keep PRs small.
+- **Branches:** `a/<feature>` and `b/<feature>` → merge to `main` **as soon as a milestone builds and tests pass** (not only at a Sync), and `git pull` on `main` before starting work. Keep PRs small. See CLAUDE.md Conventions.
 - **Ownership:** don't edit the other person's package without asking. **`SharedKit` changes need the other's review**; they're contracts (`docs/interfaces.md`).
 - **Project-file conflicts:** almost all code lives in the Swift packages, so the Xcode project file rarely changes. ⚠️ If Xcode 27 offers folder-synced groups, use them for `App/`, `Widgets/`, `ShareExtension/` so adding files doesn't edit the project file.
 - **Blocked?** Code against the protocol and use the fake implementation in `SharedKit/Fakes`. Never wait on the other person.

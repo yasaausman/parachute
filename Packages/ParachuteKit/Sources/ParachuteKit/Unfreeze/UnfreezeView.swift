@@ -14,6 +14,8 @@ public struct UnfreezeView: View {
 
     @Environment(\.parachute) private var services
     @Environment(\.openURL) private var openURL
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    private var isLarge: Bool { dynamicTypeSize.isAccessibilitySize }
     @ScaledMetric(relativeTo: .title) private var ringSize: CGFloat = 72
 
     @State private var steps: [PlanStep]
@@ -124,7 +126,8 @@ public struct UnfreezeView: View {
             }
         }
         .padding(.horizontal)
-        .padding(.top, 8)
+        .padding(.vertical, 8)
+        .background(Color(uiColor: .systemBackground))
         .tint(.primary)
     }
 
@@ -223,7 +226,8 @@ public struct UnfreezeView: View {
 
             VStack(spacing: 4) {
                 primaryButton("Done", systemImage: "checkmark") { advance() }
-                HStack {
+                // Side by side normally; stacked at accessibility sizes so "Break it smaller" never truncates.
+                AnyLayout(isLarge ? AnyLayout(VStackLayout(spacing: 12)) : AnyLayout(HStackLayout())) {
                     Button {
                         Task { await breakSmaller() }
                     } label: {
@@ -231,6 +235,7 @@ public struct UnfreezeView: View {
                             ProgressView().frame(maxWidth: .infinity)
                         } else {
                             Label("Break it smaller", systemImage: "scissors")
+                                .labelStyle(isLarge ? AnyLabelStyle(.titleOnly) : AnyLabelStyle(.titleAndIcon))
                                 .frame(maxWidth: .infinity)
                         }
                     }
@@ -340,6 +345,7 @@ public struct UnfreezeView: View {
 
     private var suggestedBadge: some View {
         Label("Suggested steps", systemImage: "sparkles")
+            .labelStyle(isLarge ? AnyLabelStyle(.titleOnly) : AnyLabelStyle(.titleAndIcon))
             .font(.caption.weight(.semibold))
             .padding(.horizontal, 10)
             .padding(.vertical, 4)

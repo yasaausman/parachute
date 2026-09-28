@@ -34,6 +34,7 @@ Parachute is an iOS app, the ADHD follow-through engine. **Money path** (Dev A):
   - **B0 can't run in the simulator:** the model reports available but inference fails (`InferenceError::operationNotAllowed::Simulator is not supported`). This Mac's own model reports `modelNotReady`. Needs an Apple Intelligence iPhone, or Apple Intelligence turned on for this Mac. Atomizer failures are now logged (`Parachute`/`Atomizer`).
   - Still unexercised: widgets on the Home Screen, voice/ambient audio (needs Pro).
   - **2026-09-28 UI pass (Dev B screens):** step progress is now a row of tick marks (player top bar + task rows) instead of "Step 3 of 7"; steps are left-aligned with an inline ring; Refunded leads with one big dollar figure (the three identical stat cards are gone); Home's "I'm frozen" card is left-aligned and the refund total is plain type; past due times are hidden (no "17 hours ago"); "Break it smaller"/"Skip" meet 4.5:1; Parachute screens tint with the frozen accent instead of orange.
+  - **2026-09-28 largest-text pass:** Home card, player actions, Suggested badge, Refunded month headers and win rows now reflow at accessibility sizes (no "Bre ak…", "Sep-tember", or "$20.0 / 0"); the player's top bar masks scrolled text; the share card image renders only when its numbers change.
 - ⏭️ Next (Dev B): run on iPhone (set `Config/Local.xcconfig`) → check widgets, voice/ambient, share, confetti → B0 spike on an Apple Intelligence device (Home → ladybug) → tick the boxes. Also: review S0.2 contracts (still ☐).
 
 ## How to run

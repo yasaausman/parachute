@@ -21,6 +21,13 @@ struct StepTicks: View {
     }
 }
 
+/// Type-erased label style, so the style can switch with text size.
+struct AnyLabelStyle: LabelStyle {
+    private let make: (Configuration) -> AnyView
+    init<S: LabelStyle>(_ style: S) { make = { AnyView(style.makeBody(configuration: $0)) } }
+    func makeBody(configuration: Configuration) -> some View { make(configuration) }
+}
+
 #Preview {
     VStack(spacing: 20) {
         StepTicks(done: 0, total: 5)

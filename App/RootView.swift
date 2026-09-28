@@ -1,4 +1,5 @@
 import MoneyKit
+import ParachuteKit
 import SharedKit
 import SwiftData
 import SwiftUI
@@ -13,17 +14,17 @@ struct RootView: View {
 
     var body: some View {
         TabView {
-            Tab("Home", systemImage: "parachute") {
-                placeholder("Home", detail: "I'm frozen → task path (B4)")
+            Tab("Home", systemImage: "house") {
+                HomeView()
             }
             Tab("Money", systemImage: "dollarsign.circle") {
                 NavigationStack { MoneyListView() }
             }
             Tab("Tasks", systemImage: "checklist") {
-                placeholder("Tasks", detail: "Frozen tasks (B4)")
+                TaskListView()
             }
             Tab("Refunded", systemImage: "trophy") {
-                placeholder("ADHD Tax Refunded", detail: "Scoreboard (B6)")
+                ScoreboardView()
             }
             #if DEBUG
             Tab("Debug", systemImage: "ladybug") {
@@ -35,24 +36,15 @@ struct RootView: View {
         .sheet(item: $router.sheet) { sheet in
             switch sheet {
             case .decide(let itemID):
-                DecideView(itemID: itemID) { request in
-                    router.sheet = .unfreeze(request, itemID: itemID)
+                DecideRoute(itemID: itemID) { request in
+                    router.unfreeze(request, itemID: itemID)
                 }
-            case .unfreeze(let request, let itemID):
-                UnfreezeHost(request: request, itemID: itemID)
             case .paywall:
                 if let pro { PaywallView(entitlements: pro) }
             }
         }
-        // `presentPaywall()` (A's list limit, B's gating) lands here.
-        .onChange(of: pro?.isPaywallPresented) { _, presented in
-            guard presented == true else { return }
-            router.sheet = .paywall
-            pro?.isPaywallPresented = false
-        }
-        // Pro arms the final-day alarms; losing it disarms them.
-        .onChange(of: pro?.isProNow) { _, _ in
-            Task { await escalation?.resync(deadlines) }
+        .fullScreenCover(item: $router.frozen) { frozen in
+            UnfreezeHost(request: frozen.request, itemID: frozen.itemID)
         }
         // Trials saved from the share sheet get their alarm when the app comes to the front.
         .onChange(of: scenePhase) { _, phase in
@@ -65,16 +57,37 @@ struct RootView: View {
             router.sheet = .decide(itemID: request.itemID)
             decide.pending = nil
         }
-    }
-
-    private func placeholder(_ title: String, detail: String) -> some View {
-        NavigationStack {
-            ContentUnavailableView(title, systemImage: "hammer", description: Text(detail))
-                .navigationTitle(title)
+        // `presentPaywall()` (A's trial limit, B's gating) lands here.
+        .onChange(of: pro?.isPaywallPresented) { _, presented in
+            guard presented == true else { return }
+            router.sheet = .paywall
+            pro?.isPaywallPresented = false
+        }
+        // Pro arms the final-day alarms; losing it disarms them.
+        .onChange(of: pro?.isProNow) { _, _ in
+            Task { await escalation?.resync(deadlines) }
         }
     }
 }
 
-#Preview {
-    RootView()
+/// Reminders and alarms carry an item ID. Task IDs (B5) resume the task; money IDs open Decide.
+private struct DecideRoute: View {
+    @Environment(\.dismiss) private var dismiss
+    @Query private var tasks: [FrozenTask]
+    let itemID: UUID
+    let onFrozen: (UnfreezeRequest) -> Void
+
+    init(itemID: UUID, onFrozen: @escaping (UnfreezeRequest) -> Void) {
+        self.itemID = itemID
+        self.onFrozen = onFrozen
+        _tasks = Query(filter: #Predicate<FrozenTask> { $0.id == itemID })
+    }
+
+    var body: some View {
+        if let task = tasks.first {
+            TaskPlayerView(task: task) { dismiss() }
+        } else {
+            DecideView(itemID: itemID, onFrozen: onFrozen)
+        }
+    }
 }

@@ -1,15 +1,18 @@
 import MoneyKit
 import Observation
+import ParachuteKit
 import SharedKit
+import SwiftData
 
-/// The composition root: every cross-package protocol is injected here.
-/// Swap each fake for the real implementation as it lands (docs/interfaces.md §5).
+/// The composition root: every cross-package protocol is injected here (docs/interfaces.md).
 @Observable
 final class AppDependencies {
     /// MoneyKit's concrete scheduler; `escalation` is the same object behind the shared protocol.
     let moneyEscalation: EscalationScheduler
     var escalation: any EscalationScheduling { moneyEscalation }
-    let unfreeze: any UnfreezeProviding
+    /// ParachuteKit's engine; `unfreeze` is the same object behind the shared protocol.
+    let unfreezeEngine: UnfreezeEngine
+    var unfreeze: any UnfreezeProviding { unfreezeEngine }
     /// MoneyKit's RevenueCat-backed entitlements; `entitlements` is the same object for B's gating.
     let pro: ProEntitlements
     var entitlements: any EntitlementsProviding { pro }
@@ -17,25 +20,30 @@ final class AppDependencies {
 
     init(
         moneyEscalation: EscalationScheduler,
-        unfreeze: any UnfreezeProviding,
+        unfreezeEngine: UnfreezeEngine,
         pro: ProEntitlements,
         ledger: any CompletionLedger
     ) {
         self.moneyEscalation = moneyEscalation
-        self.unfreeze = unfreeze
+        self.unfreezeEngine = unfreezeEngine
         self.pro = pro
         self.ledger = ledger
     }
 
     @MainActor
-    static var live: AppDependencies {
-        let pro = ProEntitlements()                      // real since A8 (RevenueCat)
+    static func live(container: ModelContainer) -> AppDependencies {
+        let pro = ProEntitlements()                                  // real since A8 (RevenueCat)
         let alarmIsPro = ProFeatures.finalDayAlarmIsPro
         return AppDependencies(
             moneyEscalation: EscalationScheduler(alarmsAllowed: { alarmIsPro ? await pro.isPro : true }), // A2 + A4
-            unfreeze: FakeUnfreezeProvider(),            // → ParachuteKit UnfreezeEngine (B3)
+            unfreezeEngine: UnfreezeEngine(),                        // real since B3
             pro: pro,
-            ledger: InMemoryLedger()                     // → ParachuteKit ledger (B6)
+            ledger: SwiftDataLedger(modelContainer: container)       // real since B6
         )
+    }
+
+    /// What ParachuteKit's screens read from `\.parachute`.
+    var parachute: ParachuteServices {
+        ParachuteServices(engine: unfreezeEngine, ledger: ledger, scheduler: escalation, entitlements: entitlements)
     }
 }

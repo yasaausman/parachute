@@ -59,7 +59,7 @@ public struct PaywallView: View {
 
     private var header: some View {
         VStack(spacing: 8) {
-            Image(systemName: "parachute")
+            Image(systemName: "sparkles")
                 .font(.system(size: 52))
                 .accessibilityHidden(true)
                 .foregroundStyle(Theme.accent)

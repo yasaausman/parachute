@@ -2,24 +2,38 @@ import Foundation
 import Observation
 import SharedKit
 
-/// The app's one modal slot. Swapping `sheet` from `.decide` to `.unfreeze` lets
-/// "I'm frozen" hand off from A's Decide screen to B's Unfreeze player (docs/interfaces.md §3).
+/// The app's modals. Decide and the paywall are sheets; B's Unfreeze player is full screen
+/// (docs/interfaces.md, "As implemented (B)"). "I'm frozen" swaps the Decide sheet for the player.
 @MainActor
 @Observable
 final class SheetRouter {
     enum Sheet: Identifiable {
         case decide(itemID: UUID)
-        case unfreeze(UnfreezeRequest, itemID: UUID?)
         case paywall
 
         var id: String {
             switch self {
-            case .paywall: "paywall"
             case .decide(let itemID): "decide-\(itemID)"
-            case .unfreeze(_, let itemID): "unfreeze-\(itemID?.uuidString ?? "task")"
+            case .paywall: "paywall"
             }
         }
     }
 
+    struct Frozen: Identifiable {
+        var request: UnfreezeRequest
+        var itemID: UUID?
+        var id: String { "unfreeze-\(itemID?.uuidString ?? "task")" }
+    }
+
     var sheet: Sheet?
+    var frozen: Frozen?
+
+    /// Closes the Decide sheet, then opens the player once the sheet is gone.
+    func unfreeze(_ request: UnfreezeRequest, itemID: UUID?) {
+        sheet = nil
+        Task {
+            try? await Task.sleep(for: .milliseconds(450))
+            frozen = Frozen(request: request, itemID: itemID)
+        }
+    }
 }

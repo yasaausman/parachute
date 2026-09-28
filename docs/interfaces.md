@@ -132,6 +132,23 @@ UnfreezeView(plan: UnfreezePlan, onFinish: (UnfreezeOutcome) -> Void)
 ### Apple-billed path (A6, for B3)
 `SharedKit.AppleSubscriptions.steps(serviceName:)` returns Apple Support's cancel steps as `[PlanStep]`; `manageURL` is the deep link (⚠️ device check) and `webURL` Apple's web page. B3 can return `UnfreezePlan(steps: AppleSubscriptions.steps(...), source: .appleSubscriptions, isSuggested: false)`.
 
+### As implemented (B, 2026-09-27)
+- ParachuteKit reads everything from one environment value, `\.parachute` (`ParachuteServices`: `UnfreezeEngine`, ledger, scheduler, entitlements), set in `ParachuteApp`.
+- **For A5's 🧊 I'm frozen**, present `UnfreezeFlowView` full screen. It fetches the plan and plays it; the caller records the decision:
+  ```swift
+  .fullScreenCover(item: $frozen) { request in
+      UnfreezeFlowView(request: request, win: .money(cents: deadline.amountCents)) { outcome in
+          // .completed on a cancel → status .cancelled, ledger.record(.moneyCancelled, …), escalation.resolve(id)
+      }
+  }
+  ```
+  MoneyKit doesn't import ParachuteKit, so either A5 takes an `onFrozen` closure and `App/` presents this, or `App/` wraps `DecideView`.
+  **Done (A, 2026-09-27):** `DecideView(itemID:onFrozen:)` → `SheetRouter.unfreeze(_:itemID:)` closes the Decide sheet and opens `App/UnfreezeHost.swift` full screen, which plays `UnfreezeFlowView` with `win: .money(cents:)` and applies `DeadlineDecision` (`.completed` → cancelled + ledger + resolve; `.snoozed` → snooze). `ProEntitlements` now backs `ParachuteServices.entitlements`, so B's upsell opens A's paywall.
+- `CelebrationView(win: .money(cents:)) { }` is public if you want confetti on a plain Cancel too.
+- **Task reminders:** `DecideRouter` receives task IDs too (B5). `App/RootView.swift`'s `DecideRoute` opens the task player for a `FrozenTask` ID and `DecideView` otherwise, so Decide never sees a task ID.
+- **Engine order:** curated → Apple settings → AI → template. An Apple-billed trial skips *web* curated steps (rule 8); curated ids starting `apple-` count as Apple's own. ⚠️ A: if you'd rather mark this in the JSON (e.g. `"billing": "apple"`), that's a SharedKit change; let's agree first. **A (2026-09-27):** the `apple-` prefix is fine for the sprint. B3's `appleSubscriptionSteps` duplicates `SharedKit.AppleSubscriptions.steps` (same Apple Support source); worth switching to the shared one later so the two can't drift.
+- `CancelStepsLoader` drops services that fail `CancelStepsValidator` (empty id/name/text, not verified, no steps, a step ≤ 0 s or > 90 s, non-https URL). `testBundledFileIsValid` fails on any of these in your file.
+
 ## 4. `CancelSteps.json` (content by A, loaded by B)
 Location: `Packages/SharedKit/Sources/SharedKit/Resources/CancelSteps.json`
 ```json

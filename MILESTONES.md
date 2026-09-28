@@ -21,6 +21,8 @@ Every milestone has a **Done when**. Nothing is done until it runs on a real iPh
 
 ---
 
+> **Dev B status (2026-09-27):** 🟡 = code complete, builds in Xcode 27, all tests pass on the iOS simulator, main flows checked in the simulator. **Not yet run on a real iPhone.** Tick each one after it runs on an iPhone.
+
 ## Phase 0: Setup & spikes (Fri Sep 25, today/tonight)
 
 ### Together (≈1.5 h, pair on one screen)
@@ -36,7 +38,7 @@ Every milestone has a **Done when**. Nothing is done until it runs on a real iPh
   *Done when:* all three work, or you've written down what doesn't and the workaround.
 
 ### Dev B spikes
-- [ ] **B0 Atomizer spike.** Foundation Models `@Generable` → `[Step{text, seconds}]`. Run it on **20 real deadline tasks** (essays, forms, applications, emails) and **10 unknown services** ("how to cancel X").
+- [ ] 🟡 **B0 Atomizer spike.** (Kit ready: `docs/b0-atomizer-spike.md` + Home → ladybug → "Run B0 atomizer spike"; needs an Apple Intelligence iPhone.) Foundation Models `@Generable` → `[Step{text, seconds}]`. Run it on **20 real deadline tasks** (essays, forms, applications, emails) and **10 unknown services** ("how to cancel X").
   *Done when:* ≥ 15/20 task lists and ≥ 7/10 service lists are specific enough to follow without guessing; prompt + results saved in `docs/`. **If it fails, tell Dev A and cut or shrink the task path now.**
 
 ---
@@ -52,15 +54,16 @@ Every milestone has a **Done when**. Nothing is done until it runs on a real iPh
   *Status (2026-09-26):* `EscalationScheduler` (real `EscalationScheduling`) on `a/a2-reminders`. Money ladder at 10:00, 3 days and 1 day before the last day to act (a day earlier for Apple-billed items); task ladder for B5 (1 day, 1 hour, at due). Saving a trial schedules, deleting resolves, the Money tab resyncs on open. Debug → *Reminders + time travel* shows what's pending and squeezes 1 day into 1 minute. 11 new tests (planner dates/copy, replace-not-duplicate, resolve, snooze, task path). **Simulator run:** Spotify $6.99 due Oct 3 → real schedule Sep 30 and Oct 2 at 10:00 → time travel → both fired at 6:29:30 and 6:31:30 PM ("Spotify · $6.99 in 3 days", "Spotify · $6.99 tomorrow / $6.99 leaves your account tomorrow"). **iPhone run (iOS 27):** Apple-billed Spotify $7.00 due Oct 3 → time travel → both fired at 6:49:53 and 6:51:53 PM in order ("in 4 days · cancel at least a day before Oct 3", "in 2 days · cancel by tomorrow to skip the Oct 3 charge"), also mirrored to the Mac. Time travel switched back off.
 - [ ] **A3 Curate 5 services.** Hand-verify cancel steps on real accounts → `SharedKit/Resources/CancelSteps.json` + a log in `docs/cancel-steps-verification.md` (date, screenshots).
   *Done when:* each of the 5 was followed end to end; the JSON passes B's validity test.
-  *Status (2026-09-26):* 4 of 5 in `CancelSteps.json`: Spotify, Claude, Google AI Pro (web, followed to the final button on a Mac) and Apple One (Apple-billed, cancelled for real on the iPhone). Left: service #5, the 3 web page URLs, and an iPhone Safari check of the 3 web flows. B's validity test (B2) not written yet.
+  *Status (2026-09-26):* 4 of 5 in `CancelSteps.json`: Spotify, Claude, Google AI Pro (web, followed to the final button on a Mac) and Apple One (Apple-billed, cancelled for real on the iPhone). Left: service #5, the 3 web page URLs, and an iPhone Safari check of the 3 web flows. ✅ The JSON passes B's `testBundledFileIsValid` (2026-09-27).
 
 ### Dev B
-- [ ] **B1 Unfreeze player UI** (with a fake plan). One step on screen, 90-second ring, companion line, **Done / Break it smaller / Skip**, finish → callback.
+- [ ] 🟡 **B1 Unfreeze player UI** (with a fake plan). One step on screen, 90-second ring, companion line, **Done / Break it smaller / Skip**, finish → callback.
   *Done when:* a 5-step fake plan plays start to finish; works with Dynamic Type at the largest size.
-- [ ] **B2 CancelSteps loader + validation.** Reads `CancelSteps.json` → `UnfreezePlan`; unit test rejects bad entries (missing steps, step > 90 s, empty text).
+- [ ] 🟡 **B2 CancelSteps loader + validation.** Reads `CancelSteps.json` → `UnfreezePlan`; unit test rejects bad entries (missing steps, step > 90 s, empty text).
   *Done when:* the test passes on A's real file.
 
 ### 🔄 Sync 1 (end of Day 1)
+*Simulator, 2026-09-27 (after merging PR #1):* Decide → 🧊 I'm frozen → B's `UnfreezeFlowView` played A's curated Spotify steps (Step 1 of 4…) → celebration "+$11.99 ADHD Tax Refunded" → scoreboard "Cancelled Spotify +$11.99". ☐ On device.
 Merge. A temporary "I'm frozen" button on a money item opens **B's real UnfreezeView** with **A's real curated steps**.
 *Done when:* you can "unfreeze" a real Netflix-style cancel on device.
 
@@ -80,11 +83,11 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
   *Status (2026-09-27):* built on `a/a6-apple-path`. `SharedKit.AppleSubscriptions`: steps from Apple Support 118428 ("In Settings, tap your name → Subscriptions → the subscription → Cancel Subscription"), Apple's web link (`account.apple.com/account/manage/section/subscriptions`, from the same article), and the button URL `https://apps.apple.com/account/subscriptions` ⚠️ (widely used, not on an Apple page). StoreKit's `showManageSubscriptions(in:)` was ruled out: Apple's docs say it shows *"the customer's currently active subscription for your app"*, i.e. Parachute's own. "Cancel it" on an Apple-billed trial now leads with **Open Apple Subscriptions**. ☐ Confirm the button on the iPhone (combined test).
 
 ### Dev B
-- [ ] **B3 UnfreezeEngine (real).** `UnfreezeProviding`: curated → Apple path → AI fallback ("Suggested steps," never invents URLs) → graceful non-AI fallback on devices without Apple Intelligence.
+- [ ] 🟡 **B3 UnfreezeEngine (real).** `UnfreezeProviding`: curated → Apple path → AI fallback ("Suggested steps," never invents URLs) → graceful non-AI fallback on devices without Apple Intelligence.
   *Done when:* the right source is picked for all 4 cases in unit tests.
-- [ ] **B4 Task path.** Home "I'm frozen" → "What's overwhelming you?" → `FrozenTask` (+ optional due time) → atomizer → player. "Break it smaller" re-atomizes the current step.
+- [ ] 🟡 **B4 Task path.** Home "I'm frozen" → "What's overwhelming you?" → `FrozenTask` (+ optional due time) → atomizer → player. "Break it smaller" re-atomizes the current step.
   *Done when:* 5 of B0's test tasks go from typed description to finished on device.
-- [ ] **B5 Task reminders.** The task path uses **A's `EscalationScheduling`** for due-time reminders and the deadline alarm.
+- [ ] 🟡 **B5 Task reminders.** The task path uses **A's `EscalationScheduling`** for due-time reminders and the deadline alarm.
   *Done when:* a task due in 5 minutes (time-travel) triggers a reminder.
 
 ### 🔄 Sync 2 (end of Day 2): the full money flow
@@ -100,13 +103,13 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
   *Status (2026-09-27):* built on `a/a7-share-extension`. `TrialCapture` target: Vision OCR → `PatternExtractor` (non-AI, always on) + `AIExtractor` (Foundation Models `@Generable`, greedy) → a fact-check merge that throws out any AI price/date/name not printed in the text. Share sheet card: "Found: Spotify · $11.99 · charges Oct 26" → **Track it** (one tap) → saved to the App Group store with reminders; the app arms the alarm when it's next active. **Eval: 10/10 synthetic fixtures (committed, `Packages/MoneyKit/Fixtures/`), 4/5 on real screenshots** (not committed: personal data). Simulator: Photos → Share → Parachute → Track it → shows in the Money tab. 12 new tests. ☐ iPhone: share a real screenshot; check whether the AI runs inside the extension.
 
 ### Dev B
-- [ ] **B6 Scoreboard + ledger.** `CompletionLedger` implementation; "ADHD Tax Refunded" screen: $ back · tasks unfrozen · **best run** (no shame); monthly list.
+- [ ] 🟡 **B6 Scoreboard + ledger.** `CompletionLedger` implementation; "ADHD Tax Refunded" screen: $ back · tasks unfrozen · **best run** (no shame); monthly list.
   *Done when:* the numbers are right after cancel, keep (no $), task done, and snooze (nothing).
-- [ ] **B7 Celebration + share.** Confetti + haptics on every win; "Share my wins" renders an image card.
+- [ ] 🟡 **B7 Celebration + share.** Confetti + haptics on every win; "Share my wins" renders an image card.
   *Done when:* smooth on device; the share sheet exports the image.
-- [ ] **B8 Widgets.** Money countdown ("Hulu · $17.99 in 3 days") + task variant ("Essay · Step 3 of 7"), reading SharedKit data from the App Group.
+- [ ] 🟡 **B8 Widgets.** Money countdown ("Hulu · $17.99 in 3 days") + task variant ("Essay · Step 3 of 7"), reading SharedKit data from the App Group.
   *Done when:* both widgets update after changes in the app.
-- [ ] **B9 Audio companion.** AVSpeechSynthesizer reads the step aloud (toggle) + gentle procedural ambient sound (AVAudioEngine; no licensed audio).
+- [ ] 🟡 **B9 Audio companion.** AVSpeechSynthesizer reads the step aloud (toggle) + gentle procedural ambient sound (AVAudioEngine; no licensed audio).
   *Done when:* on/off works; audio stops cleanly when the player closes.
 
 ### 🔄 Sync 3
@@ -124,9 +127,9 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
   *Status (2026-09-27):* on `a/a9-readme`: RevenueCat table (setup, offerings, `parachute_pro`, purchase/restore, gating, our-own-trial reminder), money-path Mermaid diagram + design notes, build/run, privacy. Screenshots and the full two-path diagram come with V2/B11.
 
 ### Dev B
-- [ ] **B10 Gating in Parachute.** "First step always free"; AI unfreeze + voice are Pro, via **A's `EntitlementsProviding`**. (Or 3/week if you chose that.)
+- [ ] 🟡 **B10 Gating in Parachute.** "First step always free"; AI unfreeze + voice are Pro, via **A's `EntitlementsProviding`**. (Or 3/week if you chose that.)
   *Done when:* the free user sees Step 1, then an upsell; a Pro user gets everything.
-- [ ] **B11 README: Foundation Models / Unfreeze section** + the Mermaid architecture diagram.
+- [x] **B11 README: Foundation Models / Unfreeze section** + the Mermaid architecture diagram.
 
 ### Both (afternoon)
 - [ ] **P1 Polish your own screens.** Dark Mode · Dynamic Type · VoiceOver labels · SF Symbols · smooth transitions.

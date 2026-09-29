@@ -1,7 +1,6 @@
 import SharedKit
 import SwiftData
 import SwiftUI
-import UIKit
 import WidgetKit
 
 // Widgets read the shared App Group store and immediately copy what they need into plain
@@ -108,19 +107,12 @@ enum Countdown {
     }
 }
 
-/// Contrast-safe text colors (WCAG AA on white and on dark backgrounds); same values as ParachuteKit's `Palette`.
+/// Contrast-safe text colors from SharedKit's `Theme`.
 private enum WidgetInk {
-    static let money = adaptive(light: (0x1E, 0x7A, 0x35), dark: (0x30, 0xD1, 0x58))
-    static let frozen = adaptive(light: (0x00, 0x6E, 0x8C), dark: (0x32, 0xD2, 0xF5))
-    static let soon = adaptive(light: (0xB3, 0x54, 0x00), dark: (0xFF, 0x9F, 0x0A))
-    static let urgent = adaptive(light: (0xC4, 0x28, 0x1C), dark: (0xFF, 0x45, 0x3A))
-
-    private static func adaptive(light: (Int, Int, Int), dark: (Int, Int, Int)) -> Color {
-        func color(_ c: (Int, Int, Int)) -> UIColor {
-            UIColor(red: CGFloat(c.0) / 255, green: CGFloat(c.1) / 255, blue: CGFloat(c.2) / 255, alpha: 1)
-        }
-        return Color(uiColor: UIColor { $0.userInterfaceStyle == .dark ? color(dark) : color(light) })
-    }
+    static let money = Theme.moneyText
+    static let frozen = Theme.frozenText
+    static let soon = Theme.accentText
+    static let urgent = Theme.urgentText
 }
 
 // MARK: - Money Widget

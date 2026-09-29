@@ -25,20 +25,32 @@ public enum DeadlineDecision: Sendable, Hashable {
             deadline.snoozedUntil = nil
             // Only real dollars count: the charge hasn't gone through yet (PLAN §4).
             let saved = Self.beforeCharge(deadline.dueDate, now: now) ? deadline.amountCents : nil
-            try? context.save()
+            guard Self.commit(context) else { return }
             await escalation?.resolve(itemID: id)
             await ledger?.record(kind: .moneyCancelled, title: "Cancelled \(name)", amountCents: saved)
         case .kept:
             deadline.status = .kept
             deadline.snoozedUntil = nil
-            try? context.save()
+            guard Self.commit(context) else { return }
             await escalation?.resolve(itemID: id)
             await ledger?.record(kind: .moneyKept, title: "Kept \(name)", amountCents: nil)
         case .snoozed(let until):
             deadline.status = .snoozed
             deadline.snoozedUntil = until
-            try? context.save()
+            guard Self.commit(context) else { return }
             try? await escalation?.snooze(itemID: id, until: until)
+        }
+    }
+
+    /// Saves, or rolls the change back so the alarm chain and ledger never get ahead of what's on disk.
+    @MainActor
+    private static func commit(_ context: ModelContext) -> Bool {
+        do {
+            try context.save()
+            return true
+        } catch {
+            context.rollback()
+            return false
         }
     }
 

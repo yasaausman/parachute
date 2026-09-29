@@ -52,7 +52,7 @@ struct RootView: View {
             Task { await escalation?.resync(deadlines) }
         }
         // Alarm "Decide", reminder taps and trial rows all land here.
-        .onChange(of: decide.pending) { _, request in
+        .onChange(of: decide.pending, initial: true) { _, request in
             guard let request else { return }
             router.sheet = .decide(itemID: request.itemID)
             decide.pending = nil

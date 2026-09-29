@@ -28,6 +28,7 @@ public struct TrackTrialView: View {
     @State private var billedByApple = false
     @State private var editing = false
     @State private var saveFailed = false
+    @State private var overLimit = false
     /// No price and no charge date: probably not a trial screen (e.g. a list of cancelled subscriptions).
     @State private var foundNothing = false
 
@@ -116,6 +117,9 @@ public struct TrackTrialView: View {
                     .textCase(nil)
             }
 
+            if overLimit {
+                Text("You're tracking \(ProFeatures.freeTrialLimit) trials, the free limit. Open Parachute to go Pro and add more.")
+            }
             if saveFailed {
                 Text("Couldn't save. Open Parachute and add it there.").foregroundStyle(.red)
             }
@@ -161,6 +165,12 @@ public struct TrackTrialView: View {
         do {
             let container = try SharedStore.makeContainer()
             let context = ModelContext(container)
+            // The extension can't ask RevenueCat, so it trusts the app's last known Pro state.
+            let openCount = try context.fetch(FetchDescriptor<MoneyDeadline>()).filter(\.isOpen).count
+            if !AppGroup.defaults.bool(forKey: ProFeatures.cachedProKey), openCount >= ProFeatures.freeTrialLimit {
+                overLimit = true
+                return
+            }
             let name = serviceName.trimmingCharacters(in: .whitespaces)
             let deadline = MoneyDeadline(
                 serviceName: name,

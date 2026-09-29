@@ -90,6 +90,8 @@ public struct NoAlarmClient: AlarmClient {
 /// safety net), and only `disarm` (a recorded decision) ends it.
 public struct DeadlineAlarms: Sendable {
     static let recordsKey = "alarm.records"
+    /// Serializes read-modify-write of the record list across the app and the Stop/Decide intents.
+    private static let recordsLock = NSLock()
 
     /// `UserDefaults` isn't Sendable, so keep the suite name and open it on use.
     let suiteName: String?
@@ -170,9 +172,7 @@ public struct DeadlineAlarms: Sendable {
     public func disarm(itemID: UUID) {
         guard let current = record(for: itemID) else { return }
         client.cancel(alarmID: current.alarmID)
-        var all = records()
-        all[itemID] = nil
-        save(all)
+        mutateRecords { $0[itemID] = nil }
         log("Disarmed \(current.title)")
     }
 
@@ -189,6 +189,14 @@ public struct DeadlineAlarms: Sendable {
         return Dictionary(list.map { ($0.itemID, $0) }, uniquingKeysWith: { _, last in last })
     }
 
+    private func mutateRecords(_ body: (inout [UUID: AlarmRecord]) -> Void) {
+        Self.recordsLock.lock()
+        defer { Self.recordsLock.unlock() }
+        var all = records()
+        body(&all)
+        save(all)
+    }
+
     private func save(_ records: [UUID: AlarmRecord]) {
         let data = try? JSONEncoder().encode(Array(records.values))
         defaults.set(data, forKey: Self.recordsKey)
@@ -200,9 +208,7 @@ public struct DeadlineAlarms: Sendable {
         }
         let alarmID = UUID()
         try await client.schedule(alarmID: alarmID, itemID: itemID, title: title, at: fire)
-        var all = records()
-        all[itemID] = AlarmRecord(itemID: itemID, alarmID: alarmID, title: title, planned: planned, rings: rings, fireDate: fire, isTest: isTest)
-        save(all)
+        mutateRecords { $0[itemID] = AlarmRecord(itemID: itemID, alarmID: alarmID, title: title, planned: planned, rings: rings, fireDate: fire, isTest: isTest) }
         log("\(isTest == true ? "Test" : rings > 0 ? "Re-armed #\(rings)" : "Armed") \(title) for \(fire.formatted(date: .abbreviated, time: .shortened))")
     }
 

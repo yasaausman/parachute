@@ -10,6 +10,8 @@ public enum ProFeatures {
     public static let freeTrialLimit = 5
     /// The final-day alarm that keeps coming back is Pro; reminders stay free.
     public static let finalDayAlarmIsPro = true
+    /// The last known Pro state, in the App Group, for the share extension (it can't reach RevenueCat).
+    public static let cachedProKey = "pro.cached"
 }
 
 /// A8: the real `EntitlementsProviding`, backed by RevenueCat's `parachute_pro` entitlement.
@@ -54,6 +56,7 @@ public final class ProEntitlements: EntitlementsProviding {
     public func apply(_ info: CustomerInfo) {
         let entitlement = info.entitlements[Self.entitlementID]
         isProNow = entitlement?.isActive == true || Self.forcedPro
+        AppGroup.defaults.set(isProNow, forKey: ProFeatures.cachedProKey)
         if let entitlement, entitlement.isActive, entitlement.periodType == .trial, entitlement.willRenew,
            let ends = entitlement.expirationDate {
             trialEnds = ends
@@ -101,6 +104,7 @@ public final class ProEntitlements: EntitlementsProviding {
         AppGroup.defaults.set(on, forKey: Self.forceProKey)
         if on {
             isProNow = true
+            AppGroup.defaults.set(true, forKey: ProFeatures.cachedProKey)
             return
         }
         Task {
@@ -108,6 +112,7 @@ public final class ProEntitlements: EntitlementsProviding {
                 apply(info)
             } else {
                 isProNow = false
+                AppGroup.defaults.set(false, forKey: ProFeatures.cachedProKey)
             }
         }
         #endif

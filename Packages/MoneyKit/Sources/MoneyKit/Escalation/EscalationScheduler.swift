@@ -122,7 +122,8 @@ public actor EscalationScheduler: EscalationScheduling {
         switch kind {
         case .money(let amountCents):
             try await add(ReminderPlanner.genericMoneyReminders(itemID: itemID, title: title, amountCents: amountCents, due: due, now: current))
-            if let planned = DeadlineAlarmPlanner.moneyFireDate(chargeDate: due, billedByApple: false, now: current) {
+            if await alarmsAllowed(),
+               let planned = DeadlineAlarmPlanner.moneyFireDate(chargeDate: due, billedByApple: false, now: current) {
                 let alarmTitle = DeadlineAlarmPlanner.moneyTitle(serviceName: title, amountCents: amountCents, currencyCode: "USD", billedByApple: false)
                 try await alarms.arm(itemID: itemID, title: alarmTitle, planned: planned)
             }

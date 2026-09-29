@@ -138,7 +138,7 @@ struct DeadlineRow: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(headline)
             .font(.headline)
-            .foregroundStyle(deadline.isOpen && daysToAct <= 1 ? Theme.accent : .primary)
+            .foregroundStyle(deadline.isOpen && daysToAct <= 1 ? Theme.urgentText : .primary)
 
             Text(detail)
                 .font(.subheadline)

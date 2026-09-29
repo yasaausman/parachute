@@ -97,7 +97,7 @@ public struct DecideView: View {
                 .font(.largeTitle.bold())
             Text(chargeLine(deadline))
                 .font(.title3)
-                .foregroundStyle(Theme.accent)
+                .foregroundStyle(Theme.accentText)
             if deadline.billedByApple {
                 Text("Billed by Apple: cancel by \(deadline.cancelBy.formatted(.dateTime.weekday(.wide).month(.abbreviated).day())).")
                     .font(.subheadline)
@@ -181,7 +181,7 @@ struct ChoiceButton: View {
 
     private var background: Color {
         switch style {
-        case .primary: Theme.accent
+        case .primary: Theme.accentFill
         case .frozen: Theme.frozen.opacity(0.25)
         case .plain: Color(.secondarySystemBackground)
         }

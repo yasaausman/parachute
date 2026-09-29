@@ -15,6 +15,8 @@ public enum Theme {
     public static let moneyText = adaptive(light: (0x1E, 0x7A, 0x35), dark: (0x30, 0xD1, 0x58))
     /// Accent text: #B35400 light (5.0:1), #FF9F0A dark (8.3:1).
     public static let accentText = adaptive(light: (0xB3, 0x54, 0x00), dark: (0xFF, 0x9F, 0x0A))
+    /// Behind white text (primary buttons, badges): white on #B35400 is 5.0:1 in both modes.
+    public static let accentFill = Color(red: 0xB3 / 255, green: 0x54 / 255, blue: 0)
     /// Frozen text and icons: #006E8C light (5.8:1), #32D2F5 dark (9.5:1).
     public static let frozenText = adaptive(light: (0x00, 0x6E, 0x8C), dark: (0x32, 0xD2, 0xF5))
     /// Behind white text (buttons, cards): white on #006E8C is 5.8:1.

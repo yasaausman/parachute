@@ -54,7 +54,7 @@ public struct TrackTrialView: View {
                     } description: {
                         Text("Parachute will remind you before the charge. Open the app once to arm the final-day alarm.")
                     }
-                    .foregroundStyle(Theme.accent)
+                    .foregroundStyle(Theme.accentText)
                 }
             }
             .navigationTitle("Parachute")

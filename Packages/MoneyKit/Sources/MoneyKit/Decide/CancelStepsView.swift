@@ -87,7 +87,7 @@ private struct StepRow: View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
             Text("\(number)")
                 .font(.headline.monospacedDigit())
-                .foregroundStyle(Theme.accent)
+                .foregroundStyle(Theme.accentText)
             VStack(alignment: .leading, spacing: 6) {
                 Text(step.text)
                 if let url = step.url {

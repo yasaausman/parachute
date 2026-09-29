@@ -62,7 +62,7 @@ public struct PaywallView: View {
             Image(systemName: "sparkles")
                 .font(.system(size: 52))
                 .accessibilityHidden(true)
-                .foregroundStyle(Theme.accent)
+                .foregroundStyle(Theme.accentText)
             Text("Parachute Pro")
                 .font(.largeTitle.bold())
             Text("For every deadline your brain tries to drop.")
@@ -223,7 +223,7 @@ private struct FeatureRow: View {
         Label {
             Text(text)
         } icon: {
-            Image(systemName: systemImage).foregroundStyle(Theme.accent).accessibilityHidden(true)
+            Image(systemName: systemImage).foregroundStyle(Theme.accentText).accessibilityHidden(true)
         }
     }
 }
@@ -240,7 +240,7 @@ struct PlanRow: View {
                     if package.packageType == .lifetime {
                         Text("BEST").font(.caption2.bold())
                             .padding(.horizontal, 6).padding(.vertical, 2)
-                            .background(Theme.accent, in: .capsule)
+                            .background(Theme.accentFill, in: .capsule)
                             .foregroundStyle(.white)
                     }
                 }
@@ -249,7 +249,7 @@ struct PlanRow: View {
             Spacer()
             Text(package.storeProduct.localizedPriceString).font(.headline)
             Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                .foregroundStyle(isSelected ? Theme.accent : .secondary)
+                .foregroundStyle(isSelected ? Theme.accentText : .secondary)
         }
         .padding()
         .background(Color(.secondarySystemBackground), in: .rect(cornerRadius: Theme.cornerRadius))

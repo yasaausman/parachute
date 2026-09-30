@@ -4,7 +4,7 @@
 - [ ] Replace the "_Status: in development…_" line with the real one-line status.
 - [ ] The file has **two build sections** ("Build and run" and "Build"). Delete the short "Build" one.
 - [x] Add the app icon at the top (Untax icon, `docs/brand/untax-icon-1024.png`, 2026-09-29).
-- [ ] Add the 3 screenshots (below), then remove "Screenshots … land with the final submission".
+- [x] Added 5 screenshots (`docs/screenshots/`, 1206×2622) and removed the "Screenshots … land with the final submission" line (2026-09-30).
 - [ ] Add badges: Swift, iOS 26+, MIT, RevenueCat.
 - [ ] Add a "Parachute (unfreeze) architecture" pointer to `docs/readme-dev-b.md`, or paste its diagram.
 - [ ] Add a video link and a "Try it" note: AlarmKit needs a real iPhone; the simulator has no Apple Intelligence.

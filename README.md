@@ -6,7 +6,17 @@
 
 > 79% of Americans have started a free trial meaning to cancel, and got charged anyway ([Dimers, 2026](https://www.dimers.com/press/news/how-far-americans-will-go-for-freebies)). For ADHD brains the problem isn't remembering. It's **starting**.
 
-_Status: in development for the [RevenueCat Shipaton 2026](https://revenuecat-shipaton-2026.devpost.com/) Next Gen Award. Screenshots and the full architecture diagram land with the final submission; see `MILESTONES.md`._
+_Built for the [RevenueCat Shipaton 2026](https://revenuecat-shipaton-2026.devpost.com/) Next Gen Award._
+
+<p align="center">
+  <img src="docs/screenshots/01-home.png" width="19%" alt="Home: next charge countdown and ADHD Tax Refunded total">
+  <img src="docs/screenshots/02-track-trial.png" width="19%" alt="Share a trial screenshot: Untax finds Hulu, $18.99, charges Oct 3">
+  <img src="docs/screenshots/03-decide.png" width="19%" alt="Decide: Cancel it, Keep it, Snooze, Get unstuck">
+  <img src="docs/screenshots/04-unstuck.png" width="19%" alt="Get unstuck: one tiny step with a 90-second timer">
+  <img src="docs/screenshots/05-refunded.png" width="19%" alt="The ADHD Tax Refunded receipt">
+</p>
+
+<p align="center"><sub>Home · Catch from a screenshot · Decide · Get unstuck · Refunded receipt. Screenshots use demo data.</sub></p>
 
 ## How it works
 1. **Catch:** share a screenshot of a trial confirmation; on-device AI finds the service, price, and end date.

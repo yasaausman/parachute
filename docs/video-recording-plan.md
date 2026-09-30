@@ -1,6 +1,6 @@
 # Video recording plan (V1), 2026-09-29
 
-Device: iPhone 14 Pro, iOS 27.0.1, Debug build over cable. Record with QuickTime (File → New Movie Recording → pick the iPhone) or the phone's Screen Recording. Keep the demo under 2:00; script is `docs/demo-script.md`.
+Device: **Dev A's iPhone 17 Pro Max (iOS 27.0, has Apple Intelligence)** is preferred, so the AI steps and screenshot reading on camera are real; the iPhone 14 Pro (iOS 27.0.1) only shows the non-AI fallbacks. Debug build. Record with QuickTime (File → New Movie Recording → pick the iPhone) or the phone's Screen Recording. Keep the demo under 2:00; script is `docs/demo-script.md`.
 
 ## Before recording
 - [ ] Phone: Do Not Disturb **off**, brightness up, battery > 50%, clear the Home Screen of clutter, silent switch off (alarm and voice audio).
@@ -9,7 +9,7 @@ Device: iPhone 14 Pro, iOS 27.0.1, Debug build over cable. Record with QuickTime
 - [ ] Add the Parachute widget to the Home Screen (money countdown) and check it shows a trial.
 - [ ] Add 2 trials for the money flow: one **Apple-billed** (only if showing Apple's Subscriptions page) and Claude Pro or Spotify (has hand-verified steps).
 - [ ] Screenshot of a trial confirmation saved in Photos for the share-sheet shot.
-- [ ] Pro toggle: turn Pro **on** in Debug for the flow, **off** for the paywall shot.
+- [ ] Pro toggle: turn Pro **on** in Debug for the flow, **off** for the paywall shot. ⚠️ On a phone that already made a Test Store purchase, "Force Pro" off doesn't make it free: needs a Debug "Pretend I'm free" switch (Dev A, to build) or a fresh install.
 - [ ] Force-quit the app before the alarm shot so the cold-launch Decide path is what's on camera.
 
 ## Shots (record each 3×, keep the best)

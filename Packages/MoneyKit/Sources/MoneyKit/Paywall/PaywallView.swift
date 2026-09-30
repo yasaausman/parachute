@@ -1,3 +1,4 @@
+import OSLog
 import RevenueCat
 import SharedKit
 import SwiftUI
@@ -29,8 +30,19 @@ public struct PaywallView: View {
                     case .loading:
                         ProgressView().padding()
                     case .unavailable:
-                        Text("Purchases aren't set up in this build.")
-                            .foregroundStyle(Theme.inkMuted)
+                        // Friendly on screen; the real RevenueCat error goes to the log.
+                        VStack(spacing: 12) {
+                            Text("Plans didn't load just now. Everything free still works.")
+                                .foregroundStyle(Theme.inkMuted)
+                                .multilineTextAlignment(.center)
+                            if RevenueCatBootstrap.isConfigured {
+                                Button("Try again") {
+                                    status = .loading
+                                    Task { await load() }
+                                }
+                                .buttonStyle(.untaxQuiet)
+                            }
+                        }
                     case .ready:
                         plans
                         buyButton
@@ -174,7 +186,7 @@ public struct PaywallView: View {
             status = packages.isEmpty ? .unavailable : .ready
         } catch {
             status = .unavailable
-            message = "Couldn't load plans: \(error.localizedDescription)"
+            Logger(subsystem: "Parachute", category: "Paywall").error("Offerings failed: \(String(describing: error), privacy: .public)")
         }
     }
 
@@ -222,12 +234,17 @@ public struct PaywallView: View {
 private struct FeatureRow: View {
     let systemImage: String
     let text: String
+    /// One icon column so every line of text starts at the same edge.
+    @ScaledMetric(relativeTo: .body) private var iconWidth: CGFloat = 30
 
     var body: some View {
-        Label {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            Image(systemName: systemImage)
+                .foregroundStyle(Theme.accentText)
+                .frame(width: iconWidth)
+                .accessibilityHidden(true)
             Text(text).foregroundStyle(Theme.ink)
-        } icon: {
-            Image(systemName: systemImage).foregroundStyle(Theme.accentText).accessibilityHidden(true)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }

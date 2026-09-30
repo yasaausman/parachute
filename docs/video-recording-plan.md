@@ -19,12 +19,12 @@ Device: iPhone 14 Pro, iOS 27.0.1, Debug build over cable. Record with QuickTime
 | 2 | Money flow (0:22) | Photos → Share → Parachute → "Track it?" → save; Home Screen widget; Debug "ring in 1 minute" alarm on the lock screen → **Stop** → (cut) → **Decide** → I'm frozen → steps → confetti → Refunded | Alarm breaks through Silent, which is worth a caption |
 | 3 | Task flow (0:42) | Home → I'm frozen → type "History essay due at midnight" → steps → Done, Done | See the AI caveat below |
 | 4 | Scoreboard (1:00) | Refunded tab → Share my wins | |
-| 5 | Paywall (1:10) | Pro off → add a 6th trial → paywall ($29.99 lifetime, banner) | Purchases won't complete without a RevenueCat key; don't tap Buy on camera |
+| 5 | Paywall (1:10) | Pro off → add a 6th trial → paywall ($29.99 lifetime, banner) | Test Store purchase works; you can tap Buy on camera |
 | 6 | Tech (1:25) | Screen-record on the Mac: architecture diagram, `@Generable` atomizer code, README | |
 
 ## Things to not claim (this phone can't back them up)
 - **Apple Intelligence:** the iPhone 14 Pro doesn't have it, so the task steps on camera are the **non-AI fallback templates**, and screenshot reading uses pattern matching. The script's "Apple's on-device Foundation Models … runs locally" line must either be dropped or be shown from a device that supports it. Don't show fallback steps while saying they're AI-written.
-- **Purchase:** without a Test Store key the purchase can't complete, so show the paywall only. The RevenueCat requirement (≥ 1 purchase through the SDK) still needs a working Test Store key in `Config/Secrets.xcconfig`. Check this before submitting.
+- **Purchase:** a Test Store purchase works on the phone (2026-09-29), so it can be shown on camera. Say "test purchase"; the Test Store charges nothing.
 - **Numbers:** only the 79% / $45 per month / 15.5M stats from CLAUDE.md rule 11.
 - The refunded total in the video is seed data. Don't call it "my savings".
 

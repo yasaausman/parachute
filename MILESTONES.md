@@ -136,7 +136,7 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
 
 ### Both (afternoon)
 - [ ] 🟡 **P1 Polish your own screens.** (Dev B: done in the simulator 2026-09-28; contrast, largest text, dark mode.) Dark Mode · Dynamic Type · VoiceOver labels · SF Symbols · smooth transitions.
-  *Dev A status (2026-09-27, `a/p-polish-demo`):* Money list, Decide, and paywall checked in dark mode at the largest accessibility text size; Decide buttons stack icon over text at accessibility sizes; decorative icons hidden from VoiceOver; choice buttons read as one labelled button with a hint; trial rows get a hint plus an "Edit" VoiceOver action. ☐ Dev B's screens · ☐ app icon (logo later).
+  *Dev A status (2026-09-27, `a/p-polish-demo`):* Money list, Decide, and paywall checked in dark mode at the largest accessibility text size; Decide buttons stack icon over text at accessibility sizes; decorative icons hidden from VoiceOver; choice buttons read as one labelled button with a hint; trial rows get a hint plus an "Edit" VoiceOver action. ☐ Dev B's screens · ✅ app icon (Untax, 2026-09-29, `docs/brand/`).
 - [x] **P2 Demo data.** A seed button in debug with realistic items (only Apple-billed trials go to Apple's page, per CLAUDE.md rule 8).
   *Status (2026-09-27):* Debug → Demo data: Spotify (3 days), Duolingo via Apple (tomorrow), Claude, Google AI Pro, a cancelled Apple One; "Clear all trials" removes trials, reminders, and alarm chains. Checked in the simulator. **Fix (2026-09-28):** loading now replaces all trials and shows a confirmation; on the iPhone, repeated taps with no feedback had piled up 100 trials.
 - [ ] **🧊 FEATURE FREEZE at end of Day 4.** Only bug fixes after this.
@@ -149,7 +149,7 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
 ## Day 5: Ship (Wed Sep 30)
 
 - [ ] **V1 Video** (A records the money segments, B records the unfreeze/task segments; one person edits). Under 2 minutes, captions, device frames. QuickTime is free.
-- [ ] **V2 README final:** icon + 3 screenshots (1179×2556) · pitch · architecture · badges · RevenueCat section · build steps · privacy · MIT.
+- [ ] **V2 README final:** icon + 3 screenshots (1179×2556) · pitch · architecture · badges · RevenueCat section · build steps · privacy · MIT. *(Icon in the README header done 2026-09-29; screenshots still to capture after the video.)*
 - [ ] **V3 Code sweep:** no secrets; **Test Store key only in Debug**; no dead code; tests green.
   *Dev A side done early (2026-09-27):* no keys or team ID in tracked files (only the `test_XXXX` placeholder); Release build's `RevenueCatAPIKey` is empty and the key isn't in the binary; A0 spike code removed (its App Intents were still registered in Release); all tests green (67). ☐ Re-run at the end with Dev B's code.
 - [ ] **V4 Devpost:** description (what it does in the first line), video link, repo link, license visible. **The Representative submits by ~6pm PDT**, leaving hours of buffer before 11:45pm PDT.

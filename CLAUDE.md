@@ -3,7 +3,7 @@
 Read this first in every session. Then read `PROJECT.md` (living state) and `MILESTONES.md` (who does what).
 
 ## What this is
-**Parachute**: an iOS app, the ADHD follow-through engine. It catches money deadlines (free trials) and escalates until you act. When you freeze, on a cancellation or a deadline task, it walks you through one tiny step at a time and puts every win on an "ADHD Tax Refunded" scoreboard.
+**Untax** (formerly Parachute; code modules, targets, and bundle IDs keep the old name): an iOS app, the ADHD follow-through engine. Brand: `docs/brand/BRAND.md`. It catches money deadlines (free trials) and escalates until you act. When you freeze, on a cancellation or a deadline task, it walks you through one tiny step at a time and puts every win on an "ADHD Tax Refunded" scoreboard.
 Built for **RevenueCat Shipaton 2026, Next Gen Award** (students). Full plan: `PLAN.md`.
 
 ## Team & ownership

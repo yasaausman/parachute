@@ -3,7 +3,7 @@
 ## Fix in `README.md`
 - [ ] Replace the "_Status: in development…_" line with the real one-line status.
 - [ ] The file has **two build sections** ("Build and run" and "Build"). Delete the short "Build" one.
-- [ ] Add the app icon at the top (needs the logo, still to do).
+- [x] Add the app icon at the top (Untax icon, `docs/brand/untax-icon-1024.png`, 2026-09-29).
 - [ ] Add the 3 screenshots (below), then remove "Screenshots … land with the final submission".
 - [ ] Add badges: Swift, iOS 26+, MIT, RevenueCat.
 - [ ] Add a "Parachute (unfreeze) architecture" pointer to `docs/readme-dev-b.md`, or paste its diagram.

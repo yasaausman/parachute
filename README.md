@@ -20,6 +20,19 @@ _Built for the [RevenueCat Shipaton 2026](https://revenuecat-shipaton-2026.devpo
 
 <p align="center"><sub>Home · Catch from a screenshot · Decide · Get unstuck · Refunded receipt. Screenshots use demo data.</sub></p>
 
+## For judges: criteria → evidence
+Untax is a working iOS app, not a mockup. Each claim below links to the code, test or log that backs it.
+
+| Criterion | What we built | Evidence in this repo |
+|---|---|---|
+| **Clear, useful, original idea** | One app for the part ADHD makes hard: *starting*. The same "Get unstuck" engine handles a trial cancellation and a homework deadline, and a final-day alarm only a decision can end. | [PLAN.md](PLAN.md) (research, competitors, verdict) · [research/](research/) |
+| **Meaningful progress toward a working app** | Runs end to end on a real iPhone: alarm through Silent mode and re-armed after Stop (even after force-quit), a real screenshot tracked via the share sheet, a RevenueCat test purchase unlocking Pro. **112 automated tests, all passing.** | [PROJECT.md](PROJECT.md) (dated device results) · [docs/a0-platform-spike.md](docs/a0-platform-spike.md) · tests: [alarm](Packages/MoneyKit/Tests/MoneyKitTests/AlarmTests.swift), [escalation](Packages/MoneyKit/Tests/MoneyKitTests/EscalationTests.swift), [date math](Packages/MoneyKit/Tests/MoneyKitTests/DeadlineMathTests.swift), [capture](Packages/MoneyKit/Tests/TrialCaptureTests/TrialCaptureTests.swift), [AI output](Packages/ParachuteKit/Tests/ParachuteKitTests/AtomizerOutputTests.swift), [cancel steps](Packages/ParachuteKit/Tests/ParachuteKitTests/CancelStepsValidationTests.swift) |
+| **Thoughtful RevenueCat use** | Paywall renders the current offering; one entitlement drives all gating through `customerInfoStream`; restore; Test Store key only in Debug; a reminder 24 h before Untax's *own* trial ends. | [How RevenueCat is used](#how-revenuecat-is-used) · [ProEntitlements.swift](Packages/MoneyKit/Sources/MoneyKit/Entitlements/ProEntitlements.swift) · [PaywallView.swift](Packages/MoneyKit/Sources/MoneyKit/Paywall/PaywallView.swift) |
+| **Thoughtful technical + product choices** | On-device only (no account, server or analytics). AI can't invent prices, dates or links, and every AI path has a non-AI fallback. Stop re-arms the alarm via an App Intent. ADHD-first, no-shame copy; WCAG AA contrast. | [TrialExtractor.swift](Packages/MoneyKit/Sources/TrialCapture/TrialExtractor.swift) (fact-check) · [StepSanitizer.swift](Packages/ParachuteKit/Sources/ParachuteKit/Unfreeze/StepSanitizer.swift) (no URLs) · [DeadlineAlarmIntents.swift](Packages/MoneyKit/Sources/MoneyKit/Alarm/DeadlineAlarmIntents.swift) · [Theme.swift](Packages/SharedKit/Sources/SharedKit/Design/Theme.swift) · [BRAND.md](docs/brand/BRAND.md) |
+| **Care in presentation** | Hand-checked cancel steps for 4 services, logged with dates; brand guide; screenshots above. | [CancelSteps.json](Packages/SharedKit/Sources/SharedKit/Resources/CancelSteps.json) · [cancel-steps-verification.md](docs/cancel-steps-verification.md) |
+
+**Honest limits:** alarms need a real iPhone. The simulator has no Apple Intelligence, so there the task steps come from hand-written fallback templates. The final-day alarm is Pro-only. Screenshots use demo data.
+
 ## How it works
 1. **Catch:** share a screenshot of a trial confirmation; on-device AI finds the service, price, and end date.
 2. **Nudge:** widget countdown → reminders → a final-day alarm that keeps coming back until you decide.

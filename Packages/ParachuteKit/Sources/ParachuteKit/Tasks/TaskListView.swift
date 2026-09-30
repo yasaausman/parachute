@@ -22,10 +22,11 @@ public struct TaskListView: View {
                     ContentUnavailableView {
                         Label("Nothing frozen right now", systemImage: "snowflake")
                     } description: {
-                        Text("When something feels too big to start, tap I'm frozen.")
+                        Text("When something feels too big to start, tap Get unstuck.")
                     } actions: {
                         frozenButton
                     }
+                    .untaxScreen()
                 } else {
                     List {
                         if !active.isEmpty {
@@ -35,7 +36,7 @@ public struct TaskListView: View {
                                         .buttonStyle(.plain)
                                         .swipeActions {
                                             Button("Let it go", systemImage: "leaf") { letGo(task) }
-                                                .tint(.gray)
+                                                .tint(Theme.inkMuted)
                                         }
                                         .accessibilityHint("Resumes this task")
                                 }
@@ -51,12 +52,13 @@ public struct TaskListView: View {
                             }
                         }
                     }
+                    .untaxScreen()
                 }
             }
             .navigationTitle("Tasks")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    Button("I'm frozen", systemImage: "plus") { showingEntry = true }
+                    Button("Get unstuck", systemImage: "plus") { showingEntry = true }
                 }
             }
             .sheet(isPresented: $showingEntry) { FrozenTaskEntryView() }
@@ -68,9 +70,9 @@ public struct TaskListView: View {
     }
 
     private var frozenButton: some View {
-        Button("I'm frozen", systemImage: "snowflake") { showingEntry = true }
-            .buttonStyle(.borderedProminent)
-            .tint(Palette.frozenFill)
+        Button("Get unstuck", systemImage: "snowflake") { showingEntry = true }
+            .buttonStyle(.untaxFrozen)
+            .padding(.horizontal, Theme.screenPadding * 2)
     }
 
     /// No shame: the task just leaves the list and its reminders stop.
@@ -91,8 +93,8 @@ struct TaskRow: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline) {
                 Text(task.title)
-                    .font(.headline)
-                    .foregroundStyle(.primary)
+                    .font(Theme.headline(.headline))
+                    .foregroundStyle(Theme.ink)
                 Spacer()
                 if task.status == .done {
                     Image(systemName: "checkmark.circle.fill")
@@ -109,8 +111,8 @@ struct TaskRow: View {
                         Label(due.formatted(.relative(presentation: .named)), systemImage: "clock")
                     }
                 }
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(Theme.inkMuted)
             }
             if total > 0, task.status == .active {
                 StepTicks(done: done, total: total)

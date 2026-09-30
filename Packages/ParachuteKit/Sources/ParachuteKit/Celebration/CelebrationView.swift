@@ -25,7 +25,8 @@ public struct CelebrationView: View {
 
     public var body: some View {
         ZStack {
-            Color.black.opacity(0.92).ignoresSafeArea()
+            Theme.ink.opacity(0.94).ignoresSafeArea()
+                .environment(\.colorScheme, .light)
 
             if !reduceMotion {
                 TimelineView(.animation) { timeline in
@@ -49,14 +50,14 @@ public struct CelebrationView: View {
 
             VStack(spacing: Theme.spacing) {
                 Text(title)
-                    .font(.largeTitle.bold())
+                    .font(Theme.display())
                     .foregroundStyle(color)
                 Text(subtitle)
-                    .font(.title3)
+                    .font(Theme.headline())
                     .foregroundStyle(.white)
                 Text("Tap to continue")
                     .font(.footnote)
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(.white.opacity(0.7))
                     .padding(.top, Theme.spacing)
             }
             .multilineTextAlignment(.center)
@@ -90,7 +91,7 @@ public struct CelebrationView: View {
     private var subtitle: String {
         switch win {
         case .money: "That's real money back in your pocket."
-        case .task(let title): "\(title). Done. Your brain works; it just needed a parachute."
+        case .task(let title): "\(title). Done. That's one more thing off your plate."
         }
     }
 
@@ -111,7 +112,7 @@ private struct Confetto {
     var color: Color
 
     static func burst() -> [Confetto] {
-        let colors: [Color] = [Theme.money, Theme.frozen, Theme.accent, .white, .yellow, .pink]
+        let colors: [Color] = [Theme.money, Theme.frozen, Theme.accent, Theme.accent, Theme.money, .white]
         return (0..<90).map { _ in
             Confetto(
                 x: .random(in: 0...1),

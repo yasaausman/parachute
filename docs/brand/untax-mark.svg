@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="300 250 460 430" width="460" height="430">
+  <path d="M644 351 A172 172 0 1 0 679 504" fill="none" stroke="#1A1714" stroke-width="58" stroke-linecap="round"/>
+  <path d="M732 542 L706 431 L615 500 Z" fill="#1A1714" stroke="#1A1714" stroke-width="16" stroke-linejoin="round"/>
+  <text x="512" y="550" text-anchor="middle" font-family="ui-rounded, 'SF Pro Rounded', 'Helvetica Neue', sans-serif" font-weight="900" font-size="250" fill="#1A1714">$</text>
+</svg>

@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Parachute</string>
+	<string>Untax</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -21,7 +21,7 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSAlarmKitUsageDescription</key>
-	<string>Parachute rings on the day a trial is about to charge you, so you can decide before the money leaves.</string>
+	<string>Untax rings on the day a trial is about to charge you, so you can decide before the money leaves.</string>
 	<key>ParachuteAppGroup</key>
 	<string>$(PARACHUTE_APP_GROUP)</string>
 	<key>RevenueCatAPIKey</key>

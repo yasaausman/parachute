@@ -96,7 +96,7 @@ public final class ProEntitlements: EntitlementsProviding {
         let fire = ends.addingTimeInterval(-24 * 60 * 60)
         guard ends > now else { return }
         let content = UNMutableNotificationContent()
-        content.title = "Parachute Pro: your trial ends tomorrow"
+        content.title = "Untax Pro: your trial ends tomorrow"
         content.body = "As promised. Keep Pro or cancel it before it charges: your call, no hard feelings."
         content.sound = .default
         let delay = max(60, fire.timeIntervalSince(now))

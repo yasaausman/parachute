@@ -31,7 +31,7 @@ struct SnoozeView: View {
                     DatePicker("Pick a time", selection: $custom, in: Date.now...lastMoment)
                     Button("Snooze until then") { onSnooze(custom) }
                 } footer: {
-                    Text("To skip the charge, decide by \(lastMoment.formatted(date: .abbreviated, time: .shortened)). Parachute won't let a snooze go past that.")
+                    Text("To skip the charge, decide by \(lastMoment.formatted(date: .abbreviated, time: .shortened)). Untax won't let a snooze go past that.")
                 }
             } else {
                 Section {

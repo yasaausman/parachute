@@ -44,13 +44,14 @@ public struct ScoreboardView: View {
                 }
             }
             .navigationTitle("Refunded")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     shareButton
                 }
             }
         }
-        .tint(Palette.frozenInk)
+        .tint(Theme.accentText)
         // Render the share card only when its numbers change, not on every body update.
         .task(id: shareNumbers) {
             let n = shareNumbers
@@ -95,30 +96,61 @@ public struct ScoreboardView: View {
         } description: {
             Text("Nothing here yet, and that's okay. Your first win is one tap away.")
         }
+        .untaxScreen()
     }
 
-    // MARK: List
+    // MARK: Receipt
 
     private var scoreList: some View {
-        List {
-            Section {
-                statCards
-                    .listRowInsets(EdgeInsets())
-                    .listRowBackground(Color.clear)
-            }
-
-            ForEach(months, id: \.self) { month in
-                let monthRecords = recordsInMonth(month)
-                Section {
-                    ForEach(monthRecords) { record in
-                        WinRow(record: record)
+        let current = entries
+        let newestID = records.first?.persistentModelID
+        return ScrollView {
+            VStack(alignment: .leading, spacing: Theme.spacing) {
+                receiptHeader
+                ForEach(months, id: \.self) { month in
+                    let monthRecords = recordsInMonth(month)
+                    VStack(alignment: .leading, spacing: 10) {
+                        monthHeader(month: month, refundedCents: refundedCents(for: monthRecords))
+                        ForEach(monthRecords) { record in
+                            WinRow(record: record)
+                                .overlay(alignment: .trailing) {
+                                    if record.persistentModelID == newestID, record.kind == .moneyCancelled {
+                                        RefundedStamp().offset(x: -64, y: -2).accessibilityHidden(true)
+                                    }
+                                }
+                        }
                     }
-                } header: {
-                    monthHeader(month: month, refundedCents: refundedCents(for: monthRecords))
                 }
+                DashedDivider()
+                totalBlock(current)
             }
+            .padding(.horizontal, Theme.screenPadding)
+            .padding(.top, 28)
+            .padding(.bottom, 40)
+            .background(ReceiptShape(tooth: 10).fill(Theme.surface))
+            .overlay(ReceiptShape(tooth: 10).stroke(Theme.hairline, lineWidth: 1))
+            .padding(.horizontal, Theme.screenPadding)
+            .padding(.vertical, Theme.spacing)
         }
-        .listStyle(.insetGrouped)
+        .untaxScreen()
+    }
+
+    private var receiptHeader: some View {
+        VStack(spacing: 6) {
+            Text("ADHD Tax Refunded")
+                .font(Theme.display(.title2))
+                .textCase(.uppercase)
+                .tracking(1.5)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(Theme.ink)
+            Text(Date.now.formatted(date: .abbreviated, time: .omitted).uppercased())
+                .font(.system(.caption, design: .monospaced))
+                .foregroundStyle(Theme.inkMuted)
+            DashedDivider().padding(.top, 8)
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isHeader)
     }
 
     private func monthHeader(month: Date, refundedCents: Int) -> some View {
@@ -126,38 +158,88 @@ public struct ScoreboardView: View {
         AnyLayout(dynamicTypeSize.isAccessibilitySize
             ? AnyLayout(VStackLayout(alignment: .leading, spacing: 4))
             : AnyLayout(HStackLayout())) {
-            Text(month.formatted(.dateTime.month(.wide).year()))
+            Text(month.formatted(.dateTime.month(.wide).year()).uppercased())
             if !dynamicTypeSize.isAccessibilitySize { Spacer() }
             if refundedCents > 0 {
                 Text("+" + refundedCents.formattedCents())
-                    .foregroundStyle(Palette.moneyInk)
+                    .foregroundStyle(Theme.moneyText)
             }
+        }
+        .font(.system(.caption, design: .monospaced, weight: .bold))
+        .tracking(1)
+        .foregroundStyle(Theme.inkMuted)
+        .accessibilityElement(children: .combine)
+    }
+
+    /// TOTAL carries the screen; the other two stats read as receipt footer lines.
+    private func totalBlock(_ current: [ScoreEntry]) -> some View {
+        let tasks = ScoreMath.tasksUnfrozen(current)
+        let run = ScoreMath.bestRun(current)
+        return VStack(alignment: .leading, spacing: 8) {
+            Text("TOTAL")
+                .font(.system(.subheadline, design: .monospaced, weight: .bold))
+                .tracking(2)
+                .foregroundStyle(Theme.ink)
+            Text(ScoreMath.refundedCents(current).formattedCents())
+                .font(Theme.number(.largeTitle).monospacedDigit())
+                .foregroundStyle(Theme.moneyText)
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+            DashedDivider()
+            receiptLine("Tasks unfrozen", "\(tasks)")
+            receiptLine("Best run", "\(run) \(run == 1 ? "day" : "days")")
+            Text("Thank you for untaxing.")
+                .font(.system(.caption, design: .monospaced))
+                .foregroundStyle(Theme.inkMuted)
+                .frame(maxWidth: .infinity)
+                .padding(.top, 8)
         }
         .accessibilityElement(children: .combine)
     }
 
-    /// One number carries the screen; the other two stats read as a sentence under it.
-    private var statCards: some View {
-        let current = entries
-        let tasks = ScoreMath.tasksUnfrozen(current)
-        let run = ScoreMath.bestRun(current)
-        return VStack(alignment: .leading, spacing: 4) {
-            Text("ADHD Tax Refunded")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
-            Text(ScoreMath.refundedCents(current).formattedCents())
-                .font(.system(size: 56, weight: .bold, design: .rounded).monospacedDigit())
-                .foregroundStyle(Palette.moneyInk)
-                .minimumScaleFactor(0.5)
-                .lineLimit(1)
-            Text("**\(tasks)** \(tasks == 1 ? "task" : "tasks") unfrozen · best run **\(run) \(run == 1 ? "day" : "days")**")
-                .font(.body)
-                .foregroundStyle(.secondary)
+    private func receiptLine(_ name: String, _ value: String) -> some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(name).foregroundStyle(Theme.inkMuted)
+            Spacer(minLength: 8)
+            Text(value).foregroundStyle(Theme.ink)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 4)
-        .padding(.vertical, Theme.spacing / 2)
-        .accessibilityElement(children: .combine)
+        .font(.system(.subheadline, design: .monospaced).monospacedDigit())
+    }
+}
+
+// MARK: - Receipt parts
+
+private struct DashedDivider: View {
+    var body: some View {
+        Line()
+            .stroke(Theme.inkMuted.opacity(0.5), style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
+            .frame(height: 1)
+            .accessibilityHidden(true)
+    }
+
+    private struct Line: Shape {
+        func path(in rect: CGRect) -> Path {
+            var p = Path()
+            p.move(to: CGPoint(x: rect.minX, y: rect.midY))
+            p.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
+            return p
+        }
+    }
+}
+
+/// The rotated "REFUNDED" stamp on the newest money win.
+private struct RefundedStamp: View {
+    var body: some View {
+        Text("REFUNDED")
+            .font(.system(.caption, design: .monospaced, weight: .heavy))
+            .tracking(1.5)
+            .foregroundStyle(Theme.moneyText)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
+            .overlay(RoundedRectangle(cornerRadius: 4).strokeBorder(Theme.moneyText, lineWidth: 2))
+            .rotationEffect(.degrees(-12))
+            .opacity(0.85)
     }
 }
 
@@ -170,21 +252,33 @@ private struct WinRow: View {
 
     var body: some View {
         // Stacked at accessibility sizes so amounts never wrap mid-number.
-        AnyLayout(dynamicTypeSize.isAccessibilitySize
-            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 6))
-            : AnyLayout(HStackLayout(spacing: 12))) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(record.title)
-                    .font(.body)
-                Text(record.date.formatted(date: .abbreviated, time: .omitted))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+        // Plain branches, not AnyLayout: AnyLayout misreported heights for wrapped titles and rows overlapped.
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 6) { titleBlock; trailing }
+            } else {
+                HStack(alignment: .top, spacing: 8) {
+                    titleBlock
+                    Spacer(minLength: 8)
+                    trailing
+                }
             }
-            if !dynamicTypeSize.isAccessibilitySize { Spacer(minLength: 8) }
-            trailing
         }
+        .font(.system(.subheadline, design: .monospaced))
+        .frame(minHeight: 44)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(verbatim: accessibilityText))
+    }
+
+    private var titleBlock: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(record.title)
+                .foregroundStyle(Theme.ink)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(record.date.formatted(date: .abbreviated, time: .omitted))
+                .font(.system(.caption2, design: .monospaced))
+                .foregroundStyle(Theme.inkMuted)
+        }
     }
 
     @ViewBuilder
@@ -192,16 +286,15 @@ private struct WinRow: View {
         switch record.kind {
         case .moneyCancelled:
             Text("+" + (record.amountCents ?? 0).formattedCents())
-                .font(.body.weight(.semibold))
-                .foregroundStyle(Palette.moneyInk)
+                .font(.system(.subheadline, design: .monospaced, weight: .bold).monospacedDigit())
+                .foregroundStyle(Theme.moneyText)
         case .moneyKept:
-            Text("Kept")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            Text("KEPT")
+                .foregroundStyle(Theme.inkMuted)
         case .taskDone:
-            Image(systemName: "checkmark.circle.fill")
-                .foregroundStyle(Palette.frozenInk)
-                .imageScale(.large)
+            Text("DONE ✓")
+                .font(.system(.subheadline, design: .monospaced, weight: .bold))
+                .foregroundStyle(Theme.frozenText)
         }
     }
 

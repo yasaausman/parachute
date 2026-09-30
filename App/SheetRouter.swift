@@ -3,7 +3,7 @@ import Observation
 import SharedKit
 
 /// The app's modals. Decide and the paywall are sheets; B's Unfreeze player is full screen
-/// (docs/interfaces.md, "As implemented (B)"). "I'm frozen" swaps the Decide sheet for the player.
+/// (docs/interfaces.md, "As implemented (B)"). "Get unstuck" swaps the Decide sheet for the player.
 @MainActor
 @Observable
 final class SheetRouter {

@@ -4,9 +4,9 @@ Device: **Dev A's iPhone 17 Pro Max (iOS 27.0, has Apple Intelligence)** is pref
 
 ## Before recording
 - [ ] Phone: Do Not Disturb **off**, brightness up, battery > 50%, clear the Home Screen of clutter, silent switch off (alarm and voice audio).
-- [ ] Settings → Notifications → Parachute: allow, Time Sensitive not needed. AlarmKit: allow when prompted.
+- [ ] Settings → Notifications → Untax: allow, Time Sensitive not needed. AlarmKit: allow when prompted.
 - [ ] Debug tab → **clear**, then **seed demo data** (shows $214.89 · 12 tasks · 5-day best run). Say "demo data" nowhere on screen, but don't claim it's real earnings in the voiceover.
-- [ ] Add the Parachute widget to the Home Screen (money countdown) and check it shows a trial.
+- [ ] Add the Untax widget to the Home Screen (money countdown) and check it shows a trial.
 - [ ] Add 2 trials for the money flow: one **Apple-billed** (only if showing Apple's Subscriptions page) and Claude Pro or Spotify (has hand-verified steps).
 - [ ] Screenshot of a trial confirmation saved in Photos for the share-sheet shot.
 - [ ] Pro toggle: turn Pro **on** in Debug for the flow, **off** for the paywall shot. Use Debug → **Pro for testing → Pretend free** for the paywall shot (works on a phone that already bought Pro); a purchase on the paywall flips it back to Real, so Pro unlocks on camera.
@@ -15,9 +15,9 @@ Device: **Dev A's iPhone 17 Pro Max (iOS 27.0, has Apple Intelligence)** is pref
 ## Shots (record each 3×, keep the best)
 | # | Segment | What to do on the phone | Notes |
 |---|---|---|---|
-| 1 | Two taxes (0:05) | Lock screen: a "trial ends tomorrow" notification, swipe it away | Use a real Parachute reminder |
-| 2 | Money flow (0:22) | Photos → Share → Parachute → "Track it?" → save; Home Screen widget; Debug "ring in 1 minute" alarm on the lock screen → **Stop** → (cut) → **Decide** → I'm frozen → steps → confetti → Refunded | Alarm breaks through Silent, which is worth a caption |
-| 3 | Task flow (0:42) | Home → I'm frozen → type "History essay due at midnight" → steps → Done, Done | See the AI caveat below |
+| 1 | Two taxes (0:05) | Lock screen: a "trial ends tomorrow" notification, swipe it away | Use a real Untax reminder |
+| 2 | Money flow (0:22) | Photos → Share → Untax → "Track it?" → save; Home Screen widget; Debug "ring in 1 minute" alarm on the lock screen → **Stop** → (cut) → **Decide** → Get unstuck → steps → confetti → Refunded | Alarm breaks through Silent, which is worth a caption |
+| 3 | Task flow (0:42) | Home → Get unstuck → type "History essay due at midnight" → steps → Done, Done | See the AI caveat below |
 | 4 | Scoreboard (1:00) | Refunded tab → Share my wins | |
 | 5 | Paywall (1:10) | Pro off → add a 6th trial → paywall ($29.99 lifetime, banner) | Test Store purchase works; you can tap Buy on camera |
 | 6 | Tech (1:25) | Screen-record on the Mac: architecture diagram, `@Generable` atomizer code, README | |

@@ -1,0 +1,172 @@
+<title>Untax Brand Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a single column that reads like a long thermal receipt, with sections as line items. */
+:root{
+  --paper:#FAF7F2; --surface:#FFFFFF; --ink:#1A1714; --muted:#6B645C; --line:rgba(26,23,20,.12);
+  --coral:#E8472B; --coral-text:#C2381F; --coral-fill:#C2381F; --refund:#1E7A35; --unfreeze:#006E8C; --urgent:#C4281C;
+  --display:"Nunito", ui-rounded, "SF Pro Rounded", system-ui, sans-serif;
+  --body:ui-sans-serif, -apple-system, "SF Pro Text", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#141210;--surface:#1F1C19;--ink:#F2EEE8;--muted:#A39B91;--line:rgba(242,238,232,.14);--coral-text:#FF7A5C;--refund:#30D158;--unfreeze:#32D2F5;--urgent:#FF453A;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#141210;--surface:#1F1C19;--ink:#F2EEE8;--muted:#A39B91;--line:rgba(242,238,232,.14);--coral-text:#FF7A5C;--refund:#30D158;--unfreeze:#32D2F5;--urgent:#FF453A;color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font:16px/1.55 var(--body);padding-inline:20px;padding-block:0 64px}
+main{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:56px}
+h1,h2,h3{font-family:var(--display);font-weight:900;text-wrap:balance;margin:0;letter-spacing:-.02em}
+h2{font-size:30px}
+p{margin:0;max-width:62ch}
+.eyebrow{font:700 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+section{display:flex;flex-direction:column;gap:18px}
+.hero{padding-top:56px;display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center}
+.hero svg{width:132px;height:132px;border-radius:30px;display:block}
+.hero h1{font-size:clamp(64px,14vw,112px);line-height:.9}
+.tag{font:700 22px var(--display);color:var(--muted);margin-top:8px}
+@media (max-width:520px){.hero{grid-template-columns:1fr}.hero svg{width:96px;height:96px;border-radius:22px}}
+.lede{font-size:19px}
+.lede b{color:var(--coral-text)}
+.logos{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.tile svg{height:96px;width:auto}
+.tile .cap{font:500 13px var(--mono);color:var(--muted)}
+.tile.dark{background:#1A1714;border-color:#1A1714}
+.tile.dark .cap{color:#A39B91}
+.rules{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.sw{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.sw i{display:block;height:72px}
+.sw div{padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.sw b{font:700 14px var(--display)}
+.sw span{font:500 12px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.warn{border-left:3px solid var(--urgent);padding:4px 0 4px 14px;color:var(--ink)}
+.type{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.type>div{display:grid;grid-template-columns:120px 1fr;gap:16px;padding:16px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.type small{font:500 12px var(--mono);color:var(--muted)}
+@media (max-width:520px){.type>div{grid-template-columns:1fr;gap:4px}}
+/* signature receipt */
+.receipt{background:var(--surface);color:var(--ink);max-width:360px;padding:24px 22px 34px;font-family:var(--mono);font-size:14px;position:relative;
+  -webkit-mask:linear-gradient(#000 0 0) top/100% calc(100% - 12px) no-repeat,conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/20px 12px repeat-x;
+  mask:linear-gradient(#000 0 0) top/100% calc(100% - 12px) no-repeat,conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/20px 12px repeat-x;
+  box-shadow:0 0 0 1px var(--line) inset}
+.receipt h3{font:900 16px var(--display);text-align:center;letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:3px 0;font-variant-numeric:tabular-nums}
+.row span:first-child{color:var(--muted)}
+.dash{border-top:2px dashed var(--line);margin:12px 0}
+.total{display:flex;justify-content:space-between;align-items:baseline;font-weight:700}
+.total b{font-size:32px;color:var(--refund)}
+.stamp{position:absolute;right:18px;top:62px;transform:rotate(-12deg);border:3px solid var(--refund);color:var(--refund);font:700 13px var(--mono);letter-spacing:.14em;padding:4px 8px;border-radius:6px;opacity:.85}
+.voice{width:100%;border-collapse:collapse}
+.voice th{text-align:left;font:700 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;padding:0 12px 10px 0}
+.voice td{border-top:1px solid var(--line);padding:12px 12px 12px 0;vertical-align:top;width:50%}
+.voice td:first-child{color:var(--refund);font-weight:600}
+.voice td:last-child{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.btn{font:800 17px var(--display);border-radius:14px;min-height:54px;padding:0 24px;display:inline-flex;align-items:center;border:0}
+.btn.primary{background:var(--coral-fill);color:#fff}
+.btn.quiet{background:transparent;color:var(--ink);box-shadow:0 0 0 1px var(--line) inset}
+.btn.frozen{background:#006E8C;color:#fff}
+code{font:500 14px var(--mono)}
+</style>
+
+<main>
+  <header class="hero">
+    <svg viewBox="0 0 1024 1024" role="img" aria-label="Untax app icon"><rect width="1024" height="1024" fill="#E8472B"/><path d="M262 176 H762 Q782 176 782 196 V792 L740 834 L698 792 L656 834 L614 792 L572 834 L530 792 L488 834 L446 792 L404 834 L362 792 L320 834 L278 792 L242 828 V196 Q242 176 262 176 Z" fill="#FAF7F2"/><path d="M644 351 A172 172 0 1 0 679 504" fill="none" stroke="#1A1714" stroke-width="58" stroke-linecap="round"/><path d="M732 542 L706 431 L615 500 Z" fill="#1A1714" stroke="#1A1714" stroke-width="16" stroke-linejoin="round"/><text x="512" y="550" text-anchor="middle" font-family="Nunito, ui-rounded, sans-serif" font-weight="900" font-size="250" fill="#1A1714">$</text><rect x="330" y="714" width="200" height="22" rx="11" fill="#1A1714" opacity=".18"/><rect x="580" y="714" width="114" height="22" rx="11" fill="#1E7A35"/></svg>
+    <div>
+      <h1>untax</h1>
+      <p class="tag">Get your ADHD tax back.</p>
+    </div>
+  </header>
+
+  <p class="lede">Untax catches your free trials before they charge you, and gets you unstuck when you freeze. Every win lands on a receipt called <b>ADHD Tax Refunded</b>. It was called Parachute; that name is retired from everything a user sees.</p>
+
+  <section>
+    <span class="eyebrow">Logo</span>
+    <h2>A receipt, with the money coming back</h2>
+    <p>The arrow circles the dollar sign the way a refund does. The green line on the receipt is the amount you got back.</p>
+    <div class="logos">
+      <div class="tile"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" rx="230" fill="#E8472B"/><path d="M262 176 H762 Q782 176 782 196 V792 L740 834 L698 792 L656 834 L614 792 L572 834 L530 792 L488 834 L446 792 L404 834 L362 792 L320 834 L278 792 L242 828 V196 Q242 176 262 176 Z" fill="#FAF7F2"/><path d="M644 351 A172 172 0 1 0 679 504" fill="none" stroke="#1A1714" stroke-width="58" stroke-linecap="round"/><path d="M732 542 L706 431 L615 500 Z" fill="#1A1714" stroke="#1A1714" stroke-width="16" stroke-linejoin="round"/><text x="512" y="550" text-anchor="middle" font-family="Nunito, ui-rounded, sans-serif" font-weight="900" font-size="250" fill="#1A1714">$</text><rect x="330" y="714" width="200" height="22" rx="11" fill="#1A1714" opacity=".18"/><rect x="580" y="714" width="114" height="22" rx="11" fill="#1E7A35"/></svg><span class="cap">untax-icon.svg · app icon</span></div>
+      <div class="tile" style="background:#FAF7F2"><svg viewBox="300 250 460 430"><path d="M644 351 A172 172 0 1 0 679 504" fill="none" stroke="#1A1714" stroke-width="58" stroke-linecap="round"/><path d="M732 542 L706 431 L615 500 Z" fill="#1A1714" stroke="#1A1714" stroke-width="16" stroke-linejoin="round"/><text x="512" y="550" text-anchor="middle" font-family="Nunito, ui-rounded, sans-serif" font-weight="900" font-size="250" fill="#1A1714">$</text></svg><span class="cap" style="color:#6B645C">untax-mark.svg · ink on paper</span></div>
+      <div class="tile dark"><svg viewBox="300 250 460 430"><path d="M644 351 A172 172 0 1 0 679 504" fill="none" stroke="#FAF7F2" stroke-width="58" stroke-linecap="round"/><path d="M732 542 L706 431 L615 500 Z" fill="#FAF7F2" stroke="#FAF7F2" stroke-width="16" stroke-linejoin="round"/><text x="512" y="550" text-anchor="middle" font-family="Nunito, ui-rounded, sans-serif" font-weight="900" font-size="250" fill="#FAF7F2">$</text></svg><span class="cap">paper on ink</span></div>
+    </div>
+    <ul class="rules">
+      <li>Write the wordmark as lowercase <code>untax</code>, and "Untax" in sentences. Never UnTax, UNTAX, or Un-tax.</li>
+      <li>Leave clear space of at least a quarter of the icon's width. The mark's minimum size is 20pt; the wordmark's is 120pt wide.</li>
+      <li>Only ever color the mark Ink or Paper. No gradients, shadows, outlines, or rotation.</li>
+    </ul>
+  </section>
+
+  <section>
+    <span class="eyebrow">Color</span>
+    <h2>One coral, warm neutrals, two meaning colors</h2>
+    <p>Coral is the brand. Green only ever means money you got back. Teal only ever means Unfreeze mode.</p>
+    <div class="swatches">
+      <div class="sw"><i style="background:#E8472B"></i><div><b>Coral</b><span>#E8472B · icon, big display</span></div></div>
+      <div class="sw"><i style="background:#C2381F"></i><div><b>Coral fill/text</b><span>#C2381F · buttons 5.4:1</span></div></div>
+      <div class="sw"><i style="background:#1A1714"></i><div><b>Ink</b><span>#1A1714 · text 16.7:1</span></div></div>
+      <div class="sw"><i style="background:#FAF7F2;box-shadow:inset 0 -1px 0 rgba(0,0,0,.08)"></i><div><b>Paper</b><span>#FAF7F2 · background</span></div></div>
+      <div class="sw"><i style="background:#6B645C"></i><div><b>Ink muted</b><span>#6B645C · 5.5:1</span></div></div>
+      <div class="sw"><i style="background:#1E7A35"></i><div><b>Refund</b><span>#1E7A35 / #30D158</span></div></div>
+      <div class="sw"><i style="background:#006E8C"></i><div><b>Unfreeze</b><span>#006E8C / #32D2F5</span></div></div>
+      <div class="sw"><i style="background:#C4281C"></i><div><b>Urgent</b><span>#C4281C · ≤ 1 day only</span></div></div>
+    </div>
+    <p class="warn">White text on bright coral is 3.9:1 and fails. Put white text on Coral fill (#C2381F) instead.</p>
+    <div class="btns"><span class="btn primary">Cancel it for me</span><span class="btn quiet">Keep it</span><span class="btn frozen">Get unstuck</span></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Type</span>
+    <h2>Rounded and heavy for moments, mono for money</h2>
+    <p>These are all system fonts, so nothing needs bundling. This page substitutes Nunito and JetBrains Mono for them.</p>
+    <div class="type">
+      <div><small>Display</small><span style="font:900 40px/1.1 var(--display)">Trial ends tomorrow</span></div>
+      <div><small>Headline</small><span style="font:800 22px var(--display)">Open Settings › Subscriptions</span></div>
+      <div><small>Body</small><span>Netflix bills you $15.49 tomorrow at 9:00am. Want out?</span></div>
+      <div><small>Numbers</small><span style="font:700 32px var(--mono);font-variant-numeric:tabular-nums">$15.49 · 23:59:12</span></div>
+    </div>
+    <p><code>.rounded</code> + <code>.heavy</code> for display, SF Pro for body, <code>.monospaced</code> + <code>.monospacedDigit()</code> for amounts and countdowns. Always use text styles, so Dynamic Type keeps working.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Signature</span>
+    <h2>The receipt</h2>
+    <p>The scoreboard is a thermal receipt: mono line items, a dashed divider, a big green total, a torn edge, and a stamp for each new win. Use it only on the scoreboard and the share card, so it stays special.</p>
+    <div class="receipt" aria-label="Example ADHD Tax Refunded receipt">
+      <h3>ADHD Tax Refunded</h3>
+      <span class="stamp">REFUNDED</span>
+      <div class="row"><span>Netflix trial</span><span>$15.49</span></div>
+      <div class="row"><span>Duolingo Max</span><span>$13.99</span></div>
+      <div class="row"><span>Audible trial</span><span>$14.95</span></div>
+      <div class="row"><span>Unfroze: FAFSA form</span><span>3 steps</span></div>
+      <div class="dash"></div>
+      <div class="total"><span>TOTAL</span><b>$44.43</b></div>
+      <div class="row" style="margin-top:10px"><span>Best run</span><span>4 days</span></div>
+    </div>
+    <p class="eyebrow">Example amounts, for illustration only</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Shape</span>
+    <h2>Soft, flat, roomy</h2>
+    <ul class="rules">
+      <li>8pt grid. Screen padding 20; stack spacing 12, 16, and 24.</li>
+      <li>Radius 14 on buttons and cards. Receipt surfaces get a torn bottom edge instead.</li>
+      <li>One elevation: a hairline border in 8% Ink. No drop shadows, except on the celebration share card.</li>
+      <li>Touch targets are at least 44pt. Primary buttons are 54pt tall.</li>
+    </ul>
+  </section>
+
+  <section>
+    <span class="eyebrow">Voice</span>
+    <h2>The friend who texts you first</h2>
+    <p>Warm, plain, a little funny, never shaming. The first unfreeze step is always free.</p>
+    <div style="overflow-x:auto"><table class="voice">
+      <tr><th>Say</th><th>Not</th></tr>
+      <tr><td>Netflix bills you tomorrow. Want out?</td><td>WARNING: You will be charged!</td></tr>
+      <tr><td>Frozen? Totally normal. Here's one tiny step.</td><td>You still haven't done this.</td></tr>
+      <tr><td>Best run: 4 days</td><td>You lost your streak.</td></tr>
+      <tr><td>$15.49 back in your pocket.</td><td>You wasted $15.49.</td></tr>
+    </table></div>
+    <p><b>Stats we use:</b> 79% of Americans started a trial meaning to cancel and got charged. $45/month goes to forgotten trials (Dimers, Sep 2026). 15.5M US adults have ADHD (CDC). Use no other figures.</p>
+  </section>
+</main>

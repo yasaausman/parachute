@@ -12,7 +12,7 @@
 
 ## Screenshots (1179×2556, iPhone 17 Pro, debug seed on, Do Not Disturb off)
 - [ ] 1. **Home / money list**: 2–3 trials with day counts, one urgent, plus widget if possible.
-- [ ] 2. **Decide** screen with a trial, showing Cancel · Keep · Snooze · I'm frozen.
+- [ ] 2. **Decide** screen with a trial, showing Cancel · Keep · Snooze · Get unstuck.
 - [ ] 3. **Unfreeze player**: one step, ring, Done / Break it smaller / Skip.
 - [ ] 4. (bonus) **ADHD Tax Refunded** ($214.89 · 12 tasks · 5-day best run) and the paywall.
 - Capture with `xcrun simctl io booted screenshot` and check the pixel size.

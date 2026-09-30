@@ -15,7 +15,7 @@ struct RootView: View {
     var body: some View {
         TabView {
             Tab("Home", systemImage: "house") {
-                HomeView()
+                HomeView { decide.request(itemID: $0) }
             }
             Tab("Money", systemImage: "dollarsign.circle") {
                 NavigationStack { MoneyListView() }
@@ -23,7 +23,7 @@ struct RootView: View {
             Tab("Tasks", systemImage: "checklist") {
                 TaskListView()
             }
-            Tab("Refunded", systemImage: "trophy") {
+            Tab("Refunded", systemImage: "receipt") {
                 ScoreboardView()
             }
             #if DEBUG

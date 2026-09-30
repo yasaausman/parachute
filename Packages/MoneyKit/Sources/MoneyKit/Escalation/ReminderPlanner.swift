@@ -58,7 +58,7 @@ public enum ReminderPlanner {
     public static func taskReminders(itemID: UUID, title: String, due: Date, now: Date) -> [PlannedReminder] {
         let steps: [(suffix: String, offset: TimeInterval, body: String)] = [
             ("t1d", -24 * 60 * 60, "Due tomorrow. One tiny step now makes tomorrow easier."),
-            ("t1h", -60 * 60, "Due in an hour. Tap and Parachute will give you one small step."),
+            ("t1h", -60 * 60, "Due in an hour. Tap and Untax will give you one small step."),
             ("t0", 0, "It's due now. Frozen? Tap for one small step."),
         ]
         return steps.compactMap { step in

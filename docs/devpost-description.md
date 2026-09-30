@@ -3,7 +3,7 @@
 Fill the ⚠️ items only with what was verified on a real iPhone before submitting. Stats: only those in CLAUDE.md rule 11.
 
 ## Tagline
-Parachute is the ADHD follow-through engine: it catches your free-trial deadlines, keeps coming back until you decide, and when you freeze, walks you through one tiny step at a time.
+Untax is the ADHD follow-through engine: it catches your free-trial deadlines, keeps coming back until you decide, and when you freeze, walks you through one tiny step at a time.
 
 ## Inspiration
 79% of Americans have started a free trial meaning to cancel and got charged anyway. For people with ADHD (15.5M US adults, per the CDC) the problem usually isn't remembering. It's starting. A reminder you swipe away doesn't fix that. We wanted an app that stays with you through the hard part, and counts every win instead of every miss.
@@ -11,7 +11,7 @@ Parachute is the ADHD follow-through engine: it catches your free-trial deadline
 ## What it does
 - **Catch:** share a screenshot of a trial confirmation. On-device OCR and extraction find the service, price and last day to cancel. You confirm it in one tap, or add it by hand.
 - **Nudge:** a widget countdown, reminders 3 days and 1 day out, and a final-day AlarmKit alarm. Stop only snoozes it: the alarm re-arms about 30 minutes later until you record a decision.
-- **Decide:** Cancel · Keep · Snooze · 🧊 I'm frozen.
+- **Decide:** Cancel · Keep · Snooze · 🧊 Get unstuck.
 - **Unfreeze:** one exact step at a time ("Step 1: Open Settings. That's it."), with a soft 90-second ring, an optional voice and ambient sound, and "Break it smaller" if a step is still too big. It works for cancellations (hand-verified steps for real services, plus Apple's own path for Apple-billed trials) and for deadline tasks like an essay due at midnight.
 - **Reward:** every win lands on the **ADHD Tax Refunded** scoreboard: dollars back, tasks unfrozen, and a best run (never "you lost your streak").
 
@@ -30,7 +30,7 @@ SwiftUI and SwiftData in an App Group, split into local Swift packages so the tw
 No account, no server, no analytics: everything stays on the phone. Fully open source under MIT. ⚠️ Add the test counts, the number of hand-verified services, and the real-device results once confirmed.
 
 ## What we learned
-Escalation only works if there's a way to answer it. The "I'm frozen" button turned out to matter more than the alarm.
+Escalation only works if there's a way to answer it. The "Get unstuck" button turned out to matter more than the alarm.
 
 ## What's next
 More hand-verified cancel guides, Live Activities for the final hours, and shared "accountability" trials with a friend. ⚠️ Keep only what we're willing to stand behind.

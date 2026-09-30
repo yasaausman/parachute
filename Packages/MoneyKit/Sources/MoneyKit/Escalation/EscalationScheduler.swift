@@ -139,7 +139,7 @@ public actor EscalationScheduler: EscalationScheduling {
     public func snooze(itemID: UUID, until: Date) async throws {
         let title = await center.pending()
             .first { $0.id.hasPrefix(itemID.uuidString) }?
-            .title ?? "Parachute"
+            .title ?? "Untax"
         let alarm = alarms.record(for: itemID)
         await resolve(itemID: itemID)
         try await add([PlannedReminder(

@@ -1,3 +1,4 @@
+import SharedKit
 import SwiftUI
 
 /// Progress as one tick per step, filled when done: "how far" at a glance instead of "Step 3 of 7".
@@ -11,7 +12,7 @@ struct StepTicks: View {
         HStack(spacing: 3) {
             ForEach(0..<max(total, 1), id: \.self) { i in
                 Capsule()
-                    .fill(i < done ? Palette.frozenInk : Color.secondary.opacity(0.4))
+                    .fill(i < done ? Palette.frozenInk : Palette.tickEmpty)
                     .frame(height: height)
             }
         }

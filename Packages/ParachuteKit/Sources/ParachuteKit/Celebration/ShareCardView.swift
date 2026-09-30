@@ -1,7 +1,7 @@
 import SharedKit
 import SwiftUI
 
-/// B7: the "Share my wins" image. Always dark so it looks the same wherever it's posted.
+/// B7: the "Share my wins" image: a light receipt on a coral field, the same wherever it's posted.
 public struct ShareCardView: View {
     let refundedCents: Int
     let tasksUnfrozen: Int
@@ -14,37 +14,64 @@ public struct ShareCardView: View {
     }
 
     public var body: some View {
-        VStack(spacing: Theme.spacing) {
-            Label("ADHD TAX REFUNDED", systemImage: "trophy.fill")
-                .font(.headline.bold())
-                .foregroundStyle(Theme.accent)
-
+        VStack(alignment: .leading, spacing: 14) {
+            Text("ADHD TAX REFUNDED")
+                .font(.system(.title3, design: .rounded, weight: .heavy))
+                .tracking(1.5)
+                .foregroundStyle(Theme.ink)
+                .frame(maxWidth: .infinity)
+            dashes
+            line(tasksUnfrozen == 1 ? "Task unfrozen" : "Tasks unfrozen", "\(tasksUnfrozen)")
+            line("Best run", "\(bestRun) \(bestRun == 1 ? "day" : "days")")
+            dashes
+            Text("TOTAL")
+                .font(.system(.subheadline, design: .monospaced, weight: .bold))
+                .tracking(2)
+                .foregroundStyle(Theme.ink)
             Text(refundedCents.formattedCents())
-                .font(.system(size: 64, weight: .bold, design: .rounded))
-                .foregroundStyle(Theme.money)
-
-            HStack(spacing: 40) {
-                stat("\(tasksUnfrozen)", tasksUnfrozen == 1 ? "task unfrozen" : "tasks unfrozen")
-                stat("\(bestRun) \(bestRun == 1 ? "day" : "days")", "best run")
-            }
-
-            Text("Parachute · my brain works, it just needed a parachute")
-                .font(.caption2)
-                .foregroundStyle(.gray)
-                .padding(.top, Theme.spacing)
+                .font(.system(size: 52, weight: .semibold, design: .monospaced))
+                .foregroundStyle(Theme.moneyText)
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+            Text("Untax · Get your ADHD tax back.")
+                .font(.system(.caption, design: .monospaced))
+                .foregroundStyle(Theme.inkMuted)
+                .frame(maxWidth: .infinity)
+                .padding(.top, 6)
         }
-        .padding(32)
+        .padding(.horizontal, 24)
+        .padding(.top, 28)
+        .padding(.bottom, 40)
+        .background(ReceiptShape(tooth: 10).fill(Theme.surface))
+        .padding(28)
         .frame(width: 360)
-        .background(Color.black, in: RoundedRectangle(cornerRadius: Theme.cornerRadius))
-        .overlay(RoundedRectangle(cornerRadius: Theme.cornerRadius).stroke(Theme.accent.opacity(0.3), lineWidth: 1))
-        .environment(\.colorScheme, .dark)
+        .background(Theme.accent, in: RoundedRectangle(cornerRadius: Theme.cornerRadius))
+        .environment(\.colorScheme, .light)
     }
 
-    private func stat(_ value: String, _ label: String) -> some View {
-        VStack {
-            Text(value).font(.title2.bold()).foregroundStyle(.white)
-            Text(label).font(.caption).foregroundStyle(.gray)
+    private var dashes: some View {
+        Rectangle()
+            .fill(.clear)
+            .frame(height: 1)
+            .overlay(
+                GeometryReader { g in
+                    Path { p in
+                        p.move(to: .zero)
+                        p.addLine(to: CGPoint(x: g.size.width, y: 0))
+                    }
+                    .stroke(Theme.inkMuted.opacity(0.5), style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
+                }
+            )
+    }
+
+    private func line(_ name: String, _ value: String) -> some View {
+        HStack {
+            Text(name).foregroundStyle(Theme.inkMuted)
+            Spacer()
+            Text(value).foregroundStyle(Theme.ink)
         }
+        .font(.system(.subheadline, design: .monospaced))
     }
 
     /// Renders at 3× for a crisp image in the share sheet.

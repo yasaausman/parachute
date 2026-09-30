@@ -1,6 +1,8 @@
-# 🪂 Parachute
+# Untax
 
-**The ADHD follow-through engine.** Parachute catches the money deadlines your brain loses, nudges until you act, and when you freeze, on a cancellation or an essay, walks you through one tiny step at a time. **Pull the cord.**
+<img src="docs/brand/untax-icon-1024.png" width="96" alt="Untax app icon">
+
+**The ADHD follow-through engine.** Untax catches the money deadlines your brain loses, nudges until you act, and when you freeze, on a cancellation or an essay, walks you through one tiny step at a time. **Get your ADHD tax back.** (Formerly Parachute; code modules keep that name.)
 
 > 79% of Americans have started a free trial meaning to cancel, and got charged anyway ([Dimers, 2026](https://www.dimers.com/press/news/how-far-americans-will-go-for-freebies)). For ADHD brains the problem isn't remembering. It's **starting**.
 
@@ -9,7 +11,7 @@ _Status: in development for the [RevenueCat Shipaton 2026](https://revenuecat-sh
 ## How it works
 1. **Catch:** share a screenshot of a trial confirmation; on-device AI finds the service, price, and end date.
 2. **Nudge:** widget countdown → reminders → a final-day alarm that keeps coming back until you decide.
-3. **Decide:** Cancel · Keep · Snooze · 🧊 **I'm frozen**
+3. **Decide:** Cancel · Keep · Snooze · 🧊 **Get unstuck**
 4. **Unfreeze:** one tiny, exact step at a time ("Step 1: Open Settings. That's it.") for cancellations *and* deadline tasks.
 5. **Reward:** every win goes on the **ADHD Tax Refunded** scoreboard.
 
@@ -17,7 +19,7 @@ _Status: in development for the [RevenueCat Shipaton 2026](https://revenuecat-sh
 SwiftUI · SwiftData · AlarmKit · Apple Foundation Models (on-device) · Vision · AVSpeechSynthesizer + AVAudioEngine · WidgetKit · RevenueCat
 
 ## How RevenueCat is used
-RevenueCat powers every purchase in Parachute and decides what Pro unlocks. All of it lives in `Packages/MoneyKit`.
+RevenueCat powers every purchase in Untax and decides what Pro unlocks. All of it lives in `Packages/MoneyKit`.
 
 | What | How | Where |
 |---|---|---|
@@ -26,7 +28,7 @@ RevenueCat powers every purchase in Parachute and decides what Pro unlocks. All 
 | **One entitlement** | Every product unlocks the **`parachute_pro`** entitlement. `ProEntitlements` listens to `customerInfoStream` and exposes `isPro`, so the UI updates the moment a purchase, restore, renewal, or expiry lands. | `Entitlements/ProEntitlements.swift` |
 | **Purchase + restore** | `purchase(package:)` and `restorePurchases()`, with plain-language results ("Nothing was charged"). | `Paywall/PaywallView.swift` |
 | **Gating** | `ProEntitlements` is also the shared `EntitlementsProviding` protocol, so the Parachute module (Dev B) gates its Pro features without importing RevenueCat. Money side: free keeps 5 open trials, reminders, and hand-checked cancel steps; Pro adds unlimited trials and the **final-day alarm** (armed or disarmed the moment Pro changes). | `ProFeatures`, `SharedKit/Protocols/EntitlementsProviding.swift` |
-| **Our own trial, honestly** | If `parachute_pro` is in a **trial period** that will renew, Parachute schedules a local notification **24 hours before its own trial ends**, using the entitlement's `expirationDate` and `periodType`. An app about forgotten trials shouldn't be one. | `ProEntitlements.scheduleTrialReminder` |
+| **Our own trial, honestly** | If `parachute_pro` is in a **trial period** that will renew, Untax schedules a local notification **24 hours before its own trial ends**, using the entitlement's `expirationDate` and `periodType`. An app about forgotten trials shouldn't be one. | `ProEntitlements.scheduleTrialReminder` |
 
 **Pricing:** **$29.99 lifetime** is the headline ("We'd never charge a subscription to fix your follow-through"), with $24.99/yr and $3.99/mo as options. "Your first step is always free."
 
@@ -43,13 +45,13 @@ flowchart LR
     Alarm -- "Decide" --> Decide["Decide screen"]
     Rem -- "tap" --> Decide
     Decide -- "Cancel it / Keep it" --> Ledger["CompletionLedger<br/>(scoreboard)"]
-    Decide -- "I'm frozen" --> Unfreeze["Unfreeze player<br/>(ParachuteKit)"]
+    Decide -- "Get unstuck" --> Unfreeze["Unfreeze player<br/>(ParachuteKit)"]
     Decide -- "Snooze" --> Esc
 ```
 - **The alarm can't be silenced for good, only answered.** AlarmKit alerts have a Stop button plus one custom button. Stop runs an App Intent that schedules the next ring 30 minutes later (even if the app was force-quit); **Decide** opens the app. Only a recorded decision ends the chain.
 - **Apple-billed trials move a day earlier.** Apple asks for cancellation "at least a day before each renewal date", so reminders and the alarm count down to the day before the charge.
 - **Capture never invents facts.** Pattern matching always runs, so capture works without Apple Intelligence. When the on-device model is available it may choose among the prices and dates printed in the screenshot, but anything it returns that isn't printed there is dropped. Scored with `TrialCaptureEval` on committed fixtures (`Packages/MoneyKit/Fixtures/`).
-- **MoneyKit never imports ParachuteKit.** "I'm frozen" is a closure; the app target wires the two packages together through the protocols in `SharedKit` (`docs/interfaces.md`).
+- **MoneyKit never imports ParachuteKit.** "Get unstuck" is a closure; the app target wires the two packages together through the protocols in `SharedKit` (`docs/interfaces.md`).
 
 ## Build and run
 1. Xcode 27 (iOS 27 SDK), an iPhone on iOS 26 or later, and [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`brew install xcodegen`).

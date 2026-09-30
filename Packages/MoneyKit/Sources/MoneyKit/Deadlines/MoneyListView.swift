@@ -43,11 +43,13 @@ public struct MoneyListView: View {
             ContentUnavailableView {
                 Label("No trials yet", systemImage: "dollarsign.circle")
             } description: {
-                Text("Add a free trial and Parachute will count down to the charge.")
+                Text("Add a free trial and Untax will count down to the charge, then help you get out in time.")
             } actions: {
                 Button("Add a trial") { add() }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(.untax)
+                    .padding(.horizontal, Theme.screenPadding)
             }
+            .untaxScreen()
         } else {
             List {
                 if !open.isEmpty {
@@ -58,24 +60,35 @@ public struct MoneyListView: View {
                         .onDelete { delete(open, at: $0) }
                     } header: {
                         Text("Coming up")
+                            .font(Theme.headline(.subheadline))
+                            .foregroundStyle(Theme.inkMuted)
+                            .textCase(nil)
                     } footer: {
                         if let pro, !pro.isProNow {
                             Button("Reminders are on. The final-day alarm that keeps coming back is Pro. See Pro") {
                                 pro.presentPaywall()
                             }
                             .font(.footnote)
+                            .foregroundStyle(Theme.accentText)
                         }
                     }
                 }
                 if !done.isEmpty {
-                    Section("Decided") {
+                    Section {
                         ForEach(done) { deadline in
                             row(deadline, now: now)
                         }
                         .onDelete { delete(done, at: $0) }
+                    } header: {
+                        Text("Decided")
+                            .font(Theme.headline(.subheadline))
+                            .foregroundStyle(Theme.inkMuted)
+                            .textCase(nil)
                     }
                 }
             }
+            .listRowBackground(Theme.surface)
+            .untaxScreen()
         }
     }
 
@@ -90,12 +103,12 @@ public struct MoneyListView: View {
         } label: {
             DeadlineRow(deadline: deadline, now: now)
         }
-        .tint(.primary)
+        .tint(Theme.ink)
         .accessibilityHint(deadline.isOpen ? "Opens Decide: cancel, keep, snooze, or get help" : "Edit or reopen")
         .accessibilityAction(named: "Edit") { editing = deadline }
         .swipeActions(edge: .leading) {
             Button("Edit", systemImage: "pencil") { editing = deadline }
-                .tint(.gray)
+                .tint(Theme.inkMuted)
         }
         .contextMenu {
             Button("Edit", systemImage: "pencil") { editing = deadline }
@@ -134,18 +147,36 @@ struct DeadlineRow: View {
         DeadlineMath.calendarDays(from: now, to: deadline.cancelBy)
     }
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(headline)
-            .font(.headline)
-            .foregroundStyle(deadline.isOpen && daysToAct <= 1 ? Theme.urgentText : .primary)
+    private var isUrgent: Bool { deadline.isOpen && daysToAct <= 1 }
 
-            Text(detail)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(deadline.serviceName)
+                    .font(Theme.headline())
+                    .foregroundStyle(deadline.isOpen ? Theme.ink : Theme.inkMuted)
+                Text(detail)
+                    .font(.subheadline)
+                    .foregroundStyle(Theme.inkMuted)
+            }
+            Spacer(minLength: 8)
+            VStack(alignment: .trailing, spacing: 4) {
+                Text(deadline.amountCents.formattedCents(currencyCode: deadline.currencyCode))
+                    .font(Theme.number(.headline))
+                    .monospacedDigit()
+                    .foregroundStyle(deadline.isOpen ? Theme.ink : Theme.inkMuted)
+                if deadline.isOpen {
+                    Text(DeadlineMath.countdownText(days: DeadlineMath.calendarDays(from: now, to: deadline.dueDate)))
+                        .font(Theme.number(.subheadline))
+                        .monospacedDigit()
+                        .foregroundStyle(isUrgent ? Theme.urgentText : Theme.inkMuted)
+                }
+            }
         }
-        .padding(.vertical, 2)
-        .accessibilityElement(children: .combine)
+        .padding(.vertical, 6)
+        .frame(minHeight: 44)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(headline). \(detail)")
     }
 
     /// Open: the countdown. Decided: just the service and amount; the countdown no longer matters.

@@ -61,7 +61,7 @@ public enum DeadlineDecision: Sendable, Hashable {
 }
 
 public extension MoneyDeadline {
-    /// What "I'm frozen" hands to Dev B's Unfreeze engine.
+    /// What "Get unstuck" hands to Dev B's Unfreeze engine.
     var unfreezeRequest: UnfreezeRequest {
         .cancel(serviceID: serviceID, serviceName: serviceName, billedByApple: billedByApple)
     }

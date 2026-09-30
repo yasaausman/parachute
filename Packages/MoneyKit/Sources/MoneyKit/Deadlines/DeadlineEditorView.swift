@@ -48,26 +48,33 @@ public struct DeadlineEditorView: View {
                                 let name = CuratedServices.shortName(service)
                                 Button(name) { serviceName = name }
                                     .buttonStyle(.bordered)
+                                    .tint(Theme.accentText)
                             }
                         }
                     }
                 }
             } header: {
                 Text("What's the trial?")
+                    .font(Theme.headline(.subheadline))
+                    .textCase(nil)
             }
 
             Section {
                 TextField("Amount", value: $amount, format: .currency(code: currencyCode))
                     .keyboardType(.decimalPad)
+                    .font(Theme.number(.body))
+                    .monospacedDigit()
                 DatePicker("Charges on", selection: $dueDate, displayedComponents: .date)
             } header: {
-                Text("What happens if you forget")
+                Text("When it charges")
+                    .font(Theme.headline(.subheadline))
+                    .textCase(nil)
             }
 
             Section {
                 Toggle("Billed by Apple", isOn: $billedByApple)
             } footer: {
-                Text("Turn this on if you started it inside an iPhone app and pay with your Apple Account. Apple needs you to cancel at least a day early, so Parachute counts down to the day before.")
+                Text("Turn this on if you started it inside an iPhone app and pay with your Apple Account. Apple needs you to cancel at least a day early, so Untax counts down to the day before.")
             }
 
             if let deadline, !deadline.isOpen {
@@ -84,6 +91,8 @@ public struct DeadlineEditorView: View {
                 }
             }
         }
+        .tint(Theme.accentText)
+        .untaxScreen()
         .navigationTitle(deadline == nil ? "Add trial" : "Edit trial")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

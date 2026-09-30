@@ -22,8 +22,10 @@ struct CancelStepsView: View {
                         openURL(AppleSubscriptions.manageURL)
                     } label: {
                         Label("Open Apple Subscriptions", systemImage: "apple.logo")
-                            .font(.headline)
                     }
+                    .buttonStyle(.untax)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets())
                 } footer: {
                     Text("Billed by Apple: cancel at least a day before the charge. Cancelling a free trial may end it right away.")
                 }
@@ -36,6 +38,9 @@ struct CancelStepsView: View {
                     }
                 } header: {
                     Text("Cancel \(deadline.serviceName)")
+                        .font(Theme.headline())
+                        .foregroundStyle(Theme.ink)
+                        .textCase(nil)
                 } footer: {
                     Text("Checked by hand on \(curated.verifiedOn).")
                 }
@@ -46,6 +51,8 @@ struct CancelStepsView: View {
                     }
                     Button("Or cancel on Apple's website") { openURL(AppleSubscriptions.webURL) }
                         .font(.subheadline)
+                        .foregroundStyle(Theme.accentText)
+                        .frame(minHeight: 44)
                 } header: {
                     Text("If the button doesn't open it")
                 } footer: {
@@ -53,26 +60,35 @@ struct CancelStepsView: View {
                 }
             } else {
                 Section {
-                    Text("There are no saved steps for \(deadline.serviceName) yet. Look for Account, Billing, or Subscription in its app or website.")
+                    Text("No saved steps for \(deadline.serviceName) yet. Look for Account, Billing, or Subscription in its app or website.")
+                        .foregroundStyle(Theme.ink)
                 } footer: {
-                    Text("Stuck? \"I'm frozen\" walks you through it one step at a time.")
+                    Text("Stuck? \"Get unstuck\" walks you through it one step at a time.")
                 }
             }
 
             Section {
-                Button {
-                    onDone()
-                } label: {
-                    Label("Done, it's cancelled", systemImage: "checkmark.circle.fill")
-                        .font(.headline)
+                VStack(spacing: 12) {
+                    Button {
+                        onDone()
+                    } label: {
+                        Label("Done, it's cancelled", systemImage: "checkmark.circle.fill")
+                    }
+                    .buttonStyle(.untax)
+                    Button {
+                        onFrozen()
+                    } label: {
+                        Label("I'm stuck", systemImage: "snowflake")
+                    }
+                    .buttonStyle(.untaxFrozen)
                 }
-                Button {
-                    onFrozen()
-                } label: {
-                    Label("I'm stuck", systemImage: "snowflake")
-                }
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets())
             }
         }
+        .listRowBackground(Theme.surface)
+        .tint(Theme.accentText)
+        .untaxScreen()
         .navigationTitle("Cancel it")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -86,13 +102,19 @@ private struct StepRow: View {
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
             Text("\(number)")
-                .font(.headline.monospacedDigit())
+                .font(Theme.number(.headline))
+                .monospacedDigit()
                 .foregroundStyle(Theme.accentText)
+                .accessibilityLabel("Step \(number)")
             VStack(alignment: .leading, spacing: 6) {
                 Text(step.text)
+                    .foregroundStyle(Theme.ink)
                 if let url = step.url {
                     Button("Open link") { open(url) }
-                        .font(.subheadline)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Theme.accentText)
+                        .frame(minHeight: 44)
+                        .buttonStyle(.borderless)
                 }
             }
         }

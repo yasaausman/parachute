@@ -2,7 +2,7 @@ import SharedKit
 import SwiftData
 import SwiftUI
 
-/// B4: "I'm frozen" → "What's overwhelming you?" (+ optional due time) → atomizer → player.
+/// B4: "Get unstuck" → "What's overwhelming you?" (+ optional due time) → atomizer → player.
 /// Present in a sheet; it closes itself when the player finishes.
 public struct FrozenTaskEntryView: View {
     @Environment(\.modelContext) private var context
@@ -28,14 +28,9 @@ public struct FrozenTaskEntryView: View {
                     Label("Help me start", systemImage: "arrow.right.circle.fill")
                 }
             }
-            .font(.title3.bold())
             .multilineTextAlignment(.center)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 6)
         }
-        .buttonStyle(.borderedProminent)
-        .controlSize(.large)
-        .tint(Palette.frozenFill)
+        .buttonStyle(.untaxFrozen)
         .disabled(trimmed.isEmpty || isWorking)
     }
 
@@ -51,6 +46,9 @@ public struct FrozenTaskEntryView: View {
                         .submitLabel(.go)
                 } header: {
                     Text("What's overwhelming you?")
+                        .font(Theme.headline())
+                        .foregroundStyle(Theme.ink)
+                        .textCase(nil)
                 } footer: {
                     Text("Messy is fine. We'll make the first step tiny.")
                 }
@@ -62,7 +60,7 @@ public struct FrozenTaskEntryView: View {
                     }
                 } footer: {
                     if hasDueDate {
-                        Text("Parachute will nudge you before it's due.")
+                        Text("Untax will nudge you before it's due.")
                     }
                 }
 
@@ -73,14 +71,15 @@ public struct FrozenTaskEntryView: View {
                         .listRowBackground(Color.clear)
                 }
             }
+            .untaxScreen()
             .safeAreaInset(edge: .bottom) {
                 if !dynamicTypeSize.isAccessibilitySize {
                     startButton
-                        .padding()
-                        .background(.bar)
+                        .padding(Theme.screenPadding)
+                        .background(Theme.paper)
                 }
             }
-            .navigationTitle("I'm frozen")
+            .navigationTitle("Get unstuck")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -93,7 +92,7 @@ public struct FrozenTaskEntryView: View {
             .onAppear { focused = true }
         }
         .interactiveDismissDisabled(task != nil)
-        .tint(Palette.frozenFill)
+        .tint(Theme.frozenText)
     }
 
     private func start() {

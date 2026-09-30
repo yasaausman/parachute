@@ -103,7 +103,7 @@ enum Countdown {
     static func color(days: Int) -> Color {
         if days <= 1 { return WidgetInk.urgent }
         if days <= 3 { return WidgetInk.soon }
-        return WidgetInk.money
+        return WidgetInk.muted
     }
 }
 
@@ -113,6 +113,7 @@ private enum WidgetInk {
     static let frozen = Theme.frozenText
     static let soon = Theme.accentText
     static let urgent = Theme.urgentText
+    static let muted = Theme.inkMuted
 }
 
 // MARK: - Money Widget
@@ -172,7 +173,7 @@ struct MoneyWidgetView: View {
                 if family == .accessoryRectangular {
                     Color.clear
                 } else {
-                    Color(uiColor: .systemBackground)
+                    Theme.paper
                 }
             }
     }
@@ -214,18 +215,20 @@ struct MoneyWidgetView: View {
             let d = days(for: first)
             VStack(alignment: .leading, spacing: 4) {
                 Label("Next charge", systemImage: "dollarsign.circle")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Theme.inkMuted)
                 Text(first.serviceName)
-                    .font(.headline)
+                    .font(Theme.headline(.headline))
+                    .foregroundStyle(Theme.ink)
                     .lineLimit(1)
                 Text(first.amountCents.formattedCents(currencyCode: first.currencyCode))
-                    .font(.system(.title, design: .rounded).bold())
+                    .font(Theme.number().monospacedDigit())
+                    .foregroundStyle(Theme.ink)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
                 Spacer(minLength: 0)
                 Text(Countdown.text(days: d))
-                    .font(.subheadline.bold())
+                    .font(Theme.headline(.subheadline))
                     .foregroundStyle(Countdown.color(days: d))
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -242,18 +245,20 @@ struct MoneyWidgetView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Label("Trials to watch", systemImage: "dollarsign.circle")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Theme.inkMuted)
                 ForEach(visible.prefix(3)) { deadline in
                     let d = days(for: deadline)
                     HStack(spacing: 8) {
                         Text(deadline.serviceName)
-                            .font(.subheadline.bold())
+                            .font(Theme.headline(.subheadline))
+                            .foregroundStyle(Theme.ink)
                             .lineLimit(1)
                         Spacer(minLength: 4)
                         Text(deadline.amountCents.formattedCents(currencyCode: deadline.currencyCode))
-                            .font(.subheadline)
+                            .font(.system(.subheadline, design: .monospaced).monospacedDigit())
+                            .foregroundStyle(Theme.ink)
                         Text(Countdown.text(days: d))
-                            .font(.subheadline.bold())
+                            .font(Theme.headline(.subheadline))
                             .foregroundStyle(Countdown.color(days: d))
                     }
                 }
@@ -266,12 +271,13 @@ struct MoneyWidgetView: View {
     private var emptyState: some View {
         VStack(alignment: .leading, spacing: 4) {
             Image(systemName: "dollarsign.circle")
-                .foregroundStyle(WidgetInk.money)
+                .foregroundStyle(WidgetInk.soon)
             Text("No trials to watch.")
-                .font(.headline)
+                .font(Theme.headline(.headline))
+                .foregroundStyle(Theme.ink)
             Text("Add one when you sign up for something.")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Theme.inkMuted)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
@@ -340,7 +346,7 @@ struct TaskWidgetView: View {
                 if family == .accessoryRectangular {
                     Color.clear
                 } else {
-                    Color(uiColor: .systemBackground)
+                    Theme.paper
                 }
             }
     }
@@ -386,19 +392,20 @@ struct TaskWidgetView: View {
         if let task = entry.task {
             VStack(alignment: .leading, spacing: 4) {
                 Text(task.title)
-                    .font(.headline)
+                    .font(Theme.headline(.headline))
                     .foregroundStyle(WidgetInk.frozen)
                     .lineLimit(2)
                 Text(progressText(task))
-                    .font(.subheadline.bold())
-                    .foregroundStyle(.secondary)
+                    .font(.system(.caption, design: .monospaced, weight: .semibold))
+                    .foregroundStyle(Theme.inkMuted)
                 Spacer(minLength: 0)
                 if let next = task.nextStepText {
                     Text(next)
-                        .font(.caption)
+                        .font(Theme.headline(.subheadline))
+                        .foregroundStyle(Theme.ink)
                         .lineLimit(3)
                 } else if task.totalSteps == 0 {
-                    Text("Open Parachute for your first tiny step.")
+                    Text("Open Untax for your first tiny step.")
                         .font(.caption)
                         .lineLimit(3)
                 }
@@ -409,10 +416,11 @@ struct TaskWidgetView: View {
                 Image(systemName: "snowflake")
                     .foregroundStyle(WidgetInk.frozen)
                 Text("Nothing frozen right now.")
-                    .font(.headline)
-                Text("If something feels stuck, Parachute can break it down.")
+                    .font(Theme.headline(.headline))
+                    .foregroundStyle(Theme.ink)
+                Text("If something feels stuck, Untax can break it down.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Theme.inkMuted)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }

@@ -4,7 +4,7 @@ import SharedKit
 import SwiftData
 import SwiftUI
 
-/// Decide → 🧊 "I'm frozen": plays B's `UnfreezeFlowView`, then records the money decision the
+/// Decide → 🧊 "Get unstuck": plays B's `UnfreezeFlowView`, then records the money decision the
 /// same way the Decide screen does (`DeadlineDecision`).
 struct UnfreezeHost: View {
     @Environment(AppDependencies.self) private var dependencies

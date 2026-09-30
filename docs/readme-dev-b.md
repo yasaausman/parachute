@@ -47,7 +47,7 @@ flowchart TD
 
     %% Data Flow - Task Path
     subgraph TaskPath [Task Path]
-        Frozen["I'm frozen"] -->|AI Atomizer| TaskSteps["Steps"]
+        Frozen["Get unstuck"] -->|AI Atomizer| TaskSteps["Steps"]
     end
 
     %% Shared Flow

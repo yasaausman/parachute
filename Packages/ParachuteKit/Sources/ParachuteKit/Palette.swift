@@ -7,4 +7,5 @@ enum Palette {
     static let frozenInk = Theme.frozenText
     static let moneyInk = Theme.moneyText
     static let accentInk = Theme.accentText
+    static let tickEmpty = Theme.inkMuted.opacity(0.3)
 }

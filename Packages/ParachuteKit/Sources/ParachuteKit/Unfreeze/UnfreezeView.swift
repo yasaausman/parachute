@@ -77,7 +77,7 @@ public struct UnfreezeView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .background(Color(uiColor: .systemBackground).ignoresSafeArea())
+        .background(Theme.paper.ignoresSafeArea())
         .animation(.easeInOut(duration: 0.35), value: stepToken)
         .animation(.easeInOut(duration: 0.35), value: started)
         .toolbar(.hidden, for: .navigationBar)
@@ -113,7 +113,9 @@ public struct UnfreezeView: View {
                 Image(systemName: "xmark")
                     .font(.body.weight(.semibold))
                     .padding(12)
-                    .background(.fill.tertiary, in: Circle())
+                    .frame(minWidth: 44, minHeight: 44)
+                    .background(Theme.surface, in: Circle())
+                    .overlay(Circle().strokeBorder(Theme.hairline, lineWidth: 1))
             }
             .accessibilityLabel("Close")
 
@@ -127,8 +129,8 @@ public struct UnfreezeView: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
-        .background(Color(uiColor: .systemBackground))
-        .tint(.primary)
+        .background(Theme.paper)
+        .tint(Theme.ink)
     }
 
     private var audioMenu: some View {
@@ -147,13 +149,15 @@ public struct UnfreezeView: View {
                 Label(audio.isAmbientOn ? "Stop background sound" : "Calm background sound", systemImage: "cloud.rain")
             }
             if !isPro {
-                Text("Voice and sound are part of Parachute Pro.")
+                Text("Voice and sound are part of Untax Pro.")
             }
         } label: {
             Image(systemName: audio.isVoiceOn || audio.isAmbientOn ? "speaker.wave.2.fill" : "speaker.slash")
                 .font(.body.weight(.semibold))
                 .padding(12)
-                .background(.fill.tertiary, in: Circle())
+                .frame(minWidth: 44, minHeight: 44)
+                    .background(Theme.surface, in: Circle())
+                    .overlay(Circle().strokeBorder(Theme.hairline, lineWidth: 1))
         }
         .accessibilityLabel("Companion sound")
     }
@@ -164,15 +168,16 @@ public struct UnfreezeView: View {
                 Spacer()
                 Image(systemName: "snowflake")
                     .font(.system(size: 56))
-                    .foregroundStyle(Palette.frozenInk)
+                    .foregroundStyle(Theme.frozenText)
                     .accessibilityHidden(true)
                 Text("Let's do this.\nOne tiny step at a time.")
-                    .font(.largeTitle.bold())
+                    .font(Theme.display())
+                    .foregroundStyle(Theme.ink)
                     .multilineTextAlignment(.center)
                 if !goal.isEmpty {
                     Text(goal)
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
+                        .font(Theme.headline())
+                        .foregroundStyle(Theme.inkMuted)
                         .multilineTextAlignment(.center)
                 }
                 if isSuggested { suggestedBadge }
@@ -183,10 +188,10 @@ public struct UnfreezeView: View {
                 }
                 Text(line)
                     .font(.callout)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Theme.inkMuted)
                     .padding(.bottom)
             }
-            .padding()
+            .padding(Theme.screenPadding)
         }
     }
 
@@ -196,8 +201,14 @@ public struct UnfreezeView: View {
                 // Left-aligned like a note card: the step reads as an instruction, not a slogan.
                 VStack(alignment: .leading, spacing: Theme.spacing * 1.5) {
                     if isSuggested { suggestedBadge }
+                    Text("THIS STEP")
+                        .font(.system(.caption, design: .monospaced, weight: .bold))
+                        .tracking(1.5)
+                        .foregroundStyle(Theme.frozenText)
+                        .accessibilityHidden(true)
                     Text(step.text)
-                        .font(.system(.largeTitle, design: .rounded).bold())
+                        .font(Theme.display())
+                        .foregroundStyle(Theme.ink)
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityAddTraits(.isHeader)
                     if let url = step.url {
@@ -205,21 +216,20 @@ public struct UnfreezeView: View {
                             openURL(url)
                         } label: {
                             Label("Open the page", systemImage: "safari")
-                                .font(.headline)
+                                .foregroundStyle(Theme.frozenText)
                         }
-                        .buttonStyle(.bordered)
-                        .tint(Palette.frozenFill)
+                        .buttonStyle(.untaxQuiet)
                     }
                     HStack(spacing: Theme.spacing) {
                         ring(total: step.seconds)
                         Text(remaining == 0 ? "Take all the time you need." : line)
                             .font(.body)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Theme.inkMuted)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                 }
-                .padding(.horizontal, Theme.spacing * 1.25)
-                .padding(.top, Theme.spacing * 2)
+                .padding(.horizontal, Theme.screenPadding)
+                .padding(.top, Theme.spacing * 2.5)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .scrollBounceBehavior(.basedOnSize)
@@ -241,17 +251,19 @@ public struct UnfreezeView: View {
                     }
                     .disabled(isBreaking)
                     .fontWeight(.semibold)
-                    .foregroundStyle(Palette.frozenInk)
+                    .foregroundStyle(Theme.frozenText)
+                    .frame(minHeight: 44)
                     .accessibilityHint("Splits this step into even smaller ones")
                     Button("Skip") { advance() }
                         .frame(maxWidth: .infinity)
-                        .foregroundStyle(.primary)
+                        .frame(minHeight: 44)
+                        .foregroundStyle(Theme.inkMuted)
                         .accessibilityHint("Moves on without this step")
                 }
                 .font(.body)
                 .padding(.vertical, 10)
             }
-            .padding(.horizontal)
+            .padding(.horizontal, Theme.screenPadding)
             .padding(.bottom, 8)
         }
     }
@@ -259,21 +271,21 @@ public struct UnfreezeView: View {
     private func ring(total: Int) -> some View {
         let size = min(ringSize, 120)
         return ZStack {
-            Circle().stroke(Palette.frozenInk.opacity(0.2), lineWidth: 8)
+            Circle().stroke(Theme.frozen.opacity(0.18), lineWidth: 8)
             Circle()
                 .trim(from: 0, to: total > 0 ? CGFloat(remaining) / CGFloat(total) : 0)
-                .stroke(Palette.frozenInk, style: StrokeStyle(lineWidth: 8, lineCap: .round))
+                .stroke(Theme.frozenText, style: StrokeStyle(lineWidth: 8, lineCap: .round))
                 .rotationEffect(.degrees(-90))
                 .animation(.linear(duration: 1), value: remaining)
             if remaining > 0 {
                 Text("\(remaining)")
-                    .font(.title.bold().monospacedDigit())
-                    .foregroundStyle(Palette.frozenInk)
+                    .font(Theme.number().monospacedDigit())
+                    .foregroundStyle(Theme.frozenText)
                     .contentTransition(.numericText(countsDown: true))
             } else {
                 Image(systemName: "hourglass")
                     .font(.title)
-                    .foregroundStyle(Palette.frozenInk)
+                    .foregroundStyle(Theme.frozenText)
             }
         }
         .frame(width: size, height: size)
@@ -287,23 +299,24 @@ public struct UnfreezeView: View {
                 Spacer()
                 Image(systemName: "checkmark.seal.fill")
                     .font(.system(size: 56))
-                    .foregroundStyle(Palette.moneyInk)
+                    .foregroundStyle(Theme.moneyText)
                     .accessibilityHidden(true)
                 Text(index == 1 ? "Step 1: done." : "\(index) steps done.")
-                    .font(.largeTitle.bold())
-                Text("You're already moving. Parachute Pro walks you through the rest of any task, and any service.")
-                    .font(.title3)
-                    .foregroundStyle(.secondary)
+                    .font(Theme.display())
+                    .foregroundStyle(Theme.ink)
+                Text("You're already moving. Untax Pro walks you through the rest of any task, and any service.")
+                    .font(Theme.headline())
+                    .foregroundStyle(Theme.inkMuted)
                     .multilineTextAlignment(.center)
                 Spacer()
                 primaryButton("Keep going with Pro", systemImage: "sparkles") {
                     services.entitlements.presentPaywall()
                 }
                 Button("Stop here for now") { leave(.snoozed(until: .now.addingTimeInterval(3600))) }
-                    .foregroundStyle(.secondary)
+                    .buttonStyle(.untaxQuiet)
                     .padding(.bottom)
             }
-            .padding()
+            .padding(Theme.screenPadding)
         }
         .task {
             // Pick up a purchase made on the paywall without making anyone tap again.
@@ -320,19 +333,20 @@ public struct UnfreezeView: View {
                 Spacer()
                 Image(systemName: "party.popper.fill")
                     .font(.system(size: 64))
-                    .foregroundStyle(Palette.frozenInk)
+                    .foregroundStyle(Theme.frozenText)
                     .accessibilityHidden(true)
                 Text("You did it.")
-                    .font(.largeTitle.bold())
+                    .font(Theme.display())
+                    .foregroundStyle(Theme.ink)
                 Text("That was the hard part, and you did it anyway.")
-                    .font(.title3)
-                    .foregroundStyle(.secondary)
+                    .font(Theme.headline())
+                    .foregroundStyle(Theme.inkMuted)
                     .multilineTextAlignment(.center)
                 Spacer()
                 primaryButton("Finish", systemImage: "checkmark") { leave(.completed) }
                     .padding(.bottom)
             }
-            .padding()
+            .padding(Theme.screenPadding)
         }
         // Hidden under the confetti so "You did it." doesn't show through the win title.
         .opacity(celebrating ? 0 : 1)
@@ -347,24 +361,20 @@ public struct UnfreezeView: View {
         Label("Suggested steps", systemImage: "sparkles")
             .labelStyle(isLarge ? AnyLabelStyle(.titleOnly) : AnyLabelStyle(.titleAndIcon))
             .font(.caption.weight(.semibold))
+            .foregroundStyle(Theme.frozenText)
             .padding(.horizontal, 10)
             .padding(.vertical, 4)
-            .background(.fill.tertiary, in: Capsule())
+            .background(Theme.frozen.opacity(0.14), in: Capsule())
             .accessibilityLabel("Suggested steps, made on this iPhone. Double-check before you tap anything that costs money.")
     }
 
     private func primaryButton(_ title: String, systemImage: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Label(title, systemImage: systemImage)
-                .font(.title3.bold())
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 6)
         }
-        .buttonStyle(.borderedProminent)
-        .controlSize(.large)
-        .tint(Palette.frozenFill)
+        .buttonStyle(.untaxFrozen)
     }
 
     // MARK: - Flow

@@ -1,7 +1,7 @@
 import SharedKit
 import SwiftUI
 
-/// Decide → 🧊 "I'm frozen" (Dev A): fetches the plan and plays it. Present it full screen:
+/// Decide → 🧊 "Get unstuck" (Dev A): fetches the plan and plays it. Present it full screen:
 ///
 ///     .fullScreenCover(item: $frozen) { request in
 ///         UnfreezeFlowView(request: request, win: .money(cents: deadline.amountCents)) { outcome in ... }

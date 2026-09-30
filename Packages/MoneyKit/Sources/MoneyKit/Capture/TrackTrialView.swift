@@ -47,18 +47,25 @@ public struct TrackTrialView: View {
                 switch phase {
                 case .reading:
                     ProgressView("Reading it…")
+                        .tint(Theme.inkMuted)
+                        .foregroundStyle(Theme.inkMuted)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Theme.paper.ignoresSafeArea())
                 case .ready(let source):
                     form(source: source)
                 case .saved:
                     ContentUnavailableView {
                         Label("Tracking \(serviceName)", systemImage: "checkmark.circle.fill")
                     } description: {
-                        Text("Parachute will remind you before the charge. Open the app once to arm the final-day alarm.")
+                        Text("Untax will remind you before the charge. Open the app once to arm the final-day alarm.")
+                            .foregroundStyle(Theme.inkMuted)
                     }
-                    .foregroundStyle(Theme.accentText)
+                    .foregroundStyle(Theme.moneyText)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Theme.paper.ignoresSafeArea())
                 }
             }
-            .navigationTitle("Parachute")
+            .navigationTitle("Untax")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -66,7 +73,7 @@ public struct TrackTrialView: View {
                 }
             }
         }
-        .tint(Theme.accent)
+        .tint(Theme.accentText)
         .task { await read() }
     }
 
@@ -76,16 +83,19 @@ public struct TrackTrialView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     if foundNothing {
                         Text("No upcoming charge on this screen.")
-                            .font(.title3.bold())
+                            .font(Theme.headline())
+                            .foregroundStyle(Theme.ink)
                         Text("Share the screen that shows the price and the date it charges (a trial confirmation or receipt), or fill it in below.")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Theme.inkMuted)
                     } else {
                         Text(canSave ? "Found:" : "Almost there. Fill in what's missing:")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Theme.inkMuted)
                         Text(summary)
-                            .font(.title3.bold())
+                            .font(Theme.headline())
+                            .monospacedDigit()
+                            .foregroundStyle(Theme.ink)
                     }
                 }
                 .padding(.vertical, 4)
@@ -94,12 +104,10 @@ public struct TrackTrialView: View {
                     save()
                 } label: {
                     Label("Track it", systemImage: "bell.badge.fill")
-                        .frame(maxWidth: .infinity)
-                        .font(.headline)
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
+                .buttonStyle(.untax)
                 .disabled(!canSave)
+                .padding(.vertical, 4)
             } footer: {
                 Text(source == .ai ? "Read on this iPhone with Apple Intelligence. Nothing left your phone." : "Read on this iPhone. Nothing left your phone.")
             }
@@ -109,21 +117,28 @@ public struct TrackTrialView: View {
                     .textInputAutocapitalization(.words)
                 TextField("Amount", value: $amount, format: .currency(code: "USD"))
                     .keyboardType(.decimalPad)
+                    .font(Theme.number(.body))
+                    .monospacedDigit()
                 DatePicker("Charges on", selection: $chargeDate, displayedComponents: .date)
                 Toggle("Billed by Apple", isOn: $billedByApple)
             } header: {
                 Button(editing ? "Hide details" : "Something's wrong? Edit") { editing.toggle() }
-                    .font(.subheadline)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Theme.accentText)
+                    .frame(minHeight: 44)
                     .textCase(nil)
             }
 
             if overLimit {
-                Text("You're tracking \(ProFeatures.freeTrialLimit) trials, the free limit. Open Parachute to go Pro and add more.")
+                Text("You're tracking \(ProFeatures.freeTrialLimit) trials, the free limit. Open Untax to go Pro and add more.")
+                    .foregroundStyle(Theme.ink)
             }
             if saveFailed {
-                Text("Couldn't save. Open Parachute and add it there.").foregroundStyle(.red)
+                Text("Couldn't save. Open Untax and add it there.").foregroundStyle(Theme.urgentText)
             }
         }
+        .listRowBackground(Theme.surface)
+        .untaxScreen()
     }
 
     private var summary: String {

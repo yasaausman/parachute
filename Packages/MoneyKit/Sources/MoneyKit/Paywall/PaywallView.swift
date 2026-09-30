@@ -2,7 +2,7 @@ import RevenueCat
 import SharedKit
 import SwiftUI
 
-/// A8: Parachute Pro. Prices come from the current RevenueCat offering; lifetime is the headline.
+/// A8: Untax Pro. Prices come from the current RevenueCat offering; lifetime is the headline.
 public struct PaywallView: View {
     @Environment(\.dismiss) private var dismiss
     let entitlements: ProEntitlements
@@ -30,7 +30,7 @@ public struct PaywallView: View {
                         ProgressView().padding()
                     case .unavailable:
                         Text("Purchases aren't set up in this build.")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Theme.inkMuted)
                     case .ready:
                         plans
                         buyButton
@@ -39,19 +39,20 @@ public struct PaywallView: View {
                         }
                     }
                     if let message {
-                        Text(message).font(.subheadline).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                        Text(message).font(.subheadline).foregroundStyle(Theme.inkMuted).multilineTextAlignment(.center)
                     }
                     footer
                 }
-                .padding()
+                .padding(Theme.screenPadding)
             }
+            .untaxScreen()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Not now") { dismiss() }
                 }
             }
         }
-        .tint(Theme.accent)
+        .tint(Theme.accentText)
         .task { await load() }
     }
 
@@ -60,13 +61,15 @@ public struct PaywallView: View {
     private var header: some View {
         VStack(spacing: 8) {
             Image(systemName: "sparkles")
-                .font(.system(size: 52))
+                .font(.largeTitle)
+                .imageScale(.large)
                 .accessibilityHidden(true)
-                .foregroundStyle(Theme.accentText)
-            Text("Parachute Pro")
-                .font(.largeTitle.bold())
-            Text("For every deadline your brain tries to drop.")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Theme.accent)
+            Text("Untax Pro")
+                .font(Theme.display())
+                .foregroundStyle(Theme.ink)
+            Text("Get your ADHD tax back. Every deadline your brain tries to drop.")
+                .foregroundStyle(Theme.inkMuted)
                 .multilineTextAlignment(.center)
         }
         .padding(.top)
@@ -80,8 +83,7 @@ public struct PaywallView: View {
             FeatureRow(systemImage: "gift", text: "Always free: reminders, hand-checked cancel steps, and your first step")
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(Color(.secondarySystemBackground), in: .rect(cornerRadius: Theme.cornerRadius))
+        .padding(.vertical, 4)
     }
 
     private var plans: some View {
@@ -105,36 +107,37 @@ public struct PaywallView: View {
                 if working {
                     ProgressView()
                 } else {
-                    Text(buyTitle).font(.headline)
+                    Text(buyTitle)
                 }
             }
-            .frame(maxWidth: .infinity)
+            .tint(.white)
         }
-        .buttonStyle(.borderedProminent)
-        .controlSize(.large)
+        .buttonStyle(.untax)
         .disabled(selected == nil || working)
     }
 
     private var ironicBanner: some View {
         Label("We'll remind you 24 hours before this trial ends too. Because that would be pretty ironic. 😉", systemImage: "bell.fill")
             .font(.subheadline)
-            .padding()
+            .foregroundStyle(Theme.ink)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Theme.accent.opacity(0.15), in: .rect(cornerRadius: Theme.cornerRadius))
+            .untaxCard()
     }
 
     private var footer: some View {
         VStack(spacing: 10) {
             Text("We'd never charge a subscription to fix your follow-through. Lifetime is one payment: no trial to forget.")
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Theme.inkMuted)
                 .multilineTextAlignment(.center)
             Button("Restore purchases") { Task { await restore() } }
-                .font(.footnote)
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(Theme.accentText)
+                .frame(minHeight: 44)
             #if DEBUG
             Text("Debug build: purchases use RevenueCat's Test Store (simulated, no real money).")
                 .font(.caption2)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(Theme.inkMuted)
             #endif
         }
     }
@@ -195,7 +198,7 @@ public struct PaywallView: View {
             entitlements.purchaseCompleted()
             entitlements.apply(result.customerInfo)
             if entitlements.isProNow {
-                message = "You're Pro. Pull the cord."
+                message = "You're Pro. Your ADHD tax is officially on notice."
                 try? await Task.sleep(for: .seconds(1))
                 dismiss()
             }
@@ -222,7 +225,7 @@ private struct FeatureRow: View {
 
     var body: some View {
         Label {
-            Text(text)
+            Text(text).foregroundStyle(Theme.ink)
         } icon: {
             Image(systemName: systemImage).foregroundStyle(Theme.accentText).accessibilityHidden(true)
         }
@@ -237,7 +240,7 @@ struct PlanRow: View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
-                    Text(title).font(.headline)
+                    Text(title).font(Theme.headline(.headline)).foregroundStyle(Theme.ink)
                     if package.packageType == .lifetime {
                         Text("BEST").font(.caption2.bold())
                             .padding(.horizontal, 6).padding(.vertical, 2)
@@ -245,19 +248,23 @@ struct PlanRow: View {
                             .foregroundStyle(.white)
                     }
                 }
-                Text(subtitle).font(.subheadline).foregroundStyle(.secondary)
+                Text(subtitle).font(.subheadline).foregroundStyle(Theme.inkMuted)
             }
             Spacer()
-            Text(package.storeProduct.localizedPriceString).font(.headline)
+            Text(package.storeProduct.localizedPriceString)
+                .font(Theme.number(.headline))
+                .monospacedDigit()
+                .foregroundStyle(Theme.ink)
             Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                .foregroundStyle(isSelected ? Theme.accentText : .secondary)
+                .foregroundStyle(isSelected ? Theme.accentText : Theme.inkMuted)
         }
-        .padding()
-        .background(Color(.secondarySystemBackground), in: .rect(cornerRadius: Theme.cornerRadius))
+        .frame(minHeight: 44)
+        .untaxCard()
         .overlay {
             RoundedRectangle(cornerRadius: Theme.cornerRadius)
-                .stroke(isSelected ? Theme.accent : .clear, lineWidth: 2)
+                .strokeBorder(isSelected ? Theme.accentText : .clear, lineWidth: 2)
         }
+        .contentShape(.rect(cornerRadius: Theme.cornerRadius))
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }

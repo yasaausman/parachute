@@ -3,7 +3,7 @@ import SwiftData
 import SwiftUI
 
 /// A5: the Decide screen. Opened by the alarm's Decide button, a reminder tap, or a trial row.
-/// Cancel · I'm frozen · Keep · Snooze. Never imports ParachuteKit: "I'm frozen" is a closure.
+/// Cancel · Get unstuck · Keep · Snooze. Never imports ParachuteKit: "Get unstuck" is a closure.
 public struct DecideView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
@@ -42,6 +42,7 @@ public struct DecideView: View {
                 } else {
                     ContentUnavailableView("This trial is gone", systemImage: "questionmark.circle", description: Text("It may have been deleted. Nothing will ring for it."))
                         .task { await escalation?.resolve(itemID: itemID) }
+                        .untaxScreen()
                 }
             }
             .toolbar {
@@ -50,68 +51,88 @@ public struct DecideView: View {
                 }
             }
         }
-        .tint(Theme.accent)
+        .tint(Theme.accentText)
     }
 
     private func choices(for deadline: MoneyDeadline) -> some View {
         ScrollView {
-            VStack(spacing: Theme.spacing) {
+            VStack(alignment: .leading, spacing: Theme.spacing) {
                 header(deadline)
-                    .padding(.vertical, Theme.spacing)
+                    .padding(.top, Theme.spacing)
+                    .padding(.bottom, Theme.spacing * 1.5)
 
-                ChoiceButton(
-                    title: "Cancel it",
-                    subtitle: "See the exact steps, then mark it done",
-                    systemImage: "xmark.circle.fill",
-                    style: .primary
-                ) { path.append(.cancelSteps) }
+                Button { path.append(.cancelSteps) } label: {
+                    Label("Cancel it", systemImage: "xmark.circle.fill")
+                }
+                .buttonStyle(.untax)
+                .accessibilityHint("See the exact steps, then mark it done")
 
-                ChoiceButton(
-                    title: "I'm frozen",
-                    subtitle: "One tiny step at a time. The first one is free.",
-                    systemImage: "snowflake",
-                    style: .frozen
-                ) { frozen(deadline) }
+                Button { decide(.kept, deadline) } label: {
+                    Label("Keep it", systemImage: "hand.thumbsup.fill")
+                }
+                .buttonStyle(.untaxQuiet)
+                .accessibilityHint("Stop reminding me. I want this one.")
 
-                ChoiceButton(
-                    title: "Keep it",
-                    subtitle: "Stop reminding me. I want this one.",
-                    systemImage: "hand.thumbsup.fill",
-                    style: .plain
-                ) { decide(.kept, deadline) }
+                Button { path.append(.snooze) } label: {
+                    Label("Snooze", systemImage: "moon.zzz.fill")
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(Theme.inkMuted)
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+                .accessibilityHint("Remind me a bit later")
 
-                ChoiceButton(
-                    title: "Snooze",
-                    subtitle: "Remind me a bit later",
-                    systemImage: "moon.zzz.fill",
-                    style: .plain
-                ) { path.append(.snooze) }
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Frozen? Totally normal. One tiny step at a time, and the first one is free.")
+                        .font(.subheadline)
+                        .foregroundStyle(Theme.inkMuted)
+                    Button { frozen(deadline) } label: {
+                        Label("Get unstuck", systemImage: "snowflake")
+                    }
+                    .buttonStyle(.untaxFrozen)
+                    .accessibilityHint("One tiny step at a time. The first one is free.")
+                }
+                .padding(.top, Theme.spacing)
             }
-            .padding()
+            .padding(Theme.screenPadding)
         }
+        .untaxScreen()
     }
 
     private func header(_ deadline: MoneyDeadline) -> some View {
-        VStack(spacing: 8) {
-            Text(deadline.serviceName)
-                .font(.largeTitle.bold())
-            Text(chargeLine(deadline))
-                .font(.title3)
-                .foregroundStyle(Theme.accentText)
+        let days = DeadlineMath.calendarDays(from: .now, to: deadline.dueDate)
+        return VStack(alignment: .leading, spacing: 12) {
+            Text(titleLine(deadline, days: days))
+                .font(Theme.display())
+                .foregroundStyle(Theme.ink)
+                .fixedSize(horizontal: false, vertical: true)
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                Text(deadline.amountCents.formattedCents(currencyCode: deadline.currencyCode))
+                    .font(Theme.number(.largeTitle))
+                    .monospacedDigit()
+                    .foregroundStyle(Theme.ink)
+                Text(DeadlineMath.countdownText(days: days))
+                    .font(Theme.number(.title3))
+                    .monospacedDigit()
+                    .foregroundStyle(days <= 1 ? Theme.urgentText : Theme.accentText)
+            }
             if deadline.billedByApple {
                 Text("Billed by Apple: cancel by \(deadline.cancelBy.formatted(.dateTime.weekday(.wide).month(.abbreviated).day())).")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Theme.inkMuted)
             }
         }
-        .multilineTextAlignment(.center)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .combine)
     }
 
-    private func chargeLine(_ deadline: MoneyDeadline) -> String {
-        let amount = deadline.amountCents.formattedCents(currencyCode: deadline.currencyCode)
-        let days = DeadlineMath.calendarDays(from: .now, to: deadline.dueDate)
-        return "\(amount) \(DeadlineMath.countdownText(days: days))"
+    /// "Netflix bills you tomorrow." Warm and plain, never a warning.
+    private func titleLine(_ deadline: MoneyDeadline, days: Int) -> String {
+        switch days {
+        case ..<0: "\(deadline.serviceName) \(DeadlineMath.countdownText(days: days))."
+        default: "\(deadline.serviceName) bills you \(DeadlineMath.countdownText(days: days))."
+        }
     }
 
     private func decide(_ decision: DeadlineDecision, _ deadline: MoneyDeadline) {
@@ -123,67 +144,5 @@ public struct DecideView: View {
 
     private func frozen(_ deadline: MoneyDeadline) {
         onFrozen(deadline.unfreezeRequest)
-    }
-}
-
-/// A big, calm, full-width choice. ADHD-first: one idea per button, a short "what happens" line.
-struct ChoiceButton: View {
-    enum Style { case primary, frozen, plain }
-
-    @Environment(\.dynamicTypeSize) private var typeSize
-
-    let title: String
-    let subtitle: String
-    let systemImage: String
-    let style: Style
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            // Accessibility text sizes stack the icon above the words so they get the full width.
-            let layout = typeSize.isAccessibilitySize
-                ? AnyLayout(VStackLayout(alignment: .leading, spacing: 8))
-                : AnyLayout(HStackLayout(spacing: Theme.spacing))
-            layout {
-                Image(systemName: systemImage)
-                    .font(.title2)
-                    .frame(minWidth: 32, alignment: .leading)
-                    .accessibilityHidden(true)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title).font(.headline)
-                    Text(subtitle).font(.subheadline).opacity(0.8)
-                }
-                if !typeSize.isAccessibilitySize {
-                    Spacer(minLength: 0)
-                    Image(systemName: "chevron.right").font(.footnote.bold()).opacity(0.5)
-                        .accessibilityHidden(true)
-                }
-            }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .foregroundStyle(foreground)
-            .background(background, in: .rect(cornerRadius: Theme.cornerRadius))
-        }
-        .buttonStyle(.plain)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(title)
-        .accessibilityHint(subtitle)
-        .accessibilityAddTraits(.isButton)
-    }
-
-    private var foreground: Color {
-        switch style {
-        case .primary: .white
-        case .frozen: .primary
-        case .plain: .primary
-        }
-    }
-
-    private var background: Color {
-        switch style {
-        case .primary: Theme.accentFill
-        case .frozen: Theme.frozen.opacity(0.25)
-        case .plain: Color(.secondarySystemBackground)
-        }
     }
 }

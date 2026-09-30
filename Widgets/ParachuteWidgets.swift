@@ -102,7 +102,6 @@ enum Countdown {
 
     static func color(days: Int) -> Color {
         if days <= 1 { return WidgetInk.urgent }
-        if days <= 3 { return WidgetInk.soon }
         return WidgetInk.muted
     }
 }

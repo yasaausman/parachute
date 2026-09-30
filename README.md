@@ -2,6 +2,8 @@
 
 <img src="docs/brand/untax-icon-1024.png" width="96" alt="Untax app icon">
 
+![Swift 6](https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white) ![iOS 26+](https://img.shields.io/badge/iOS-26%2B-1A1714?logo=apple) ![RevenueCat](https://img.shields.io/badge/RevenueCat-5.91.0-F25A5A) ![License: MIT](https://img.shields.io/badge/License-MIT-1E7A35)
+
 **The ADHD follow-through engine.** Untax catches the money deadlines your brain loses, nudges until you act, and when you freeze, on a cancellation or an essay, walks you through one tiny step at a time. **Get your ADHD tax back.** (Formerly Parachute; code modules keep that name.)
 
 > 79% of Americans have started a free trial meaning to cancel, and got charged anyway ([Dimers, 2026](https://www.dimers.com/press/news/how-far-americans-will-go-for-freebies)). For ADHD brains the problem isn't remembering. It's **starting**.
@@ -37,7 +39,7 @@ RevenueCat powers every purchase in Untax and decides what Pro unlocks. All of i
 | **Offerings, not hard-coded prices** | The paywall renders whatever is in the **current offering** (`Purchases.shared.offerings().current`), sorted lifetime → yearly → monthly, with localized prices from each `StoreProduct`. Changing prices or plans is a dashboard change, not an app update. | `Paywall/PaywallView.swift` |
 | **One entitlement** | Every product unlocks the **`parachute_pro`** entitlement. `ProEntitlements` listens to `customerInfoStream` and exposes `isPro`, so the UI updates the moment a purchase, restore, renewal, or expiry lands. | `Entitlements/ProEntitlements.swift` |
 | **Purchase + restore** | `purchase(package:)` and `restorePurchases()`, with plain-language results ("Nothing was charged"). | `Paywall/PaywallView.swift` |
-| **Gating** | `ProEntitlements` is also the shared `EntitlementsProviding` protocol, so the Parachute module (Dev B) gates its Pro features without importing RevenueCat. Money side: free keeps 5 open trials, reminders, and hand-checked cancel steps; Pro adds unlimited trials and the **final-day alarm** (armed or disarmed the moment Pro changes). | `ProFeatures`, `SharedKit/Protocols/EntitlementsProviding.swift` |
+| **Gating** | `ProEntitlements` is also the shared `EntitlementsProviding` protocol, so the unfreeze module (`ParachuteKit`, Dev B) gates its Pro features without importing RevenueCat. Money side: free keeps 5 open trials, reminders, and hand-checked cancel steps; Pro adds unlimited trials and the **final-day alarm** (armed or disarmed the moment Pro changes). | `ProFeatures`, `SharedKit/Protocols/EntitlementsProviding.swift` |
 | **Our own trial, honestly** | If `parachute_pro` is in a **trial period** that will renew, Untax schedules a local notification **24 hours before its own trial ends**, using the entitlement's `expirationDate` and `periodType`. An app about forgotten trials shouldn't be one. | `ProEntitlements.scheduleTrialReminder` |
 
 **Pricing:** **$29.99 lifetime** is the headline ("We'd never charge a subscription to fix your follow-through"), with $24.99/yr and $3.99/mo as options. "Your first step is always free."
@@ -70,6 +72,11 @@ flowchart LR
 4. `xcodegen generate`, open `Parachute.xcodeproj`, and run on your iPhone. AlarmKit needs a real device.
 5. Tests: `xcodebuild -project Parachute.xcodeproj -scheme Parachute -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test`. Capture eval (Mac with Apple Intelligence): `swift run --package-path Packages/MoneyKit TrialCaptureEval Packages/MoneyKit/Fixtures/TrialScreenshots`.
 
+## Try it
+- **Real iPhone recommended.** AlarmKit alarms only ring on a device, and the AI task steps need an Apple Intelligence iPhone.
+- **Simulator works** for everything else. Without Apple Intelligence the task steps are hand-written fallback templates and screenshot reading uses pattern matching.
+- **Demo data:** Debug build → Home → 🐞 → "Reset & seed demo data".
+
 ## Privacy
 Everything stays on the phone: no account, no server, no analytics. Screenshots are read with on-device Vision and Apple's on-device model. The only network traffic is RevenueCat, for purchases.
 
@@ -77,15 +84,11 @@ Everything stays on the phone: no account, no server, no analytics. Screenshots 
 - `PLAN.md`: product, research, verdict, architecture
 - `MILESTONES.md`: who builds what, day by day
 - `PROJECT.md`: current status
-- `docs/interfaces.md`: contracts between the Money and Parachute modules
-- `docs/readme-dev-b.md`: how the Unfreeze engine and on-device atomizer work (+ architecture diagram)
+- `docs/interfaces.md`: contracts between the money (`MoneyKit`) and unfreeze (`ParachuteKit`) modules
+- `docs/brand/BRAND.md`: logo, colors, type and voice
+- `docs/readme-dev-b.md`: **unfreeze architecture**, how the Unfreeze engine and on-device atomizer work (+ architecture diagram)
 - `docs/b0-atomizer-spike.md`: the on-device AI test plan and results
 - `research/`: background evidence
-
-## Build
-1. `cp Config/Local.xcconfig.example Config/Local.xcconfig` and set your team ID + bundle prefix.
-2. `brew install xcodegen && xcodegen generate`, then open `Parachute.xcodeproj` (Xcode 27) and run.
-3. Tests: `xcodebuild -project Parachute.xcodeproj -scheme Parachute -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test`
 
 ## License
 MIT; see `LICENSE`.

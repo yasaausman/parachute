@@ -27,7 +27,7 @@ SwiftUI and SwiftData in an App Group, split into local Swift packages so the tw
 - Contrast: the system cyan, green and orange are about 2:1 on white, so we added WCAG AA text and fill tokens and checked light, dark and largest text.
 
 ## Accomplishments
-No account, no server, no analytics: everything stays on the phone. Fully open source under MIT. ⚠️ Add the test counts, the number of hand-verified services, and the real-device results once confirmed.
+No account, no server, no analytics: everything stays on the phone. Fully open source under MIT. 112 automated tests (72 Swift Testing + 40 XCTest) cover the date math, escalation schedule, alarm re-arm, cancel-steps data and atomizer output. Four services have hand-verified cancel steps (Spotify, Claude, Google AI Pro, Apple One). On a real iPhone: the final-day alarm rang through Silent mode and re-armed after Stop, even after a force-quit; a shared Google subscription screenshot was read and tracked; and a RevenueCat Test Store purchase unlocked Pro.
 
 ## What we learned
 Escalation only works if there's a way to answer it. The "Get unstuck" button turned out to matter more than the alarm.
@@ -39,4 +39,14 @@ More hand-verified cancel guides, Live Activities for the final hours, and share
 Swift · SwiftUI · SwiftData · AlarmKit · Foundation Models · Vision · WidgetKit · AVFoundation · RevenueCat
 
 ## Links
-Video: ⚠️ · Repo: ⚠️ (public, MIT license in `LICENSE`)
+Video: ⚠️ add after upload · Repo: https://github.com/yasaausman/parachute (public, MIT license in `LICENSE`)
+
+## Image gallery (upload in this order)
+1. `docs/brand/untax-icon-1024.png`: app icon
+2. `docs/screenshots/01-home.png`: next-charge countdown + ADHD Tax Refunded total
+3. `docs/screenshots/02-track-trial.png`: share a screenshot, Untax finds the trial
+4. `docs/screenshots/03-decide.png`: Cancel · Keep · Snooze · Get unstuck
+5. `docs/screenshots/04-unstuck.png`: one tiny step at a time
+6. `docs/screenshots/05-refunded.png`: the refund receipt
+
+Screenshots use demo data.

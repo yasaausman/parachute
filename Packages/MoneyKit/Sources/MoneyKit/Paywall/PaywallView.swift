@@ -192,6 +192,7 @@ public struct PaywallView: View {
         do {
             let result = try await Purchases.shared.purchase(package: selected)
             guard !result.userCancelled else { return }
+            entitlements.purchaseCompleted()
             entitlements.apply(result.customerInfo)
             if entitlements.isProNow {
                 message = "You're Pro. Pull the cord."

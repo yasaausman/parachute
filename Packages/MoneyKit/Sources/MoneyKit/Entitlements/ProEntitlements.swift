@@ -21,16 +21,33 @@ public enum ProFeatures {
 public final class ProEntitlements: EntitlementsProviding {
     public static let entitlementID = "parachute_pro"
     static let forceProKey = "debug.forcePro"
+    static let overrideKey = "debug.proOverride"
     static let trialReminderID = "parachute.pro.trial"
 
-    /// For views: the latest known state.
+    /// Debug builds can pretend either way, to test and film both tiers on a phone that already bought Pro.
+    public enum DebugOverride: String, CaseIterable, Sendable {
+        case real, pro, free
+    }
+
+    /// For views: the latest known state (after any Debug override).
     public private(set) var isProNow = false
+    /// What RevenueCat says, before any Debug override.
+    public private(set) var hasRealPro = false
     /// When the current Pro period is a free trial, when it ends.
     public private(set) var trialEnds: Date?
     public var isPaywallPresented = false
 
     public init() {
-        isProNow = Self.forcedPro
+        isProNow = Self.resolve(real: false, override: Self.debugOverride)
+    }
+
+    /// Pro as the app should treat it.
+    nonisolated static func resolve(real: Bool, override: DebugOverride) -> Bool {
+        switch override {
+        case .real: real
+        case .pro: true
+        case .free: false
+        }
     }
 
     // MARK: EntitlementsProviding
@@ -55,8 +72,8 @@ public final class ProEntitlements: EntitlementsProviding {
 
     public func apply(_ info: CustomerInfo) {
         let entitlement = info.entitlements[Self.entitlementID]
-        isProNow = entitlement?.isActive == true || Self.forcedPro
-        AppGroup.defaults.set(isProNow, forKey: ProFeatures.cachedProKey)
+        hasRealPro = entitlement?.isActive == true
+        refresh()
         if let entitlement, entitlement.isActive, entitlement.periodType == .trial, entitlement.willRenew,
            let ends = entitlement.expirationDate {
             trialEnds = ends
@@ -90,31 +107,37 @@ public final class ProEntitlements: EntitlementsProviding {
 
     // MARK: Debug
 
-    static var forcedPro: Bool {
+    private func refresh() {
+        isProNow = Self.resolve(real: hasRealPro, override: Self.debugOverride)
+        AppGroup.defaults.set(isProNow, forKey: ProFeatures.cachedProKey)
+    }
+
+    public static var debugOverride: DebugOverride {
         #if DEBUG
-        AppGroup.defaults.bool(forKey: forceProKey)
+        if let raw = AppGroup.defaults.string(forKey: overrideKey), let value = DebugOverride(rawValue: raw) {
+            return value
+        }
+        // Older builds had a single "Force Pro" switch.
+        return AppGroup.defaults.bool(forKey: forceProKey) ? .pro : .real
         #else
-        false
+        return .real
         #endif
     }
 
-    /// Debug only: pretend to be Pro without a purchase.
-    public func setForcedPro(_ on: Bool) {
+    /// Debug only: Real (RevenueCat decides), Force Pro (no purchase needed), or Pretend free
+    /// (ignore a purchase this phone already made).
+    public func setDebugOverride(_ value: DebugOverride) {
         #if DEBUG
-        AppGroup.defaults.set(on, forKey: Self.forceProKey)
-        if on {
-            isProNow = true
-            AppGroup.defaults.set(true, forKey: ProFeatures.cachedProKey)
-            return
-        }
-        Task {
-            if RevenueCatBootstrap.isConfigured, let info = try? await Purchases.shared.customerInfo() {
-                apply(info)
-            } else {
-                isProNow = false
-                AppGroup.defaults.set(false, forKey: ProFeatures.cachedProKey)
-            }
-        }
+        AppGroup.defaults.set(value.rawValue, forKey: Self.overrideKey)
+        AppGroup.defaults.removeObject(forKey: Self.forceProKey)
+        refresh()
         #endif
+    }
+
+    /// After a purchase on the paywall, "Pretend free" steps aside so the purchase visibly unlocks Pro.
+    public func purchaseCompleted() {
+        if Self.debugOverride == .free {
+            setDebugOverride(.real)
+        }
     }
 }

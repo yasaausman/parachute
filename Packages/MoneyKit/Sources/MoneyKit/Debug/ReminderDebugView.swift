@@ -125,7 +125,7 @@ public struct MoneyDebugMenu: View {
     @State private var trialReminderNote: String?
     @State private var demoNote: String?
     @State private var demoBusy = false
-    @AppStorage(ProEntitlements.forceProKey, store: AppGroup.defaults) private var forcePro = false
+    @State private var proOverride = ProEntitlements.debugOverride
 
     public init() {}
 
@@ -165,8 +165,15 @@ public struct MoneyDebugMenu: View {
             if let pro {
                 Section {
                     LabeledContent("Pro", value: pro.isProNow ? "yes" : "no")
-                    Toggle("Force Pro (no purchase)", isOn: $forcePro)
-                        .onChange(of: forcePro) { _, on in pro.setForcedPro(on) }
+                    LabeledContent("Real purchase on this phone", value: pro.hasRealPro ? "yes" : "no")
+                    Picker("Pro for testing", selection: $proOverride) {
+                        Text("Real").tag(ProEntitlements.DebugOverride.real)
+                        Text("Force Pro").tag(ProEntitlements.DebugOverride.pro)
+                        Text("Pretend free").tag(ProEntitlements.DebugOverride.free)
+                    }
+                    .pickerStyle(.segmented)
+                    .onChange(of: proOverride) { _, value in pro.setDebugOverride(value) }
+                    .onAppear { proOverride = ProEntitlements.debugOverride }
                     Button("Show paywall") { pro.presentPaywall() }
                     Button("Preview \"trial ends tomorrow\" reminder in 1 minute") {
                         Task {
@@ -181,7 +188,7 @@ public struct MoneyDebugMenu: View {
                 } header: {
                     Text("Paywall (A8)")
                 } footer: {
-                    Text("Test Store purchases are simulated. Monthly plans renew every few minutes there, so Pro can lapse on its own.")
+                    Text("Real: RevenueCat decides. Force Pro: Pro without buying. Pretend free: ignore this phone's purchase (for the free-plan check and the paywall shot); buying on the paywall switches back to Real. Test Store purchases are simulated and renew every few minutes, so Pro can lapse on its own.")
                 }
             }
         }

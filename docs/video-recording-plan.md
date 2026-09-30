@@ -9,7 +9,7 @@ Device: **Dev A's iPhone 17 Pro Max (iOS 27.0, has Apple Intelligence)** is pref
 - [ ] Add the Parachute widget to the Home Screen (money countdown) and check it shows a trial.
 - [ ] Add 2 trials for the money flow: one **Apple-billed** (only if showing Apple's Subscriptions page) and Claude Pro or Spotify (has hand-verified steps).
 - [ ] Screenshot of a trial confirmation saved in Photos for the share-sheet shot.
-- [ ] Pro toggle: turn Pro **on** in Debug for the flow, **off** for the paywall shot. ⚠️ On a phone that already made a Test Store purchase, "Force Pro" off doesn't make it free: needs a Debug "Pretend I'm free" switch (Dev A, to build) or a fresh install.
+- [ ] Pro toggle: turn Pro **on** in Debug for the flow, **off** for the paywall shot. Use Debug → **Pro for testing → Pretend free** for the paywall shot (works on a phone that already bought Pro); a purchase on the paywall flips it back to Real, so Pro unlocks on camera.
 - [ ] Force-quit the app before the alarm shot so the cold-launch Decide path is what's on camera.
 
 ## Shots (record each 3×, keep the best)

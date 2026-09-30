@@ -221,3 +221,16 @@ final class TimeTravelSwitch: @unchecked Sendable {
     var on: Bool
     init(on: Bool) { self.on = on }
 }
+
+@Suite struct ProOverrideTests {
+    @Test(arguments: [
+        (true, ProEntitlements.DebugOverride.real, true),
+        (false, .real, false),
+        (false, .pro, true),
+        (true, .free, false),
+        (false, .free, false),
+    ])
+    func resolve(real: Bool, override: ProEntitlements.DebugOverride, expected: Bool) {
+        #expect(ProEntitlements.resolve(real: real, override: override) == expected)
+    }
+}

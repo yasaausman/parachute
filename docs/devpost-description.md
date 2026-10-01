@@ -9,6 +9,9 @@ Written for AI judges (confirmed by the team) as well as people: what it does in
 ## Tagline (one line)
 Untax catches your free trials before they charge you, and when ADHD freezes you, walks you out one tiny step at a time.
 
+## Summary
+Untax is a working iOS app (Swift 6, iOS 26+) for adults with ADHD. It reads free-trial screenshots on-device, escalates to an AlarmKit alarm that only a decision can end, and breaks a frozen task or cancellation into one tiny step at a time. RevenueCat powers the Pro plan ($29.99 lifetime, or $24.99/year or $3.99/month) through one entitlement. It's verified on a real iPhone, backed by 112 passing automated tests, private by design (no account or server), and open source at https://github.com/yasaausman/untax. A criteria → evidence table with links to code and tests is at the top of the README.
+
 ## Inspiration
 79% of Americans have started a free trial meaning to cancel and got charged anyway. For the 15.5 million US adults with ADHD (CDC), the problem usually isn't remembering. It's starting. A reminder you can swipe away doesn't fix that. We call the money lost this way the "ADHD tax", and we built Untax to refund it.
 

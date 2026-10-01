@@ -31,7 +31,7 @@ Untax makes money from one Pro unlock, sold through RevenueCat. Every plan grant
 
 **Why this model:** our users are people who lose money to forgotten subscriptions. Asking them for one more subscription would repeat the problem we're solving. So lifetime leads, and the paywall says it plainly: "We'd never charge a subscription to fix your follow-through. Lifetime is one payment: no trial to forget." The yearly plan is the only one with a trial, and Untax schedules a reminder 24 hours before that trial ends, so we don't charge anyone for forgetting.
 
-**How the paywall works:** it's triggered by real value moments: tracking a 6th trial, the final-day alarm, or a second unfreeze step. It renders RevenueCat's current offering with localized prices, so pricing can change from the dashboard without an app update. It includes restore, and every result is a plain message ("Nothing was charged").
+**How the paywall works:** it appears at real value moments: tracking a 6th trial, or wanting the next unfreeze step after the free first one. It renders RevenueCat's current offering with localized prices, so pricing can change from the dashboard without an app update. It includes restore, and every result is a plain message ("Nothing was charged").
 
 **Results:** none yet. The app isn't on the App Store, and purchases are Test Store only. A test purchase on a real iPhone unlocked Pro end to end.
 

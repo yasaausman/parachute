@@ -1,9 +1,9 @@
-# MILESTONES.md: Parachute (2 developers)
+# MILESTONES.md: Untax (2 developers)
 
 | | Owns | Code lives in |
 |---|---|---|
 | **Dev A: You (Money / "Untax" lead)** | Capturing money deadlines, escalation + alarm, Decide screen, curated cancel-step content, RevenueCat paywall | `Packages/MoneyKit`, `ShareExtension/` |
-| **Dev B: Your friend (Parachute lead)** | Unfreeze engine + player, AI atomizer, task path, audio companion, scoreboard + celebration, widgets | `Packages/ParachuteKit`, `Widgets/` |
+| **Dev B: Your friend (Unfreeze lead)** | Unfreeze engine + player, AI atomizer, task path, audio companion, scoreboard + celebration, widgets | `Packages/ParachuteKit`, `Widgets/` |
 | **Both** | Models, protocols, design system, app shell, polish, README, video | `Packages/SharedKit`, `App/`, `docs/` |
 
 **Dates assume the Sep 30, 2026, 11:45pm PDT deadline** (convert to your time zone). If you take longer, keep the same order and stretch the days.
@@ -130,7 +130,7 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
   *Status (2026-09-27):* on `a/a9-readme`: RevenueCat table (setup, offerings, `parachute_pro`, purchase/restore, gating, our-own-trial reminder), money-path Mermaid diagram + design notes, build/run, privacy. Screenshots and the full two-path diagram come with V2/B11.
 
 ### Dev B
-- [ ] 🟡 **B10 Gating in Parachute.** "First step always free"; AI unfreeze + voice are Pro, via **A's `EntitlementsProviding`**. (Or 3/week if you chose that.)
+- [ ] 🟡 **B10 Gating in the unfreeze path.** "First step always free"; AI unfreeze + voice are Pro, via **A's `EntitlementsProviding`**. (Or 3/week if you chose that.)
   *Done when:* the free user sees Step 1, then an upsell; a Pro user gets everything.
 - [x] **B11 README: Foundation Models / Unfreeze section** + the Mermaid architecture diagram.
 
@@ -150,8 +150,8 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
 
 - [ ] **V1 Video** (A records the money segments, B records the unfreeze/task segments; one person edits). Under 2 minutes, captions, device frames. QuickTime is free.
 - [x] **V2 README final:** icon + 5 screenshots (2026-09-30, `docs/screenshots/`) (1206×2622, iPhone 17 Pro simulator) · pitch · architecture · badges · RevenueCat section · build steps · privacy · MIT.
-- [ ] **V3 Code sweep:** no secrets; **Test Store key only in Debug**; no dead code; tests green.
-  *Dev A side done early (2026-09-27):* no keys or team ID in tracked files (only the `test_XXXX` placeholder); Release build's `RevenueCatAPIKey` is empty and the key isn't in the binary; A0 spike code removed (its App Intents were still registered in Release); all tests green (67). ☐ Re-run at the end with Dev B's code.
+- [x] **V3 Code sweep:** no secrets; **Test Store key only in Debug**; no dead code; tests green.
+  *Done (Dev A, 2026-09-30):* no keys tracked, secrets gitignored, Release build has an empty RevenueCat key and no key or debug UI in the binary (Dev A's Debug menu now `#if DEBUG`), no TODO/FIXME, repo public + MIT, all suites green. Re-run tests if anything merges after this.
 - [ ] **V4 Devpost:** description (what it does in the first line), video link, repo link, license visible. **The Representative submits by ~6pm PDT**, leaving hours of buffer before 11:45pm PDT.
   *Done when:* the submission is confirmed and someone who's never seen the app understands it from the video's first 15 seconds.
 

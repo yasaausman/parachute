@@ -15,7 +15,7 @@ public enum ProFeatures {
 }
 
 /// A8: the real `EntitlementsProviding`, backed by RevenueCat's `parachute_pro` entitlement.
-/// Also reminds you 24 h before Parachute's *own* trial ends (the ironic banner, kept honest).
+/// Also reminds you 24 h before Untax's *own* trial ends (the ironic banner, kept honest).
 @MainActor
 @Observable
 public final class ProEntitlements: EntitlementsProviding {

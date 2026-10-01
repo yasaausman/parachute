@@ -1,7 +1,7 @@
 ## Foundation Models & The Unfreeze Engine
 
 ### How Foundation Models Are Used
-Parachute uses Apple's on-device Foundation Models framework (iOS 26+) to break a task, or the cancellation of a service we don't have curated steps for, into tiny steps.
+Untax uses Apple's on-device Foundation Models framework (iOS 26+) to break a task, or the cancellation of a service we don't have curated steps for, into tiny steps.
 
 *   **On-device, no keys:** the model runs on the phone, so there's no API key in the app and the atomizer's input never leaves the device. It needs an Apple Intelligence-capable device with Apple Intelligence turned on.
 *   **Structured output:** `LanguageModelSession.respond(to:generating:)` returns a `@Generable` `AtomizedSteps` value (at most 8 steps, each with `text` and `seconds`), not free text.
@@ -13,7 +13,7 @@ Parachute uses Apple's on-device Foundation Models framework (iOS 26+) to break 
 
 Prompt, schema, and the on-device quality check: `docs/b0-atomizer-spike.md`.
 
-### Parachute Architecture
+### Unfreeze architecture
 
 ```mermaid
 flowchart TD

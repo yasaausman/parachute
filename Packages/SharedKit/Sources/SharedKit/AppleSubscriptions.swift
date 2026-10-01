@@ -3,7 +3,7 @@ import Foundation
 /// The cancel path for trials billed by Apple (CLAUDE.md rule 8). Used by A's "Cancel it"
 /// screen (A6) and B's Unfreeze engine (B3, `StepSource.appleSubscriptions`).
 public enum AppleSubscriptions {
-    /// Opens the Subscriptions page on iPhone, with a back button to Parachute. Not documented on an
+    /// Opens the Subscriptions page on iPhone, with a back button to the app. Not documented on an
     /// Apple page (checked 2026-09-27), but confirmed on an iPhone on iOS 27 (2026-09-28). `steps` stay as a fallback.
     public static let manageURL = URL(string: "https://apps.apple.com/account/subscriptions")!
 

@@ -23,15 +23,15 @@ Untax is an iOS app with one job: get you from "I should cancel that" to done.
 
 ## How it meets the judging criteria
 
-**1. A clear, useful, original idea.** Trial trackers remind you; task apps list your tasks. Neither helps with the part ADHD makes hard: starting. Untax joins the two. The same "Get unstuck" engine handles a cancellation and a homework deadline, and an alarm that only a decision can end. Research and competitor review: [PLAN.md](https://github.com/yasaausman/parachute/blob/main/PLAN.md).
+**1. A clear, useful, original idea.** Trial trackers remind you; task apps list your tasks. Neither helps with the part ADHD makes hard: starting. Untax joins the two. The same "Get unstuck" engine handles a cancellation and a homework deadline, and an alarm that only a decision can end. Research and competitor review: [PLAN.md](https://github.com/yasaausman/untax/blob/main/PLAN.md).
 
 **2. Meaningful progress toward a working app.** Untax runs end to end on a real iPhone, not as a prototype:
 - The final-day alarm rang through Silent mode and re-armed after Stop, even after the app was force-quit.
 - A real subscription screenshot was read and tracked through the share sheet.
 - A RevenueCat Test Store purchase unlocked Pro.
 - 112 automated tests (72 Swift Testing + 40 XCTest) cover date math, the escalation schedule, alarm re-arming, cancel-step data and AI output validation. All pass.
-- Cancel steps for 4 services (Spotify, Claude, Google AI Pro, Apple One) were checked by hand on real accounts and logged: [cancel-steps-verification.md](https://github.com/yasaausman/parachute/blob/main/docs/cancel-steps-verification.md).
-- Dated device results: [PROJECT.md](https://github.com/yasaausman/parachute/blob/main/PROJECT.md). Tests: [alarm](https://github.com/yasaausman/parachute/blob/main/Packages/MoneyKit/Tests/MoneyKitTests/AlarmTests.swift), [escalation](https://github.com/yasaausman/parachute/blob/main/Packages/MoneyKit/Tests/MoneyKitTests/EscalationTests.swift), [capture](https://github.com/yasaausman/parachute/blob/main/Packages/MoneyKit/Tests/TrialCaptureTests/TrialCaptureTests.swift), [AI output](https://github.com/yasaausman/parachute/blob/main/Packages/ParachuteKit/Tests/ParachuteKitTests/AtomizerOutputTests.swift).
+- Cancel steps for 4 services (Spotify, Claude, Google AI Pro, Apple One) were checked by hand on real accounts and logged: [cancel-steps-verification.md](https://github.com/yasaausman/untax/blob/main/docs/cancel-steps-verification.md).
+- Dated device results: [PROJECT.md](https://github.com/yasaausman/untax/blob/main/PROJECT.md). Tests: [alarm](https://github.com/yasaausman/untax/blob/main/Packages/MoneyKit/Tests/MoneyKitTests/AlarmTests.swift), [escalation](https://github.com/yasaausman/untax/blob/main/Packages/MoneyKit/Tests/MoneyKitTests/EscalationTests.swift), [capture](https://github.com/yasaausman/untax/blob/main/Packages/MoneyKit/Tests/TrialCaptureTests/TrialCaptureTests.swift), [AI output](https://github.com/yasaausman/untax/blob/main/Packages/ParachuteKit/Tests/ParachuteKitTests/AtomizerOutputTests.swift).
 
 **3. Thoughtful use of RevenueCat.** RevenueCat (purchases-ios 5.91.0) powers every purchase and decides what Pro unlocks:
 - The paywall renders the **current offering** with localized prices, so plans and prices change from the dashboard, not an app update.
@@ -39,13 +39,13 @@ Untax is an iOS app with one job: get you from "I should cancel that" to done.
 - Free keeps reminders, hand-checked cancel steps, 5 trials and the first unfreeze step. Pro adds the final-day alarm, unlimited trials and step-by-step help for anything.
 - The headline plan is **$29.99 lifetime** ("no trial to forget"), with $24.99/year and $3.99/month.
 - An app about forgotten trials shouldn't be one: if you start Untax's own trial, it reminds you 24 hours before it ends, using the entitlement's expiration date.
-- Code: [ProEntitlements.swift](https://github.com/yasaausman/parachute/blob/main/Packages/MoneyKit/Sources/MoneyKit/Entitlements/ProEntitlements.swift) · [PaywallView.swift](https://github.com/yasaausman/parachute/blob/main/Packages/MoneyKit/Sources/MoneyKit/Paywall/PaywallView.swift) · [README: How RevenueCat is used](https://github.com/yasaausman/parachute#how-revenuecat-is-used). The Test Store key exists only in Debug builds; Release builds carry no key.
+- Code: [ProEntitlements.swift](https://github.com/yasaausman/untax/blob/main/Packages/MoneyKit/Sources/MoneyKit/Entitlements/ProEntitlements.swift) · [PaywallView.swift](https://github.com/yasaausman/untax/blob/main/Packages/MoneyKit/Sources/MoneyKit/Paywall/PaywallView.swift) · [README: How RevenueCat is used](https://github.com/yasaausman/untax#how-revenuecat-is-used). The Test Store key exists only in Debug builds; Release builds carry no key.
 
 **4. Thoughtful technical and product choices.**
 - **Private by design.** No account, no server, no analytics. Screenshot reading and task steps use Apple's on-device Vision and Foundation Models.
-- **AI that can't invent facts.** The model may only pick prices and dates actually printed in the screenshot; anything else is dropped. AI-written steps never contain links and are labelled "Suggested steps". Every AI path has a non-AI fallback, so the app works on phones without Apple Intelligence. Code: [TrialExtractor.swift](https://github.com/yasaausman/parachute/blob/main/Packages/MoneyKit/Sources/TrialCapture/TrialExtractor.swift) (fact-check), [StepSanitizer.swift](https://github.com/yasaausman/parachute/blob/main/Packages/ParachuteKit/Sources/ParachuteKit/Unfreeze/StepSanitizer.swift) (no links).
-- **An alarm you answer, not dismiss.** Stop runs an App Intent that re-arms the alarm: [DeadlineAlarmIntents.swift](https://github.com/yasaausman/parachute/blob/main/Packages/MoneyKit/Sources/MoneyKit/Alarm/DeadlineAlarmIntents.swift).
-- **Built for ADHD.** One decision per screen, WCAG AA contrast in light and dark mode, Dynamic Type and VoiceOver labels. Design system: [BRAND.md](https://github.com/yasaausman/parachute/blob/main/docs/brand/BRAND.md).
+- **AI that can't invent facts.** The model may only pick prices and dates actually printed in the screenshot; anything else is dropped. AI-written steps never contain links and are labelled "Suggested steps". Every AI path has a non-AI fallback, so the app works on phones without Apple Intelligence. Code: [TrialExtractor.swift](https://github.com/yasaausman/untax/blob/main/Packages/MoneyKit/Sources/TrialCapture/TrialExtractor.swift) (fact-check), [StepSanitizer.swift](https://github.com/yasaausman/untax/blob/main/Packages/ParachuteKit/Sources/ParachuteKit/Unfreeze/StepSanitizer.swift) (no links).
+- **An alarm you answer, not dismiss.** Stop runs an App Intent that re-arms the alarm: [DeadlineAlarmIntents.swift](https://github.com/yasaausman/untax/blob/main/Packages/MoneyKit/Sources/MoneyKit/Alarm/DeadlineAlarmIntents.swift).
+- **Built for ADHD.** One decision per screen, WCAG AA contrast in light and dark mode, Dynamic Type and VoiceOver labels. Design system: [BRAND.md](https://github.com/yasaausman/untax/blob/main/docs/brand/BRAND.md).
 
 ## Honest limits
 Alarms need a real iPhone (iOS 26+). The simulator has no Apple Intelligence, so there the task steps come from hand-written fallback templates. The final-day alarm is a Pro feature. The screenshots use demo data.
@@ -71,8 +71,8 @@ More hand-verified cancel guides, Live Activities for a trial's final hours, and
 swift · swiftui · swiftdata · alarmkit · foundation-models · vision · widgetkit · avfoundation · revenuecat · xcodegen
 
 ## Try it
-The README opens with a criteria → evidence table: https://github.com/yasaausman/parachute#for-judges-criteria--evidence
-Public repo with build steps: https://github.com/yasaausman/parachute (MIT license). Alarms need a real iPhone on iOS 26+; the simulator runs everything else with non-AI fallback steps.
+The README opens with a criteria → evidence table: https://github.com/yasaausman/untax#for-judges-criteria--evidence
+Public repo with build steps: https://github.com/yasaausman/untax (MIT license). Alarms need a real iPhone on iOS 26+; the simulator runs everything else with non-AI fallback steps.
 
 ## Video
 ⚠️ Add the YouTube link after upload.

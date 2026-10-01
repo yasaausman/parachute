@@ -1,8 +1,8 @@
-# PLAN.md: Parachute
+# PLAN.md: Untax (formerly Parachute)
 
-> **The ADHD follow-through engine.** Parachute catches the money deadlines your brain loses, nudges until you act, and when you freeze, on a cancellation or an essay, walks you through one tiny step at a time. **Pull the cord.**
+> **The ADHD follow-through engine.** Untax catches the money deadlines your brain loses, nudges until you act, and when you freeze, on a cancellation or an essay, walks you through one tiny step at a time. **Pull the cord.**
 
-Updated 2026-09-25 · Status: planning complete, ready to build · Team: Dev A (Money) + Dev B (Parachute), see `MILESTONES.md`
+Updated 2026-09-25 · Status: planning complete, ready to build · Team: Dev A (Money) + Dev B (Unfreeze), see `MILESTONES.md`
 **Legend:** ✅ verified at the primary source (§15) · ⚠️ unverified/secondary · ❌ checked and false · 🟡 open decision (§13)
 Research archive: `research/` (original Untax plan + full 44-row audit, Parachute & Friction research, friend's notes)
 
@@ -49,7 +49,7 @@ Research archive: `research/` (original Untax plan + full 44-row audit, Parachut
 | Widget | "Hulu · $17.99 in 3 days" | "Essay · Step 3 of 7" |
 
 **Positioning:** lead with **getting unstuck** (unique), not "track your trials" (crowded; see §2).
-**Taglines:** *"Pull the cord."* · *"Stop paying for forgetting. Stop freezing when it matters."* · *"Every app reminds you. Parachute gets you through it."*
+**Taglines:** *"Pull the cord."* · *"Stop paying for forgetting. Stop freezing when it matters."* · *"Every app reminds you. Untax gets you through it."* · *"Get your ADHD tax back."* (headline since the 2026-09-29 rebrand)
 
 ---
 
@@ -122,7 +122,7 @@ Only real dollars count (cancelled before the charge). No "streak lost" messagin
 
 ## 6. Paywall (Dev A)
 ```
- PARACHUTE PRO: $29.99 lifetime  (also $3.99/mo · $24.99/yr)   [Start 7-day free trial] [Restore]
+ UNTAX PRO: $29.99 lifetime  (also $3.99/mo · $24.99/yr)   [Start 7-day free trial] [Restore]
  Free forever: 5 money deadlines · reminders · curated cancel steps · first step always free
  Pro: unlimited · final-day alarm · AI unfreeze for any service & any task · voice/audio companion
  🔔 "We'll remind you 24 hrs before THIS trial ends too. Because that would be pretty ironic. 😉"
@@ -164,7 +164,7 @@ Contracts: `docs/interfaces.md`. This split means two people rarely edit the sam
 
 ## 9. Project structure
 ```
-parachute/
+untax/                             (repo; code names keep Parachute)
 ├── CLAUDE.md  PLAN.md  MILESTONES.md  PROJECT.md  IDEAS.md  README.md  LICENSE  .gitignore
 ├── Parachute.xcodeproj            (created in Phase 0)
 ├── App/                           composition root, tab bar (Home · Money · Tasks · Scoreboard)
@@ -184,7 +184,7 @@ Structure: hook → two taxes → thesis → money flow with the freeze → task
 README: icon + 3 screenshots · pitch · Mermaid architecture · badges · **"How RevenueCat is used"** · build steps · privacy · MIT. Code: Swift 6.4 strict concurrency · package boundaries respected · tests (date math, escalation, alarm re-arm, CancelSteps validity, atomizer schema) · no secrets · no Test Store key in Release.
 
 ## 12. Team, eligibility, submission
-- **Dev A (you):** Money path (the Untax half). **Dev B (friend):** Parachute (unfreeze + tasks). Details: `MILESTONES.md`.
+- **Dev A (you):** Money path (the Untax half). **Dev B (friend):** Unfreeze (unfreeze + tasks, `ParachuteKit`). Details: `MILESTONES.md`.
 - 🟡 **Representative:** one of you submits on Devpost and allocates any prize.
 - ⚠️ Both confirm: a student/academic email on Devpost; guardian consent if under 18.
 

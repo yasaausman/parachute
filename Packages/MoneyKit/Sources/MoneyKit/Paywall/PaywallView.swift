@@ -186,7 +186,7 @@ public struct PaywallView: View {
             status = packages.isEmpty ? .unavailable : .ready
         } catch {
             status = .unavailable
-            Logger(subsystem: "Parachute", category: "Paywall").error("Offerings failed: \(String(describing: error), privacy: .public)")
+            Logger(subsystem: "Untax", category: "Paywall").error("Offerings failed: \(String(describing: error), privacy: .public)")
         }
     }
 

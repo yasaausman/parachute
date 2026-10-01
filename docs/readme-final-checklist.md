@@ -6,7 +6,7 @@
 - [x] Add the app icon at the top (Untax icon, `docs/brand/untax-icon-1024.png`, 2026-09-29).
 - [x] Added 5 screenshots (`docs/screenshots/`, 1206×2622) and removed the "Screenshots … land with the final submission" line (2026-09-30).
 - [x] Add badges: Swift, iOS 26+, MIT, RevenueCat.
-- [x] Add a "Parachute (unfreeze) architecture" pointer to `docs/readme-dev-b.md`, or paste its diagram.
+- [x] Add an "Unfreeze architecture" pointer to `docs/readme-dev-b.md`, or paste its diagram.
 - [ ] Add a video link (after upload). ✅ "Try it" note added.
   - was: Add a video link and a "Try it" note: AlarmKit needs a real iPhone; the simulator has no Apple Intelligence.
 - [x] Confirm every number is from CLAUDE.md rule 11 (checked 2026-09-30). Never "$1,900/yr", "$15–20k/yr", "thousands a year" or "48%".

@@ -1,3 +1,4 @@
+#if DEBUG
 import Foundation
 import SharedKit
 import SwiftData
@@ -54,3 +55,4 @@ enum DemoData {
         return all.count
     }
 }
+#endif

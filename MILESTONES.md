@@ -150,8 +150,8 @@ Merge. A temporary "I'm frozen" button on a money item opens **B's real Unfreeze
 
 - [ ] **V1 Video** (A records the money segments, B records the unfreeze/task segments; one person edits). Under 2 minutes, captions, device frames. QuickTime is free.
 - [x] **V2 README final:** icon + 5 screenshots (2026-09-30, `docs/screenshots/`) (1206×2622, iPhone 17 Pro simulator) · pitch · architecture · badges · RevenueCat section · build steps · privacy · MIT.
-- [ ] **V3 Code sweep:** no secrets; **Test Store key only in Debug**; no dead code; tests green.
-  *Dev A side done early (2026-09-27):* no keys or team ID in tracked files (only the `test_XXXX` placeholder); Release build's `RevenueCatAPIKey` is empty and the key isn't in the binary; A0 spike code removed (its App Intents were still registered in Release); all tests green (67). ☐ Re-run at the end with Dev B's code.
+- [x] **V3 Code sweep:** no secrets; **Test Store key only in Debug**; no dead code; tests green.
+  *Done (Dev A, 2026-09-30):* no keys tracked, secrets gitignored, Release build has an empty RevenueCat key and no key or debug UI in the binary (Dev A's Debug menu now `#if DEBUG`), no TODO/FIXME, repo public + MIT, all suites green. Re-run tests if anything merges after this.
 - [ ] **V4 Devpost:** description (what it does in the first line), video link, repo link, license visible. **The Representative submits by ~6pm PDT**, leaving hours of buffer before 11:45pm PDT.
   *Done when:* the submission is confirmed and someone who's never seen the app understands it from the video's first 15 seconds.
 

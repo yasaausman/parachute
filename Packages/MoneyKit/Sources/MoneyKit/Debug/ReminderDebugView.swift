@@ -1,3 +1,4 @@
+#if DEBUG
 import AlarmKit
 import SharedKit
 import SwiftData
@@ -205,3 +206,4 @@ public struct MoneyDebugMenu: View {
         }
     }
 }
+#endif
